@@ -1,0 +1,10 @@
+require:
+  - rubocop-defaults
+
+# minitest specifics
+Metrics/MethodLength:
+  Exclude:
+    - test/**/*
+Style/ClassAndModuleChildren:
+  Exclude:
+    - test/**/*

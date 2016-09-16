@@ -1,0 +1,30 @@
+#!/bin/bash
+set -eo pipefail
+IFS=$'\n\t'
+
+gem=${PWD##*/}
+rubies=( "jruby-9.1.5.0" "ruby-2.3.1")
+
+run() {
+  ruby -v
+  bundle install --quiet
+  bundle exec rake test
+}
+
+if command -v rvm 2>/dev/null; then
+  [[ -s "$HOME/.rvm/scripts/rvm" ]] && . "$HOME/.rvm/scripts/rvm" # Load RVM function
+  for r in "${rubies[@]}"
+  do
+    rvm use $r@$gem --create
+    run
+  done
+elif command -v rbenv 2>/dev/null; then
+  for r in "${rubies[@]}"
+  do
+    export RBENV_VERSION=$r
+    run
+  done
+  unset RBENV_VERSION
+else
+  run
+fi
