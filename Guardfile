@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # A sample Guardfile
 # More info at https://github.com/guard/guard#readme
 
@@ -15,19 +16,32 @@
 #
 # and, you'll have to watch "config/Guardfile" instead of "Guardfile"
 
-guard :rubocop do
-  watch(%r{.+\.rb$})
-  watch(%r{(?:.+/)?\.rubocop\.yml$}) { |m| File.dirname(m[0]) }
-end
+group :red_green_refactor, halt_on_fail: true do
+  guard :rspec, cmd: "bundle exec rspec" do
+    require "guard/rspec/dsl"
+    dsl = Guard::RSpec::Dsl.new(self)
 
-guard :minitest do
-  # with Minitest::Unit
-  watch(%r{^test/(.*)\/?test_(.*)\.rb$})
-  watch(%r{^lib/(.*/)?([^/]+)\.rb$})     { |m| "test/#{m[1]}test_#{m[2]}.rb" }
-  watch(%r{^test/test_helper\.rb$})      { "test" }
+    # Feel free to open issues for suggestions and improvements
 
-  # with Minitest::Spec
-  # watch(%r{^spec/(.*)_spec\.rb$})
-  # watch(%r{^lib/(.+)\.rb$})         { |m| "spec/#{m[1]}_spec.rb" }
-  # watch(%r{^spec/spec_helper\.rb$}) { 'spec' }
+    # RSpec files
+    rspec = dsl.rspec
+    watch(rspec.spec_helper) { rspec.spec_dir }
+    watch(rspec.spec_support) { rspec.spec_dir }
+    watch(rspec.spec_files)
+
+    # Ruby files
+    ruby = dsl.ruby
+    dsl.watch_spec_files_for(ruby.lib_files)
+
+    # Turnip features and steps
+    watch(%r{^spec/acceptance/(.+)\.feature$})
+    watch(%r{^spec/acceptance/steps/(.+)_steps\.rb$}) do |m|
+      Dir[File.join("**/#{m[1]}.feature")][0] || "spec/acceptance"
+    end
+  end
+
+  guard :rubocop, all_on_start: false, cli: ["--auto-correct"] do
+    watch(%r{.+\.rb$})
+    watch(%r{(?:.+/)?\.rubocop\.yml$}) { |m| File.dirname(m[0]) }
+  end
 end

@@ -59,6 +59,6 @@ def test_with_ruby(version) {
   bash """
     rvm use ${version}
     ruby -v
-    bundle exec rake test
+    bundle exec rspec spec
   """
 }
