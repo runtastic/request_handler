@@ -14,6 +14,7 @@ Gem::Specification.new do |spec|
   spec.description   = "shared base for request_handler using dry-* gems"
   spec.homepage      = "https://git.example.com/projects/GEM/repos/dry-request_handler"
   spec.license       = "MIT"
+  spec.required_ruby_version = "~> 2.2"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
   # to allow pushing to a single host or delete this section to allow pushing to any host.
@@ -47,6 +48,4 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "guard"
   spec.add_development_dependency "guard-rspec"
   spec.add_development_dependency "guard-rubocop"
-
-  spec.add_development_dependency "pry-byebug"
 end

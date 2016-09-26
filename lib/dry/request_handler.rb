@@ -6,6 +6,8 @@ require "multi_json"
 
 module Dry
   module RequestHandler
+    # TODO: gem_config for global gem config missing, i.e. logger instance of can be passed into gem
+
     class OptionHandler
       def initialize(params:, allowed_options_type:)
         @params = params
@@ -56,10 +58,12 @@ module Dry
       attr_reader :headers
 
       def accept
+        # TODO: move string into constant
         headers.fetch("ACCEPT", nil)
       end
 
       def auth
+        # TODO: move string into constant
         headers.fetch("HTTP_AUTH", nil)
       end
     end
@@ -77,7 +81,7 @@ module Dry
 
       def run
         validator = schema.with(schema_options).call(filter)
-        raise "schema error" if validator.failure?
+        raise "schema error" if validator.failure? # TODO: proper error
         validator.output
       end
 
@@ -86,7 +90,7 @@ module Dry
       attr_reader :filter, :schema, :schema_options
     end
 
-    class BodyHandler
+    class BodyHandler # TODO: shared base with FilterHandler?
       def initialize(request:, schema:, schema_options: {})
         @request = request
         @schema = schema
@@ -95,7 +99,7 @@ module Dry
 
       def run
         validator = schema.with(schema_options).call(flattened_request_body)
-        raise "schema error" if validator.failure?
+        raise "schema error" if validator.failure? # TODO: proper error
         validator.output
       end
 
@@ -157,13 +161,18 @@ module Dry
         if size.zero?
           lookup_nested_config_key("default_size", prefix)
         else
-          max_size = lookup_nested_config_key("max_size", prefix)
-          if max_size
-            [max_size, size.to_i].min
-          else
-            # warning
-            size.to_i
-          end
+          apply_max_size_constraint(size.to_i, prefix)
+        end
+      end
+
+      def apply_max_size_constraint(size, prefix)
+        max_size = lookup_nested_config_key("max_size", prefix)
+        if max_size
+          [max_size, size].min
+        else
+          # TODO: print a warning to make the user add a max_size config
+          # use logger singleton to make use of log levels
+          size
         end
       end
 
@@ -180,6 +189,7 @@ module Dry
 
     class Base
       def self.options(&block)
+        # TODO: see concerns in config getter method
         @config = Confstruct::Configuration.new(&block)
       end
 
@@ -187,15 +197,17 @@ module Dry
         @request = request
       end
 
+      # TODO: memorize
       def filter_params
         FilterHandler.new(
           params:                params,
           schema:                config.lookup!("filter.schema"),
           additional_url_filter: config.lookup!("filter.additional_url_filter"),
-          schema_options: execute_options(config.lookup!("filter.options"))
+          schema_options:        execute_options(config.lookup!("filter.options"))
         ).run
       end
 
+      # TODO: memorize
       def page_params
         PageHandler.new(
           params:      params,
@@ -203,6 +215,7 @@ module Dry
         ).run
       end
 
+      # TODO: memorize
       def include_params
         IncludeOptionHandler.new(
           params:               params,
@@ -210,6 +223,7 @@ module Dry
         ).run
       end
 
+      # TODO: memorize
       def sort_params
         SortOptionHandler.new(
           params:               params,
@@ -217,14 +231,16 @@ module Dry
         ).run
       end
 
+      # TODO: memorize
       def authorization_headers
         AuthorizationHandler.new(env: request.env).run
       end
 
+      # TODO: memorize
       def body_params
         BodyHandler.new(
-          request: request,
-          schema: config.lookup!("body.schema"),
+          request:        request,
+          schema:         config.lookup!("body.schema"),
           schema_options: execute_options(config.lookup!("body.options"))
         ).run
       end
@@ -240,6 +256,10 @@ module Dry
       def execute_options(options)
         return {} if options.nil?
         return options unless options.respond_to?(:call)
+        # TODO: not sure about this yet.
+        # request isn't enough if I want to access body options for filter schema validation w/o reparsing the raw body
+        # handler isn't enough if I want or need to access the raw request (to avoid a dependency loop)
+        # Right now also the user has to take care of not creating a dependency loop between the parts
         options.call(self, request)
       end
 
@@ -247,10 +267,14 @@ module Dry
         @params ||= _deep_transform_keys_in_object(request.params) { |k| k.tr(".", "_") }
       end
 
+      # TODO: make sure this doesn't blow up with inheritence of request_handler classes
+      # maybe overwriting the `inherited` method to dup the parents config?
       def config
         self.class.instance_variable_get("@config")
       end
 
+      # extracted out of active_support
+      # https://github.com/rails/rails/blob/master/activesupport/lib/active_support/core_ext/hash/keys.rb#L143
       def _deep_transform_keys_in_object(object, &block)
         case object
         when Hash

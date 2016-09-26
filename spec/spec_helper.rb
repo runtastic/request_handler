@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 $LOAD_PATH.unshift File.expand_path("../../lib", __FILE__)
 require "dry/request_handler"
-require 'pry'
+require "pry"
 
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|

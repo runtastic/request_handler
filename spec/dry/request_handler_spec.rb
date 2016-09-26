@@ -79,7 +79,7 @@ class IntegrationTestRequestHandlerWithBody < Dry::RequestHandler::Base
                end
              end)
 
-      options(->(_handler, request){ { query_id: request.params["id"] } })
+      options(->(_handler, request) { { query_id: request.params["id"] } })
     end
 
     filter do
@@ -91,14 +91,14 @@ class IntegrationTestRequestHandlerWithBody < Dry::RequestHandler::Base
                required(:id).filled(:str?)
              end)
       additional_url_filter %i(user_id id)
-      options(->(handler, _request){ {body_user_id: handler.body_params[:user_id]} })
+      options(->(handler, _request) { { body_user_id: handler.body_params[:user_id] } })
     end
   end
 
   def to_dto
     OpenStruct.new(
-      body: body_params,
-      filter: filter_params,
+      body:    body_params,
+      filter:  filter_params,
       headers: authorization_headers
     )
   end
@@ -110,6 +110,7 @@ describe Dry::RequestHandler do
   end
 
   def build_mock_request(params:, headers:, body: "")
+    # TODO: check if this double is close enough to a real Rack::Request
     instance_double("Rack::Request", params: params, env: headers, body: StringIO.new(body))
   end
 
@@ -153,7 +154,7 @@ describe Dry::RequestHandler do
 
       params = {
         "user_id" => "awesome_user_id",
-        "id" => "fer342ref"
+        "id"      => "fer342ref"
       }
 
       # api call looks for example like:
@@ -163,16 +164,15 @@ describe Dry::RequestHandler do
       handler = IntegrationTestRequestHandlerWithBody.new(request: request)
       dto = handler.to_dto
 
-      expect(dto.body).to eq( id: "fer342ref",
-                              type: "post",
-                              user_id: "awesome_user_id",
-                              name: "About naming stuff and cache invalidation",
-                              publish_on: Time.iso8601("2016-09-26T12:23:55Z"),
-                              category: {
-                                id: "54",
-                                type: "category"
-                              }
-                            )
+      expect(dto.body).to eq(id:         "fer342ref",
+                             type:       "post",
+                             user_id:    "awesome_user_id",
+                             name:       "About naming stuff and cache invalidation",
+                             publish_on: Time.iso8601("2016-09-26T12:23:55Z"),
+                             category:   {
+                               id:   "54",
+                               type: "category"
+                             })
 
       expect(dto.filter).to eq(id: "fer342ref", user_id: "awesome_user_id")
       expect(dto.headers).to eq(expected_headers)
@@ -182,8 +182,21 @@ describe Dry::RequestHandler do
     it "works" do
       params = {
         "user_id" => "234",
-        "filter"  => { "name" => "foo", "posts.awesome" => "true", "other_param" => "value", "age.gt" => "5", "posts.samples.photos.has_thumbnail" => "false" },
-        "page"    => { "posts.size" => "34", "posts.number" => "2", "number" => "3", "users.size" => "50", "users.number" => "1", "posts.samples.photos.size" => "4" },
+        "filter"  => {
+          "name"                               => "foo",
+          "posts.awesome"                      => "true",
+          "other_param"                        => "value",
+          "age.gt"                             => "5",
+          "posts.samples.photos.has_thumbnail" => "false"
+        },
+        "page"    => {
+          "posts.size"                => "34",
+          "posts.number"              => "2",
+          "number"                    => "3",
+          "users.size"                => "50",
+          "users.number"              => "1",
+          "posts.samples.photos.size" => "4"
+        },
         "include" => "user,groups",
         "sort"    => "name,-age"
       }
@@ -192,22 +205,22 @@ describe Dry::RequestHandler do
       handler = IntegrationTestRequestHandler.new(request: request)
       dto = handler.to_dto
 
-      expect(dto.filter).to eq(user_id: 234,
-                               name: "foo",
-                               posts_awesome: true,
-                               age_gt: 5,
+      expect(dto.filter).to eq(user_id:                            234,
+                               name:                               "foo",
+                               posts_awesome:                      true,
+                               age_gt:                             5,
                                posts_samples_photos_has_thumbnail: false)
 
-      expect(dto.page).to eq(posts_size: 34,
-                             posts_number: 2,
-                             number: 3,
-                             size: 15,
-                             users_size: 40,
-                             users_number: 1,
-                             posts_samples_photos_size: 4,
+      expect(dto.page).to eq(posts_size:                  34,
+                             posts_number:                2,
+                             number:                      3,
+                             size:                        15,
+                             users_size:                  40,
+                             users_number:                1,
+                             posts_samples_photos_size:   4,
                              posts_samples_photos_number: 1,
-                             assets_size: 10,
-                             assets_number: 1)
+                             assets_size:                 10,
+                             assets_number:               1)
 
       expect(dto.include).to eq(%i(user groups))
 
