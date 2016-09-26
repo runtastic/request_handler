@@ -31,16 +31,17 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "dry-validation", "~> 0.9.5"
+  spec.add_dependency "dry-validation", "~> 0.10.0"
   spec.add_dependency "confstruct", "~> 1.0.2"
+  spec.add_dependency "multi_json", "~> 1.12"
 
   spec.add_development_dependency "bundler", "~> 1.13"
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "rspec", "~> 3.5"
   spec.add_development_dependency "fuubar", "~> 2.2"
 
-  spec.add_development_dependency "rubocop_runner", "~> 2.0"
-  spec.add_development_dependency "rubocop-defaults", "~> 2.0.1"
+  spec.add_development_dependency "rubocop_runner"
+  spec.add_development_dependency "rubocop-defaults"
   spec.add_development_dependency "geminabox-release"
 
   spec.add_development_dependency "guard"

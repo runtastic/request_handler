@@ -2,6 +2,7 @@
 require "dry/request_handler/version"
 require "confstruct"
 require "dry-validation"
+require "multi_json"
 
 module Dry
   module RequestHandler
@@ -64,9 +65,10 @@ module Dry
     end
 
     class FilterHandler
-      def initialize(params:, schema:, additional_url_filter:)
+      def initialize(params:, schema:, additional_url_filter:, schema_options: {})
         @filter = params.fetch("filter") { {} }
         @schema = schema
+        @schema_options = schema_options
         Array(additional_url_filter).each do |key|
           key = key.to_s
           @filter[key] = params.fetch(key)
@@ -74,14 +76,55 @@ module Dry
       end
 
       def run
-        validator = schema.call(filter)
+        validator = schema.with(schema_options).call(filter)
         raise "schema error" if validator.failure?
         validator.output
       end
 
       private
 
-      attr_reader :filter, :schema
+      attr_reader :filter, :schema, :schema_options
+    end
+
+    class BodyHandler
+      def initialize(request:, schema:, schema_options: {})
+        @request = request
+        @schema = schema
+        @schema_options = schema_options
+      end
+
+      def run
+        validator = schema.with(schema_options).call(flattened_request_body)
+        raise "schema error" if validator.failure?
+        validator.output
+      end
+
+      private
+
+      def flattened_request_body
+        body = request_body["data"]
+        body.merge!(body.delete("attributes") { {} })
+        relationships = flatten_relationship_resource_linkages(body.delete("relationships") { {} })
+        body.merge!(relationships)
+        body
+      end
+
+      def flatten_relationship_resource_linkages(relationships)
+        relationships.each_with_object({}) do |(k, v), memo|
+          resource_linkage = v["data"]
+          next if resource_linkage.nil?
+          memo[k] = resource_linkage
+        end
+      end
+
+      def request_body # TODO: check if this is the best way to get the body
+        b = request.body
+        b.rewind
+        b = b.read
+        b.empty? ? {} : MultiJson.load(b)
+      end
+
+      attr_reader :request, :schema, :schema_options
     end
 
     class PageHandler
@@ -148,7 +191,8 @@ module Dry
         FilterHandler.new(
           params:                params,
           schema:                config.lookup!("filter.schema"),
-          additional_url_filter: config.lookup!("filter.additional_url_filter")
+          additional_url_filter: config.lookup!("filter.additional_url_filter"),
+          schema_options: execute_options(config.lookup!("filter.options"))
         ).run
       end
 
@@ -177,6 +221,14 @@ module Dry
         AuthorizationHandler.new(env: request.env).run
       end
 
+      def body_params
+        BodyHandler.new(
+          request: request,
+          schema: config.lookup!("body.schema"),
+          schema_options: execute_options(config.lookup!("body.options"))
+        ).run
+      end
+
       # @abstract Subclass is expected to implement #to_dto
       # !method to_dto
       #   take the parsed values and return as application specific data transfer object
@@ -184,6 +236,12 @@ module Dry
       private
 
       attr_reader :request
+
+      def execute_options(options)
+        return {} if options.nil?
+        return options unless options.respond_to?(:call)
+        options.call(self, request)
+      end
 
       def params
         @params ||= _deep_transform_keys_in_object(request.params) { |k| k.tr(".", "_") }
