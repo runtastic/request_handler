@@ -3,6 +3,7 @@ module Dry
   module RequestHandler
     class PageHandler
       def initialize(params:, page_config:)
+        raise ArgumentError if params.nil? || page_config.nil?
         @page_options = params.fetch("page") { {} }
         @config = page_config
       end
@@ -23,7 +24,9 @@ module Dry
       attr_reader :page_options, :config
 
       def extract_number(prefix: nil)
-        Integer(lookup_nested_params_key("number", prefix) || 1)
+        number = Integer(lookup_nested_params_key("number", prefix) || 1)
+        raise ArgumentError unless number.positive? # TODO: Check for non Integer Strings in this Method (Works anyway as Integer also throws an ArgumentError)
+        number
       end
 
       def extract_size(prefix: nil)

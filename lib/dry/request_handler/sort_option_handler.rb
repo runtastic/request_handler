@@ -4,7 +4,7 @@ module Dry
   module RequestHandler
     class SortOptionHandler < OptionHandler
       def run
-        params.fetch("sort") { "" }.split(",").map do |option|
+        sort_options = params.fetch("sort") { "" }.split(",").map do |option|
           name, order = if option.start_with?("-")
                           [option[1..-1], :desc]
                         else
@@ -13,6 +13,8 @@ module Dry
           allowed_options_type.call(name) if allowed_options_type
           { name.to_sym => order }
         end
+        raise ArgumentError unless sort_options.uniq! { |hash| hash.keys[0] }.nil?
+        sort_options
       end
     end
   end

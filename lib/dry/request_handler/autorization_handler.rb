@@ -2,7 +2,10 @@
 module Dry
   module RequestHandler
     class AuthorizationHandler
+      USER_ID_HEADER = "ACCEPT"
+      APP_KEY_HEADER = "HTTP_AUTH"
       def initialize(env:)
+        raise ArgumentError if env.nil?
         @headers = env.select { |k, _v| k.start_with?("HTTP_") }
       end
 
@@ -18,13 +21,11 @@ module Dry
       attr_reader :headers
 
       def accept
-        # TODO: move string into constant
-        headers.fetch("ACCEPT", nil)
+        headers.fetch(USER_ID_HEADER, nil)
       end
 
       def auth
-        # TODO: move string into constant
-        headers.fetch("HTTP_AUTH", nil)
+        headers.fetch(APP_KEY_HEADER, nil)
       end
     end
   end

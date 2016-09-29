@@ -1,17 +1,16 @@
 # frozen_string_literal: true
+require "dry/request_handler/schema_handler"
 module Dry
   module RequestHandler
-    class BodyHandler # TODO: shared base with FilterHandler?
+    class BodyHandler < SchemaHandler  # TODO: shared base with FilterHandler?
       def initialize(request:, schema:, schema_options: {})
+        raise ArgumentError if request.nil? || request.body.nil?
         @request = request
-        @schema = schema
-        @schema_options = schema_options
+        super(schema: schema, schema_options: schema_options)
       end
 
       def run
-        validator = schema.with(schema_options).call(flattened_request_body)
-        raise "schema error" if validator.failure? # TODO: proper error
-        validator.output
+        super(flattened_request_body)
       end
 
       private
@@ -39,7 +38,7 @@ module Dry
         b.empty? ? {} : MultiJson.load(b)
       end
 
-      attr_reader :request, :schema, :schema_options
+      attr_reader :request
     end
   end
 end
