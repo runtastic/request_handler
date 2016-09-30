@@ -86,7 +86,8 @@ describe Dry::RequestHandler::PageHandler do
     expect { handler.run }.to raise_error(ArgumentError)
   end
 
-  it "defaults to the default if the size is not a valid integer string" do # TODO: Ask ANE about the wanted behaviour in this case
+  it "defaults to the default if the size is not a valid integer string" do
+    # TODO: Ask ANE about the wanted behaviour in this case
     params = { "page" => {
       "users_size"   => "asdf",
       "users_number" => "2"

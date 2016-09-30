@@ -25,7 +25,8 @@ module Dry
 
       def extract_number(prefix: nil)
         number = Integer(lookup_nested_params_key("number", prefix) || 1)
-        raise ArgumentError unless number.positive? # TODO: Check for non Integer Strings in this Method (Works anyway as Integer also throws an ArgumentError)
+        raise ArgumentError unless number.positive?
+        # TODO: Check for non Integer Strings in this Method (Works anyway as Integer also throws an ArgumentError)
         number
       end
 
