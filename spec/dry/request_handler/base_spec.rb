@@ -4,17 +4,29 @@ require "dry/request_handler/base"
 
 class Parent < Dry::RequestHandler::Base
   options do
-    option_1 "option_1_parent"
-    option_nested do
-      option_2 "option_2_parent"
+    option_0_o "parent_0_o"
+    option_0_n "parent_0_n"
+    option_1 do
+      option_1_o "parent_1_o"
+      option_1_n "parent_1_n"
+      option_2 do
+        option_2_o "parent_2_o"
+        option_2_n "parent_2_n"
+      end
     end
   end
 end
 class Child < Parent
   options do
-    option_1 "option_1_child"
-    option_nested do
-      option_2 "option_2_child"
+    option_0_o "child_0_o"
+    option_0_c "child_0_c"
+    option_1 do
+      option_1_o "child_1_o"
+      option_1_c "child_1_c"
+      option_2 do
+        option_2_o "child_2_o"
+        option_2_c "child_2_c"
+      end
     end
   end
 end
@@ -48,10 +60,10 @@ describe Dry::RequestHandler::Base do
         end
       end
       expect(Dry::RequestHandler::FilterHandler)
-        .to receive(:new).with(params:                params,
-                               schema:                "schema",
-                               additional_url_filter: "url_filter",
-                               schema_options:        { body_user_id: 1 }).and_return(runstub)
+        .to receive(:new).once.with(params:                params,
+                                    schema:                "schema",
+                                    additional_url_filter: "url_filter",
+                                    schema_options:        { body_user_id: 1 }).and_return(runstub)
       testclass.new(request: request).filter_params
     end
 
@@ -203,23 +215,66 @@ describe Dry::RequestHandler::Base do
                                                                    "nested"  => { "nested_foo_bar" => "test2" })
     end
   end
-  context "inheritance tests" do
-    it "does not override the config ob the base class" do
-      expect(parent.send(:config).lookup!("option_1")).to eq("option_1_parent")
+  context "the parentclass" do
+    it "still has the correct not nested attribute after being inherited" do
+      expect(parent.send(:config).lookup!("option_0_o")).to eq("parent_0_o")
     end
-    it "does not override the nested config of the base class" do
-      expect(parent.send(:config).lookup!("option_nested.option_2")).to eq("option_2_parent")
+    it "still has the correct not nested attribute that is not overwritten after being inherited" do
+      expect(parent.send(:config).lookup!("option_0_n")).to eq("parent_0_n")
     end
-    it "returns the right normal config for the child class" do
-      expect(child.send(:config).lookup!("option_1")).to eq("option_1_child")
+    it "does not have the not nested attribute that was introduced in the child" do
+      expect(parent.send(:config).lookup!("option_0_c")).to eq(nil)
     end
-    it "returns the right nested config for the child class" do
-      expect(child.send(:config).lookup!("option_nested.option_2")).to eq("option_2_child")
+
+    it "still has the correct nested attribute after being inherited" do
+      expect(parent.send(:config).lookup!("option_1.option_1_o")).to eq("parent_1_o")
+    end
+    it "still has the correct nested attribute that is not overwritten after being inherited" do
+      expect(parent.send(:config).lookup!("option_1.option_1_n")).to eq("parent_1_n")
+    end
+    it "does not have the nested attribute that was introduced in the child" do
+      expect(parent.send(:config).lookup!("option_1.option_1_c")).to eq(nil)
+    end
+
+    it "still has the correct double nested attribute after being inherited" do
+      expect(parent.send(:config).lookup!("option_1.option_2.option_2_o")).to eq("parent_2_o")
+    end
+    it "still has the correct double nested attribute that is not overwritten after being inherited" do
+      expect(parent.send(:config).lookup!("option_1.option_2.option_2_n")).to eq("parent_2_n")
+    end
+    it "does not have the double nested attribute that was introduced in the child" do
+      expect(parent.send(:config).lookup!("option_1.option_2.option_2_c")).to eq(nil)
+    end
+  end
+  context "the childclass" do
+    it "overwrites the not nested attribute correctly" do
+      expect(child.send(:config).lookup!("option_0_o")).to eq("child_0_o")
+    end
+    it "doesn't overwrite the not nested attribute that it shoudn't" do
+      expect(child.send(:config).lookup!("option_0_n")).to eq("parent_0_n")
+    end
+    it "has the not nested attribute that was introduced by the child" do
+      expect(child.send(:config).lookup!("option_0_c")).to eq("child_0_c")
+    end
+
+    it "overwrites the nested attribute correctly" do
+      expect(child.send(:config).lookup!("option_1.option_1_o")).to eq("child_1_o")
+    end
+    it "doesn't overwrite the nested attribute that it shoudn't" do
+      expect(child.send(:config).lookup!("option_1.option_1_n")).to eq("parent_1_n")
+    end
+    it "has the nested attribute that was introduced by the child" do
+      expect(child.send(:config).lookup!("option_1.option_1_c")).to eq("child_1_c")
+    end
+
+    it "overwrites the double nested attribute correctly" do
+      expect(child.send(:config).lookup!("option_1.option_2.option_2_o")).to eq("child_2_o")
+    end
+    it "doesn't overwrite the double nested attribute that it shoudn't" do
+      expect(child.send(:config).lookup!("option_1.option_2.option_2_n")).to eq("parent_2_n")
+    end
+    it "has the double nested attribute that was introduced by the child" do
+      expect(child.send(:config).lookup!("option_1.option_2.option_2_c")).to eq("child_2_c")
     end
   end
 end
-
-# Wenn Create immer create und nicht die von update
-# Vererbung übernimmt nicht überschriebene
-
-# TODO: Übernimmt nicht überschriebene. EdgeCases?
