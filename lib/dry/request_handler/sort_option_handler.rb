@@ -5,16 +5,23 @@ module Dry
     class SortOptionHandler < OptionHandler
       def run
         sort_options = params.fetch("sort") { "" }.split(",").map do |option|
-          name, order = if option.start_with?("-")
-                          [option[1..-1], :desc]
-                        else
-                          [option, :asc]
-                        end
-          allowed_options_type.call(name) if allowed_options_type
+          name, order = parse_options(option)
+          allowed_option(name)
           { name.to_sym => order }
         end
         raise ArgumentError unless sort_options.uniq! { |hash| hash.keys[0] }.nil?
         sort_options
+      end
+      def parse_options(option)
+        if option.start_with?("-")
+          [option[1..-1], :desc]
+        else
+          [option, :asc]
+        end
+      end
+
+      def allowed_option(name)
+        allowed_options_type.call(name) if allowed_options_type
       end
     end
   end

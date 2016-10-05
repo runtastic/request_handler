@@ -35,7 +35,6 @@ module Dry
         ).run
       end
 
-      # TODO: memorize
       def page_params
         @page_handler ||= PageHandler.new(
           params:      params,
@@ -43,7 +42,6 @@ module Dry
         ).run
       end
 
-      # TODO: memorize
       def include_params
         @include_params ||= IncludeOptionHandler.new(
           params:               params,
@@ -51,7 +49,6 @@ module Dry
         ).run
       end
 
-      # TODO: memorize
       def sort_params
         @sort_params ||= SortOptionHandler.new(
           params:               params,
@@ -59,12 +56,10 @@ module Dry
         ).run
       end
 
-      # TODO: memorize
       def authorization_headers
         @authorization_headers ||= AuthorizationHandler.new(env: request.env).run
       end
 
-      # TODO: memorize
       def body_params
         @body_params ||= BodyHandler.new(
           request:        request,

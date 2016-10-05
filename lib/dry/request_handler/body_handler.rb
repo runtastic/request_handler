@@ -2,7 +2,7 @@
 require "dry/request_handler/schema_handler"
 module Dry
   module RequestHandler
-    class BodyHandler < SchemaHandler  # TODO: shared base with FilterHandler?
+    class BodyHandler < SchemaHandler
       def initialize(request:, schema:, schema_options: {})
         raise ArgumentError if request.nil? || request.body.nil?
         @request = request
