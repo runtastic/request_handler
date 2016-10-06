@@ -32,6 +32,8 @@ class Child < Parent
 end
 
 describe Dry::RequestHandler::Base do
+  require "support/shared_persistence"
+  require "support/shared_passing"
   let(:params) do
     {
       "url_filter" => "bar"
@@ -43,188 +45,98 @@ describe Dry::RequestHandler::Base do
                     env:    {},
                     body:   StringIO.new("body"))
   end
-  let(:runstub) { double("Handler", run: {foo: "bar"}) }
+  let(:runstub) { double("Handler", run: { foo: "bar" }) }
 
   let(:parent) { Parent.new(request: request) }
   let(:child) { Child.new(request: request) }
-
   context "#filter_params" do
-    it "persists the result and calls the FilterHandler only once for the same instance with a proc" do
-      testclass = Class.new(described_class) do
-        options do
-          filter do
-            schema "schema"
-            additional_url_filter "url_filter"
-            options(->(_handler, _request) { { body_user_id: 1 } })
-          end
-        end
-      end
-      testobject = testclass.new(request: request)
-      expect(Dry::RequestHandler::FilterHandler).to receive(:new).once.and_return(runstub)
-      testobject.filter_params
-      testobject.filter_params
+    let(:expected_result) do
+      {
+        params:                params,
+        schema:                "schema",
+        additional_url_filter: "url_filter",
+        schema_options:        tested_options[:output]
+      }
     end
-    it "does not persist the result between multiple instances with a proc" do
-      testclass = Class.new(described_class) do
-        options do
-          filter do
-            schema "schema"
-            additional_url_filter "url_filter"
-            options(->(_handler, _request) { { body_user_id: 1 } })
+    let(:tested_method)  { :filter_params }
+    let(:tested_handler) { Dry::RequestHandler::FilterHandler }
+
+    context "with a proc as options" do
+      # TODO: find a way to use the test_options inside the new class to save unneccessary code duplication
+      let(:testclass) do
+        Class.new(Dry::RequestHandler::Base) do
+          options do
+            filter do
+              schema "schema"
+              additional_url_filter "url_filter"
+              options(->(_handler, _request) { { body_user_id: 1 } })
+            end
           end
         end
       end
-      testobject1 = testclass.new(request: request)
-      testobject2 = testclass.new(request: request)
-      expect(Dry::RequestHandler::FilterHandler).to receive(:new).twice.and_return(runstub)
-      testobject1.filter_params
-      testobject2.filter_params
-    end
-    it "persists the result and calls the FilterHandler only once for the same instance with a fixed hash" do
-      testclass = Class.new(described_class) do
-        options do
-          filter do
-            schema "schema"
-            additional_url_filter "url_filter"
-            options(body_user_id: 1)
-          end
-        end
-      end
-      testobject = testclass.new(request: request)
-      expect(Dry::RequestHandler::FilterHandler).to receive(:new).once.and_return(runstub)
-      testobject.filter_params
-      testobject.filter_params
-    end
-    it "does not persist the result between multiple instances with a fixed hash" do
-      testclass = Class.new(described_class) do
-        options do
-          filter do
-            schema "schema"
-            additional_url_filter "url_filter"
-            options(body_user_id: 1)
-          end
-        end
-      end
-      testobject1 = testclass.new(request: request)
-      testobject2 = testclass.new(request: request)
-      expect(Dry::RequestHandler::FilterHandler).to receive(:new).twice.and_return(runstub)
-      testobject1.filter_params
-      testobject2.filter_params
-    end
-    it "persists the result and calls the FilterHandler only once for the same instance with nil" do
-      testclass = Class.new(described_class) do
-        options do
-          filter do
-            schema "schema"
-            additional_url_filter "url_filter"
-            options nil
-          end
-        end
-      end
-      testobject = testclass.new(request: request)
-      expect(Dry::RequestHandler::FilterHandler).to receive(:new).once.and_return(runstub)
-      testobject.filter_params
-      testobject.filter_params
-    end
-    it "does not persist the result between multiple instances with nil" do
-      testclass = Class.new(described_class) do
-        options do
-          filter do
-            schema "schema"
-            additional_url_filter "url_filter"
-            options nil
-          end
-        end
-      end
-      testobject1 = testclass.new(request: request)
-      testobject2 = testclass.new(request: request)
-      expect(Dry::RequestHandler::FilterHandler).to receive(:new).twice.and_return(runstub)
-      testobject1.filter_params
-      testobject2.filter_params
-    end
-    it "passes the right arguments with a proc" do
-      testclass = Class.new(described_class) do
-        options do
-          filter do
-            schema "schema"
-            additional_url_filter "url_filter"
-            options(->(_handler, _request) { { body_user_id: 1 } })
-          end
-        end
-      end
-      expect(Dry::RequestHandler::FilterHandler)
-        .to receive(:new).once.with(params:                params,
-                                    schema:                "schema",
-                                    additional_url_filter: "url_filter",
-                                    schema_options:        { body_user_id: 1 }).and_return(runstub)
-      testclass.new(request: request).filter_params
+      let(:tested_options) { { input: ->(_handler, _request) { { body_user_id: 1 } }, output: { body_user_id: 1 } } }
+      it_behaves_like "correct_persistence"
+      it_behaves_like "correct_arguments_passed"
     end
 
-    it "passes the right arguments with nil" do
-      testclass = Class.new(described_class) do
-        options do
-          filter do
-            schema "schema"
-            additional_url_filter "url_filter"
-            options nil
+    context "with a hash options" do
+      let(:testclass) do
+        Class.new(Dry::RequestHandler::Base) do
+          options do
+            filter do
+              schema "schema"
+              additional_url_filter "url_filter"
+              options(foo: "bar")
+            end
           end
         end
       end
-      expect(Dry::RequestHandler::FilterHandler)
-        .to receive(:new).with(params:                params,
-                               schema:                "schema",
-                               additional_url_filter: "url_filter",
-                               schema_options:        {}).and_return(runstub)
-      testclass.new(request: request).filter_params
+      let(:tested_options) { { input: { foo: "bar" }, output: { foo: "bar" } } }
+      it_behaves_like "correct_persistence"
+      it_behaves_like "correct_arguments_passed"
     end
-    it "passes the right arguments with a hash" do
-      testclass = Class.new(described_class) do
-        options do
-          filter do
-            schema "schema"
-            additional_url_filter "url_filter"
-            options(body_user_id: 1)
+
+    context "with nil as options" do
+      let(:testclass) do
+        Class.new(Dry::RequestHandler::Base) do
+          options do
+            filter do
+              schema "schema"
+              additional_url_filter "url_filter"
+              options nil
+            end
           end
         end
       end
-      expect(Dry::RequestHandler::FilterHandler)
-        .to receive(:new).with(params:                params,
-                               schema:                "schema",
-                               additional_url_filter: "url_filter",
-                               schema_options:        { body_user_id: 1 }).and_return(runstub)
-      testclass.new(request: request).filter_params
+      let(:tested_options) { { input: nil, output: {} } }
+      it_behaves_like "correct_persistence"
+      it_behaves_like "correct_arguments_passed"
     end
   end
+
   context "#page_params" do
-    testclass = Class.new(described_class) do
-      options do
-        page do
-          default_size "default_size"
+    let(:testclass) do
+      Class.new(Dry::RequestHandler::Base) do
+        options do
+          page do
+            default_size "default_size"
+          end
         end
       end
     end
-    it "passes the right arguments" do
-      expect(Dry::RequestHandler::PageHandler)
-        .to receive(:new).with(params:      params,
-                               page_config: { default_size: "default_size" }).and_return(runstub)
-      testclass.new(request: request).page_params
+    let(:expected_result) do
+      {
+        params:      params,
+        page_config: { default_size: "default_size" }
+      }
     end
-    it "persists the result and calls the PageHandler only once for the same instance" do
-      testobject = testclass.new(request: request)
-      expect(Dry::RequestHandler::PageHandler)
-        .to receive(:new).once.and_return(runstub)
-      testobject.page_params
-      testobject.page_params
-    end
-    it "does not persist the result between multiple instances" do
-      testobject1 = testclass.new(request: request)
-      testobject2 = testclass.new(request: request)
-      expect(Dry::RequestHandler::PageHandler)
-        .to receive(:new).twice.and_return(runstub)
-      testobject1.page_params
-      testobject2.page_params
-    end
+    let(:tested_method)  { :page_params }
+    let(:tested_handler) { Dry::RequestHandler::PageHandler }
+    it_behaves_like "correct_persistence"
+    it_behaves_like "correct_arguments_passed"
   end
+
+  # Rework not done after this line, review mostly irrelevant, except for the inheritance stuff in the bottom
   context "#include_params" do
     testclass = Class.new(described_class) do
       options do

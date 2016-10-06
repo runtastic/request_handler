@@ -20,7 +20,7 @@ module Dry
           subclass.config = @config.deep_copy
         end
 
-        attr_writer :config
+        attr_accessor :config
       end
       def initialize(request:)
         @request = request

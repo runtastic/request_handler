@@ -12,6 +12,7 @@ module Dry
         raise ArgumentError unless sort_options.uniq! { |hash| hash.keys[0] }.nil?
         sort_options
       end
+
       def parse_options(option)
         if option.start_with?("-")
           [option[1..-1], :desc]
