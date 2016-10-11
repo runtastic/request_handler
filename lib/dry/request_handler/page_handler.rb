@@ -26,16 +26,27 @@ module Dry
       def extract_number(prefix: nil)
         number = Integer(lookup_nested_params_key("number", prefix) || 1)
         raise ArgumentError unless number.positive?
-        # TODO: Check for non Integer Strings in this Method (Works anyway as Integer also throws an ArgumentError)
         number
+      rescue ArgumentError # For future error change
+        raise ArgumentError
       end
 
       def extract_size(prefix: nil)
-        size = lookup_nested_params_key("size", prefix).to_i
-        if size.zero?
-          lookup_nested_config_key("default_size", prefix)
-        else
-          apply_max_size_constraint(size.to_i, prefix)
+        size = fetch_and_check_size(prefix)
+        return lookup_nested_config_key("default_size", prefix) if size.nil? || size.zero?
+        apply_max_size_constraint(size, prefix)
+      end
+
+      def fetch_and_check_size(prefix)
+        size_string = lookup_nested_params_key("size", prefix)
+        unless size_string.nil?
+          begin
+            size = Integer(size_string)
+            raise ArgumentError if size.negative?
+            size
+          rescue TypeError
+            raise ArgumentError
+          end
         end
       end
 

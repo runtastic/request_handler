@@ -1,63 +1,82 @@
 # frozen_string_literal: true
 require "spec_helper"
 require "dry/request_handler/filter_handler"
-describe Dry::RequestHandler::FilterHandler do
-  it "generates the right output with one normal filter" do
-    params = { "filter" => {
-      "name" => "foo"
-    } }
-    schema = Dry::Validation.Schema do
-      required("name").filled
-    end
-    output = {
-      "name" => "foo"
-    }
-    handler = described_class.new(schema: schema, params: params, additional_url_filter: {})
-    expect(handler.run).to eq(output)
-  end
-  it "generates the right output with one additional_url_filter" do
-    params = {
-      "name" => "foo"
-    }
-    additional_url_filter = ["name"]
-    schema = Dry::Validation.Schema do
-      required("name").filled
-    end
-    output = {
-      "name" => "foo"
-    }
+shared_examples "proccesses the filters correctly" do
+  it "outputs the filters in a flat way" do
     handler = described_class.new(schema: schema, params: params, additional_url_filter: additional_url_filter)
     expect(handler.run).to eq(output)
   end
-  it "generates the right output with one additional_url_filter and one normal filter" do
-    params = {
-      "name"   => "foo",
-      "filter" => {
+end
+describe Dry::RequestHandler::FilterHandler do
+  let(:additional_url_filter) { [] }
+  # generates the right output with one normal filter
+  it_behaves_like "proccesses the filters correctly" do
+    let(:params) do
+      { "filter" => { "name" => "foo" } }
+    end
+    let(:schema) do
+      Dry::Validation.Schema do
+        required("name").filled
+      end
+    end
+    let(:output)  do
+      { "name" => "foo" }
+    end
+  end
+
+  # generates the right output with one additional_url_filter
+  it_behaves_like "proccesses the filters correctly" do
+    let(:params) do
+      {
+        "name" => "foo"
+      }
+    end
+    let(:additional_url_filter) { ["name"] }
+    let(:schema) do
+      Dry::Validation.Schema do
+        required("name").filled
+      end
+    end
+    let(:output) do
+      {
+        "name" => "foo"
+      }
+    end
+  end
+
+  # generates the right output with one additional_url_filter and one normal filter
+  it_behaves_like "proccesses the filters correctly" do
+    let(:params) do
+      {
+        "name"   => "foo",
+        "filter" => {
+          "test" => "bar"
+        }
+      }
+    end
+    let(:additional_url_filter) { ["name"] }
+    let(:schema) do
+      Dry::Validation.Schema do
+        required("name").filled
+        required("test").filled
+      end end
+    let(:output) do
+      {
+        "name" => "foo",
         "test" => "bar"
       }
-    }
-    additional_url_filter = ["name"]
-    schema = Dry::Validation.Schema do
-      required("name").filled
-      required("test").filled
     end
-    output = {
-      "name" => "foo",
-      "test" => "bar"
-    }
-    handler = described_class.new(schema: schema, params: params, additional_url_filter: additional_url_filter)
-    expect(handler.run).to eq(output)
   end
-  it "outputs nothing with no filter set" do
-    params = {
-      "filter" => {
+
+  # outputs nothing with no filter set
+  it_behaves_like "proccesses the filters correctly" do
+    let(:params) do
+      {
+        "filter" => {
+        }
       }
-    }
-    schema = Dry::Validation.Schema do
     end
-    output = {
-    }
-    handler = described_class.new(schema: schema, params: params, additional_url_filter: [])
-    expect(handler.run).to eq(output)
+    let(:schema) { Dry::Validation.Schema {} }
+    let(:output) { {} }
   end
 end

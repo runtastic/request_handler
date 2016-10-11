@@ -8,13 +8,14 @@ module Dry
         @schema_options = schema_options
       end
 
-      def run(data)
+      private
+
+      def validate_schema(data)
+        raise ArgumentError if data.nil?
         validator = schema.with(schema_options).call(data) # TODO: Check for performance impact
         raise "schema error" if validator.failure? # TODO: proper error
         validator.output
       end
-
-      private
 
       attr_reader :schema, :schema_options
     end

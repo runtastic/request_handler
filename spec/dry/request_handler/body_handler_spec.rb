@@ -1,18 +1,27 @@
 # frozen_string_literal: true
 require "spec_helper"
 require "dry/request_handler/body_handler"
+shared_examples "flattens the body as expected" do
+  it "returns the flattend body" do
+    handler = described_class.new(schema: schema, request: build_mock_request(params: {}, headers: {}, body: raw_body))
+    expect(handler).to receive(:validate_schema).with(wanted_result)
+    handler.run
+  end
+end
 describe Dry::RequestHandler::BodyHandler do
+  let(:schema) { Dry::Validation.JSON {} }
   def build_mock_request(params:, headers:, body: "")
     # TODO: check if this double is close enough to a real Rack::Request
     instance_double("Rack::Request", params: params, env: headers, body: StringIO.new(body))
   end
-  schema = Dry::Validation.JSON {}
-  it "flattens the body correctly with one relationship" do
-    raw_body = <<~JSON
+  # flattens the body correctly with one relationships
+  it_behaves_like "flattens the body as expected" do
+    let(:raw_body) do
+      <<~JSON
       {
         "data": {
-          "type": "post",
           "id": "fer342ref",
+          "type": "post",
           "attributes": {
             "user_id": "awesome_user_id",
             "name": "About naming stuff and cache invalidation",
@@ -20,39 +29,34 @@ describe Dry::RequestHandler::BodyHandler do
           },
           "relationships":{
             "category": {
-                "data":
-                  { "id": "54", "type": "category" }
+              "data": {
+                "id": "54",
+                "type": "category"
+              }
             }
           }
         }
       }
     JSON
-    wanted_result = { id:         "fer342ref",
-                      type:       "post",
-                      user_id:    "awesome_user_id",
-                      name:       "About naming stuff and cache invalidation",
-                      publish_on: Time.iso8601("2016-09-26T12:23:55Z"),
-                      category:   {
-                        id:   "54",
-                        type: "category"
-                      } }
-    schema = Dry::Validation.JSON do
-      required(:id).filled(:str?)
-      required(:type).value(eql?: "post")
-      required(:user_id).filled(:str?)
-      required(:name).filled(:str?)
-      optional(:publish_on).filled(:time?)
-
-      required(:category).schema do
-        required(:id).filled(:str?)
-        required(:type).value(eql?: "category")
-      end
     end
-    test = described_class.new(schema: schema, request: build_mock_request(params: {}, headers: {}, body: raw_body))
-    expect(test.run).to eq(wanted_result)
+    let(:wanted_result) do
+      {
+        "id"         => "fer342ref",
+        "type"       => "post",
+        "user_id"    => "awesome_user_id",
+        "name"       => "About naming stuff and cache invalidation",
+        "publish_on" => "2016-09-26T12:23:55Z",
+        "category"   => {
+          "id"   => "54",
+          "type" => "category"
+        }
+      }
+    end
   end
-  it "flattens the body correctly with multiple relationships" do
-    raw_body = <<~JSON
+  # flattens the body correctly with multiple relationships
+  it_behaves_like "flattens the body as expected" do
+    let(:raw_body) do
+      <<~JSON
       {
         "data": {
           "type": "post",
@@ -64,51 +68,95 @@ describe Dry::RequestHandler::BodyHandler do
           },
           "relationships":{
             "category": {
-                "data":
-                  { "id": "54", "type": "category" }
+              "data": {
+                "id": "54",
+                "type": "category"
+              }
             },
             "comments": {
-                "data":
-                  { "id": "1", "type": "comment" }
+              "data": {
+                "id": "1",
+                "type": "comment"
+              }
             }
           }
         }
       }
     JSON
-    wanted_result = { id:         "fer342ref",
-                      type:       "post",
-                      user_id:    "awesome_user_id",
-                      name:       "About naming stuff and cache invalidation",
-                      publish_on: Time.iso8601("2016-09-26T12:23:55Z"),
-                      category:   {
-                        id:   "54",
-                        type: "category"
-                      },
-                      comments:   {
-                        id:   "1",
-                        type: "comment"
-                      } }
-    schema = Dry::Validation.JSON do
-      required(:id).filled(:str?)
-      required(:type).value(eql?: "post")
-      required(:user_id).filled(:str?)
-      required(:name).filled(:str?)
-      optional(:publish_on).filled(:time?)
-
-      required(:category).schema do
-        required(:id).filled(:str?)
-        required(:type).value(eql?: "category")
-      end
-      required(:comments).schema do
-        required(:id).filled(:str?)
-        required(:type).value(eql?: "comment")
-      end
     end
-    test = described_class.new(schema: schema, request: build_mock_request(params: {}, headers: {}, body: raw_body))
-    expect(test.run).to eq(wanted_result)
+    let(:wanted_result) do
+      {
+        "id"         => "fer342ref",
+        "type"       => "post",
+        "user_id"    => "awesome_user_id",
+        "name"       => "About naming stuff and cache invalidation",
+        "publish_on" => "2016-09-26T12:23:55Z",
+        "category"   => {
+          "id"   => "54",
+          "type" => "category"
+        },
+        "comments"   => {
+          "id"   => "1",
+          "type" => "comment"
+        }
+      }
+    end
   end
-  it "flattens the body correctly without relationships" do
-    raw_body = <<~JSON
+  # flattens the body correctly with an array in a relationship
+  it_behaves_like "flattens the body as expected" do
+    let(:raw_body) do
+      <<~JSON
+      {
+        "data": {
+          "id": "fer342ref",
+          "type": "post",
+          "attributes": {
+            "user_id": "awesome_user_id",
+            "name": "About naming stuff and cache invalidation",
+            "publish_on": "2016-09-26T12:23:55Z"
+          },
+          "relationships":{
+            "category": {
+              "data": [
+                {
+                  "id": "54",
+                  "type": "category"
+                },
+                {
+                  "id": "55",
+                  "type": "category2"
+                }
+              ]
+            }
+          }
+        }
+      }
+    JSON
+    end
+    let(:wanted_result) do
+      {
+        "id"         => "fer342ref",
+        "type"       => "post",
+        "user_id"    => "awesome_user_id",
+        "name"       => "About naming stuff and cache invalidation",
+        "publish_on" => "2016-09-26T12:23:55Z",
+        "category"   => [
+          {
+            "id"   => "54",
+            "type" => "category"
+          },
+          {
+            "id"   => "55",
+            "type" => "category2"
+          }
+        ]
+      }
+    end
+  end
+  # flattens the body correctly without relationships
+  it_behaves_like "flattens the body as expected" do
+    let(:raw_body) do
+      <<~JSON
       {
         "data": {
           "type": "post",
@@ -121,60 +169,84 @@ describe Dry::RequestHandler::BodyHandler do
         }
       }
     JSON
-    wanted_result = { id:         "fer342ref",
-                      type:       "post",
-                      user_id:    "awesome_user_id",
-                      name:       "About naming stuff and cache invalidation",
-                      publish_on: Time.iso8601("2016-09-26T12:23:55Z") }
-    schema = Dry::Validation.JSON do
-      required(:id).filled(:str?)
-      required(:type).value(eql?: "post")
-      required(:user_id).filled(:str?)
-      required(:name).filled(:str?)
-      optional(:publish_on).filled(:time?)
     end
-    test = described_class.new(schema: schema, request: build_mock_request(params: {}, headers: {}, body: raw_body))
-    expect(test.run).to eq(wanted_result)
+    let(:wanted_result) do
+      {
+        "id"         => "fer342ref",
+        "type"       => "post",
+        "user_id"    => "awesome_user_id",
+        "name"       => "About naming stuff and cache invalidation",
+        "publish_on" => "2016-09-26T12:23:55Z"
+      }
+    end
   end
-  it "flattens the body correctly without attributes" do
-    raw_body = <<~JSON
+
+  # flattens the body correctly without relationships and with different types of Inputs
+  it_behaves_like "flattens the body as expected" do
+    let(:raw_body) do
+      <<~JSON
+      {
+        "data": {
+          "type": "post",
+          "id": "fer342ref",
+          "attributes": {
+            "user_id": 2,
+            "name": [1 ,2, 3],
+            "published": false
+          }
+        }
+      }
+    JSON
+    end
+    let(:wanted_result) do
+      {
+        "id"        => "fer342ref",
+        "type"      => "post",
+        "user_id"   => 2,
+        "name"      => [1, 2, 3],
+        "published" => false
+      }
+    end
+  end
+  # flattens the body correctly without attributes
+  it_behaves_like "flattens the body as expected" do
+    let(:raw_body) do
+      <<~JSON
       {
         "data": {
           "type": "post",
           "id": "fer342ref",
           "relationships":{
             "category": {
-                "data":
-                  { "id": "54", "type": "category" }
+              "data": {
+                "id": "54",
+                "type": "category"
+              }
             }
           }
         }
       }
     JSON
-    wanted_result = { id:       "fer342ref",
-                      type:     "post",
-                      category: {
-                        id:   "54",
-                        type: "category"
-                      } }
-    schema = Dry::Validation.JSON do
-      required(:id).filled(:str?)
-      required(:type).value(eql?: "post")
-
-      required(:category).schema do
-        required(:id).filled(:str?)
-        required(:type).value(eql?: "category")
-      end
     end
-    test = described_class.new(schema: schema, request: build_mock_request(params: {}, headers: {}, body: raw_body))
-    expect(test.run).to eq(wanted_result)
+    let(:wanted_result) do
+      {
+        "id"       => "fer342ref",
+        "type"     => "post",
+        "category" => {
+          "id"   => "54",
+          "type" => "category"
+        }
+      }
+    end
   end
 
   it "fails if the request is nil" do
+    schema = Dry::Validation.JSON {}
     expect { described_class.new(schema: schema, request: nil) }.to raise_error(ArgumentError)
   end
 
   it "fails if the request body is nil" do
+    schema = Dry::Validation.JSON {}
     expect do
       described_class.new(schema:  schema,
                           request: instance_double("Rack::Request", params: {}, env: {}, body: nil))

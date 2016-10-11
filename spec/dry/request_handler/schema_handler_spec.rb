@@ -1,58 +1,68 @@
 # frozen_string_literal: true
 require "spec_helper"
 require "dry/request_handler/schema_handler"
+shared_examples "handles valid input data correctly" do
+  it "genrates the expected output with valid input and without schema options" do
+    handler = testclass.new(schema: schema_without_options, data: data)
+    expect(handler.run).to eq(data)
+  end
+  it "genrates the expected output with valid input and with schema options" do
+    handler = testclass.new(schema: schema_with_options, schema_options: { testoption: 5 },  data: data)
+    expect(handler.run).to eq(data)
+  end
+end
+shared_examples "handles invalid input data correctly" do
+  it "raises an error with invalid input and without schema options" do
+    handler = testclass.new(schema: schema_without_options, data: data)
+    expect { handler.run }.to raise_error # TODO: Add Real Error here
+  end
+  it "raises an error with invalid input and with schema options" do
+    handler = testclass.new(schema: schema_without_options, schema_options: { testoption: 5 }, data: data)
+    expect { handler.run }.to raise_error # TODO: Add Real Error here
+  end
+end
 describe Dry::RequestHandler::SchemaHandler do
-  let(:schema) do
+  let(:schema_without_options) do
     Dry::Validation.Schema do
       required(:test1).filled
       required(:test2).filled
+    end
+  end
+  let(:schema_with_options) do
+    Dry::Validation.Schema do
+      configure do
+        option :testoption
+      end
+      required(:test1).filled
+      required(:test2).value(eql?: testoption)
+    end
+  end
+  let(:testclass) do
+    Class.new(described_class) do
+      def initialize(schema:, schema_options: {}, data: nil)
+        super(schema: schema, schema_options: schema_options)
+        @data = data
+      end
+
+      def run
+        validate_schema(@data)
+      end
     end
   end
   it "fails if schema is nil" do
     expect { described_class.new(schema: nil) }.to raise_error(ArgumentError)
   end
   it "fails if schema_options is nil" do
-    expect { described_class.new(schema: schema, schema_options: nil) }.to raise_error(ArgumentError)
+    expect { described_class.new(schema: schema_without_options, schema_options: nil) }.to raise_error(ArgumentError)
   end
-  context("without options") do
-    it "generates the expected output with a valid input" do
-      valid_input = { test1: "t1", test2: "t2" }
-      handler = described_class.new(schema: schema)
-      expect(handler.run(valid_input)).to eq(valid_input)
-    end
 
-    it "fails with an invalid input" do
-      invalid_input = { test1: "t1" }
-      handler = described_class.new(schema: schema)
-      expect { handler.run(invalid_input) }.to raise_error(RuntimeError) # TODO: Add Real Error here
-    end
-    it "fails if schema is nil" do
-      expect { described_class.new(schema: nil) }.to raise_error(ArgumentError)
-    end
-    it "fails if schema_options is nil" do
-      expect { described_class.new(schema: schema, schema_options: nil) }.to raise_error(ArgumentError)
-    end
+  it_behaves_like "handles valid input data correctly" do
+    let(:data) { { test1: "t1", test2: 5 } }
   end
-  context("with options") do
-    let(:schema) do
-      Dry::Validation.Schema do
-        configure do
-          option :testoption
-        end
-        required(:test1).filled
-        required(:test2).value(eql?: testoption)
-      end
-    end
-    it "generates the expected output with a valid input" do
-      valid_input = { test1: "t1", test2: 5 }
-      handler = described_class.new(schema: schema, schema_options: { testoption: 5 })
-      expect(handler.run(valid_input)).to eq(valid_input)
-    end
-
-    it "fails with no options given and an invalid input" do
-      invalid_input = { test1: "t1", test2: 1  }
-      handler = described_class.new(schema: schema, schema_options: { testoption: 5 })
-      expect { handler.run(invalid_input) }.to raise_error(RuntimeError) # TODO: Add Real Error here
-    end
+  it_behaves_like "handles invalid input data correctly" do
+    let(:data) { { test1: "t1" } }
+  end
+  it_behaves_like "handles invalid input data correctly" do
+    let(:data) { nil }
   end
 end

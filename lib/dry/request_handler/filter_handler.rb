@@ -13,7 +13,7 @@ module Dry
       end
 
       def run
-        super(filter)
+        validate_schema(filter)
       end
 
       private

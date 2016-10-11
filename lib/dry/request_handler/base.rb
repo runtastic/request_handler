@@ -3,7 +3,7 @@ require "dry/request_handler/filter_handler"
 require "dry/request_handler/page_handler"
 require "dry/request_handler/include_option_handler"
 require "dry/request_handler/sort_option_handler"
-require "dry/request_handler/autorization_handler"
+require "dry/request_handler/authorization_handler"
 require "dry/request_handler/body_handler"
 require "confstruct"
 module Dry

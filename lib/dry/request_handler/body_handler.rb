@@ -4,13 +4,13 @@ module Dry
   module RequestHandler
     class BodyHandler < SchemaHandler
       def initialize(request:, schema:, schema_options: {})
+        super(schema: schema, schema_options: schema_options)
         raise ArgumentError if request.nil? || request.body.nil?
         @request = request
-        super(schema: schema, schema_options: schema_options)
       end
 
       def run
-        super(flattened_request_body)
+        validate_schema(flattened_request_body)
       end
 
       private
@@ -31,7 +31,7 @@ module Dry
         end
       end
 
-      def request_body # TODO: check if this is the best way to get the body
+      def request_body # TODO: check if this is the best way to get the body -> Commonly used this way
         b = request.body
         b.rewind
         b = b.read

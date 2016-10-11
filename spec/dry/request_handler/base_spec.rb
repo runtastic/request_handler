@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 require "spec_helper"
 require "dry/request_handler/base"
-require "support/shared_persistence"
-require "support/shared_passing"
 
 class Parent < Dry::RequestHandler::Base
   options do
