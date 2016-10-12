@@ -32,7 +32,7 @@ describe Dry::RequestHandler::PageHandler do
       end
     end
   end
-  # reads the page from the params if it is below the limit
+  # reads the size from the params if it is below the limit
   it_behaves_like "uses the right values for page and size" do
     let(:params) do
       {

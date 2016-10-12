@@ -55,6 +55,11 @@ describe Dry::RequestHandler::SortOptionHandler do
     let(:params) { { "sort" => "id,id" } }
     let(:error) { ArgumentError }
   end
+  # fails if one of the sort keys contains spaces
+  it_behaves_like "processes invalid sort options correctly" do
+    let(:params) { { "sort" => "id, foo" } }
+    let(:error) { ArgumentError }
+  end
   # raises an contraint error if the option is not allowed
   it_behaves_like "processes invalid sort options correctly" do
     let(:params) { { "sort" => "user" } }

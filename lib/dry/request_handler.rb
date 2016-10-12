@@ -7,6 +7,13 @@ require "multi_json"
 
 module Dry
   module RequestHandler
-    # TODO: gem_config for global gem config missing, i.e. logger instance of can be passed into gem
+    class << self
+      def configure(&block)
+        @configuration ||= ::Confstruct::Configuration.new
+        @configuration.configure(&block)
+      end
+      attr_accessor :configuration
+    end
+    # require ::File.expand_path("../../config/environments/#{ENV['ENVIRONMENT']}",  __FILE__)
   end
 end

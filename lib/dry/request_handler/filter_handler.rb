@@ -8,6 +8,7 @@ module Dry
         super(schema: schema, schema_options: schema_options)
         Array(additional_url_filter).each do |key|
           key = key.to_s
+          raise ArgumentError unless @filter[key].nil?
           @filter[key] = params.fetch(key)
         end
       end

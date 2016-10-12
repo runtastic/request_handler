@@ -79,4 +79,30 @@ describe Dry::RequestHandler::FilterHandler do
     let(:schema) { Dry::Validation.Schema {} }
     let(:output) { {} }
   end
+
+  # outputs nothing without the filter hash
+  it_behaves_like "proccesses the filters correctly" do
+    let(:params) do
+      {
+      }
+    end
+    let(:schema) { Dry::Validation.Schema {} }
+    let(:output) { {} }
+  end
+
+  it "fails for a filter that was set twice" do
+    params =
+      {
+        "name"   => "foo",
+        "filter" => {
+          "name" => "bar"
+        }
+      }
+    additional_url_filter = ["name"]
+    schema = Dry::Validation.Schema do
+      required("name").filled
+    end
+    expect { described_class.new(schema: schema, params: params, additional_url_filter: additional_url_filter) }
+      .to raise_error(ArgumentError)
+  end
 end

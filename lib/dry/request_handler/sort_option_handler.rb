@@ -14,6 +14,7 @@ module Dry
       end
 
       def parse_options(option)
+        raise ArgumentError if option.include? " "
         if option.start_with?("-")
           [option[1..-1], :desc]
         else

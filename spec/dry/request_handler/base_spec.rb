@@ -33,7 +33,7 @@ end
 
 shared_examples "correct_arguments_passed" do
   it "passes the right arguments to the handler" do
-    expect(tested_handler).to receive(:new).with(expected_result).and_return(runstub)
+    expect(tested_handler).to receive(:new).with(expected_args).and_return(runstub)
     testclass.new(request: request).send(tested_method)
   end
 end
@@ -71,7 +71,19 @@ describe Dry::RequestHandler::Base do
   let(:parent) { Parent.new(request: request) }
   let(:child) { Child.new(request: request) }
   context "#filter_params" do
-    let(:expected_result) do
+    let(:testclass) do
+      opts = tested_options[:input]
+      Class.new(Dry::RequestHandler::Base) do
+        options do
+          filter do
+            schema "schema"
+            additional_url_filter "url_filter"
+            options(opts)
+          end
+        end
+      end
+    end
+    let(:expected_args) do
       {
         params:                params,
         schema:                "schema",
@@ -83,54 +95,18 @@ describe Dry::RequestHandler::Base do
     let(:tested_handler) { Dry::RequestHandler::FilterHandler }
 
     context "with a proc as options" do
-      # TODO: find a way to use the test_options inside the new class to save unneccessary code duplication
-      let(:testclass) do
-        Class.new(Dry::RequestHandler::Base) do
-          options do
-            filter do
-              schema "schema"
-              additional_url_filter "url_filter"
-              options(->(_handler, _request) { { body_user_id: 1 } })
-            end
-          end
-        end
-      end
       let(:tested_options) { { input: ->(_handler, _request) { { body_user_id: 1 } }, output: { body_user_id: 1 } } }
       it_behaves_like "correct_persistence"
       it_behaves_like "correct_arguments_passed"
     end
 
     context "with a hash options" do
-      # TODO: find a way to use the test_options inside the new class to save unneccessary code duplication
-      let(:testclass) do
-        Class.new(Dry::RequestHandler::Base) do
-          options do
-            filter do
-              schema "schema"
-              additional_url_filter "url_filter"
-              options(foo: "bar")
-            end
-          end
-        end
-      end
       let(:tested_options) { { input: { foo: "bar" }, output: { foo: "bar" } } }
       it_behaves_like "correct_persistence"
       it_behaves_like "correct_arguments_passed"
     end
 
     context "with nil as options" do
-      # TODO: find a way to use the test_options inside the new class to save unneccessary code duplication
-      let(:testclass) do
-        Class.new(Dry::RequestHandler::Base) do
-          options do
-            filter do
-              schema "schema"
-              additional_url_filter "url_filter"
-              options nil
-            end
-          end
-        end
-      end
       let(:tested_options) { { input: nil, output: {} } }
       it_behaves_like "correct_persistence"
       it_behaves_like "correct_arguments_passed"
@@ -147,7 +123,7 @@ describe Dry::RequestHandler::Base do
         end
       end
     end
-    let(:expected_result) do
+    let(:expected_args) do
       {
         params:      params,
         page_config: { default_size: "default_size" }
@@ -169,7 +145,7 @@ describe Dry::RequestHandler::Base do
         end
       end
     end
-    let(:expected_result) do
+    let(:expected_args) do
       {
         params:               params,
         allowed_options_type: "allowed_options"
@@ -191,7 +167,7 @@ describe Dry::RequestHandler::Base do
         end
       end
     end
-    let(:expected_result) do
+    let(:expected_args) do
       {
         params:               params,
         allowed_options_type: "allowed_options"
@@ -213,7 +189,7 @@ describe Dry::RequestHandler::Base do
         end
       end
     end
-    let(:expected_result) do
+    let(:expected_args) do
       {
         env: request.env
       }
@@ -225,7 +201,19 @@ describe Dry::RequestHandler::Base do
   end
 
   context "#body_params" do
-    let(:expected_result) do
+    # TODO: find a way to use the test_options inside the new class to save unneccessary code duplication
+    let(:testclass) do
+      opts = tested_options[:input]
+      Class.new(Dry::RequestHandler::Base) do
+        options do
+          body do
+            schema "schema"
+            options(opts)
+          end
+        end
+      end
+    end
+    let(:expected_args) do
       {
         request:        request,
         schema:         "schema",
@@ -236,51 +224,18 @@ describe Dry::RequestHandler::Base do
     let(:tested_handler) { Dry::RequestHandler::BodyHandler }
 
     context "with a proc as options" do
-      # TODO: find a way to use the test_options inside the new class to save unneccessary code duplication
-      let(:testclass) do
-        Class.new(Dry::RequestHandler::Base) do
-          options do
-            body do
-              schema "schema"
-              options(->(_handler, _request) { { body_user_id: 1 } })
-            end
-          end
-        end
-      end
       let(:tested_options) { { input: ->(_handler, _request) { { body_user_id: 1 } }, output: { body_user_id: 1 } } }
       it_behaves_like "correct_persistence"
       it_behaves_like "correct_arguments_passed"
     end
 
     context "with a hash as options" do
-      # TODO: find a way to use the test_options inside the new class to save unneccessary code duplication
-      let(:testclass) do
-        Class.new(Dry::RequestHandler::Base) do
-          options do
-            body do
-              schema "schema"
-              options(body_user_id: 1)
-            end
-          end
-        end
-      end
       let(:tested_options) { { input: { body_user_id: 1 }, output: { body_user_id: 1 } } }
       it_behaves_like "correct_persistence"
       it_behaves_like "correct_arguments_passed"
     end
 
     context "with nil as options" do
-      # TODO: find a way to use the test_options inside the new class to save unneccessary code duplication
-      let(:testclass) do
-        Class.new(Dry::RequestHandler::Base) do
-          options do
-            body do
-              schema "schema"
-              options nil
-            end
-          end
-        end
-      end
       let(:tested_options) { { input: nil, output: {} } }
       it_behaves_like "correct_persistence"
       it_behaves_like "correct_arguments_passed"
