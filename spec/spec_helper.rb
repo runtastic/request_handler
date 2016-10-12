@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+ENV["RACK_ENV"] = ENV["ENVIRONMENT"] ||= "test"
 $LOAD_PATH.unshift File.expand_path("../../lib", __FILE__)
 require "dry/request_handler"
 require "pry"

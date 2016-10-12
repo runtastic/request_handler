@@ -57,7 +57,7 @@ module Dry
         else
           # TODO: print a warning to make the user add a max_size config
           # use logger singleton to make use of log levels
-          #::Dry::RequestHandler.configuration.logger.warn "max size config not set"
+          ::Dry::RequestHandler.configuration.logger.warn "max size config not set"
           size
         end
       end

@@ -4,7 +4,6 @@ require "dry/request_handler/base"
 require "confstruct"
 require "dry-validation"
 require "multi_json"
-
 module Dry
   module RequestHandler
     class << self
@@ -14,6 +13,6 @@ module Dry
       end
       attr_accessor :configuration
     end
-    # require ::File.expand_path("../../config/environments/#{ENV['ENVIRONMENT']}",  __FILE__)
+    require ::File.expand_path("../../../config/environments/#{ENV['ENVIRONMENT']}",  __FILE__)
   end
 end

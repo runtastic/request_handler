@@ -1,19 +1,20 @@
 # frozen_string_literal: true
 require "spec_helper"
 require "dry/request_handler/page_handler"
-shared_examples "uses the right values for page and size" do
-  it "uses the value from the params if its within the limits" do
-    handler = Dry::RequestHandler::PageHandler.new(params: params, page_config: config.lookup!("page"))
-    expect(handler.run).to eq(output)
-  end
-end
-shared_examples "handles invalid inputs correctly" do
-  it "raises the an ArgumentError error for an invalid input" do
-    handler = Dry::RequestHandler::PageHandler.new(params: params, page_config: config.lookup!("page"))
-    expect { handler.run }.to raise_error(ArgumentError)
-  end
-end
 describe Dry::RequestHandler::PageHandler do
+  shared_examples "uses the right values for page and size" do
+    it "uses the value from the params if its within the limits" do
+      handler = Dry::RequestHandler::PageHandler.new(params: params, page_config: config.lookup!("page"))
+      expect(handler.run).to eq(output)
+    end
+  end
+  shared_examples "handles invalid inputs correctly" do
+    it "raises the an ArgumentError error for an invalid input" do
+      handler = Dry::RequestHandler::PageHandler.new(params: params, page_config: config.lookup!("page"))
+      expect { handler.run }.to raise_error(ArgumentError)
+    end
+  end
+
   let(:config) do
     Confstruct::Configuration.new do
       page do
@@ -32,6 +33,7 @@ describe Dry::RequestHandler::PageHandler do
       end
     end
   end
+
   # reads the size from the params if it is below the limit
   it_behaves_like "uses the right values for page and size" do
     let(:params) do
@@ -79,11 +81,12 @@ describe Dry::RequestHandler::PageHandler do
       }
     end
   end
+
   # defaults to the default if it is not configured in the params
   it_behaves_like "uses the right values for page and size" do
     let(:params) do
       { "page" => {
-        "users_size"   => "40",
+        "users_size"   => "39",
         "users_number" => "2"
       } }
     end
@@ -93,7 +96,7 @@ describe Dry::RequestHandler::PageHandler do
         posts_number: 1,
         posts_size:   30,
         users_number: 2,
-        users_size:   40 }
+        users_size:   39 }
     end
   end
 
