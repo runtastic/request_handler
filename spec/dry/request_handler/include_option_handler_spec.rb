@@ -1,14 +1,15 @@
 # frozen_string_literal: true
 require "spec_helper"
 require "dry/request_handler/include_option_handler"
-shared_examples "proccesses the include options correctly" do
-  it "it returns an array of include options" do
-    handler = described_class.new(params:               params,
-                                  allowed_options_type: Dry::Types["strict.string"].enum("user", "email"))
-    expect(handler.run).to eq output
-  end
-end
 describe Dry::RequestHandler::IncludeOptionHandler do
+  shared_examples "proccesses the include options correctly" do
+    it "it returns an array of include options" do
+      handler = described_class.new(params:               params,
+                                    allowed_options_type: Dry::Types["strict.string"].enum("user", "email"))
+      expect(handler.run).to eq output
+    end
+  end
+
   # return the right hash when the option is allowed
   it_behaves_like "proccesses the include options correctly" do
     let(:params) { { "include" => "user,email" } }

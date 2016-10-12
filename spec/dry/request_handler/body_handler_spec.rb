@@ -1,19 +1,23 @@
 # frozen_string_literal: true
 require "spec_helper"
 require "dry/request_handler/body_handler"
-shared_examples "flattens the body as expected" do
-  it "returns the flattend body" do
-    handler = described_class.new(schema: schema, request: build_mock_request(params: {}, headers: {}, body: raw_body))
-    expect(handler).to receive(:validate_schema).with(wanted_result)
-    handler.run
-  end
-end
 describe Dry::RequestHandler::BodyHandler do
+  let(:handler) do
+    described_class.new(schema: schema, request: build_mock_request(params: {}, headers: {}, body: raw_body))
+  end
+  shared_examples "flattens the body as expected" do
+    it "returns the flattend body" do
+      expect(handler).to receive(:validate_schema).with(wanted_result)
+      handler.run
+    end
+  end
+
   let(:schema) { Dry::Validation.JSON {} }
   def build_mock_request(params:, headers:, body: "")
     # TODO: check if this double is close enough to a real Rack::Request
     instance_double("Rack::Request", params: params, env: headers, body: StringIO.new(body))
   end
+
   # flattens the body correctly with one relationships
   it_behaves_like "flattens the body as expected" do
     let(:raw_body) do
@@ -53,6 +57,7 @@ describe Dry::RequestHandler::BodyHandler do
       }
     end
   end
+
   # flattens the body correctly with multiple relationships
   it_behaves_like "flattens the body as expected" do
     let(:raw_body) do
@@ -102,6 +107,7 @@ describe Dry::RequestHandler::BodyHandler do
       }
     end
   end
+
   # flattens the body correctly with an array in a relationship
   it_behaves_like "flattens the body as expected" do
     let(:raw_body) do
@@ -153,6 +159,7 @@ describe Dry::RequestHandler::BodyHandler do
       }
     end
   end
+
   # flattens the body correctly without relationships
   it_behaves_like "flattens the body as expected" do
     let(:raw_body) do
@@ -208,6 +215,7 @@ describe Dry::RequestHandler::BodyHandler do
       }
     end
   end
+
   # flattens the body correctly without attributes
   it_behaves_like "flattens the body as expected" do
     let(:raw_body) do

@@ -1,27 +1,28 @@
 # frozen_string_literal: true
 require "spec_helper"
 require "dry/request_handler/schema_handler"
-shared_examples "handles valid input data correctly" do
-  it "genrates the expected output with valid input and without schema options" do
-    handler = testclass.new(schema: schema_without_options, data: data)
-    expect(handler.run).to eq(data)
-  end
-  it "genrates the expected output with valid input and with schema options" do
-    handler = testclass.new(schema: schema_with_options, schema_options: { testoption: 5 },  data: data)
-    expect(handler.run).to eq(data)
-  end
-end
-shared_examples "handles invalid input data correctly" do
-  it "raises an error with invalid input and without schema options" do
-    handler = testclass.new(schema: schema_without_options, data: data)
-    expect { handler.run }.to raise_error # TODO: Add Real Error here
-  end
-  it "raises an error with invalid input and with schema options" do
-    handler = testclass.new(schema: schema_without_options, schema_options: { testoption: 5 }, data: data)
-    expect { handler.run }.to raise_error # TODO: Add Real Error here
-  end
-end
 describe Dry::RequestHandler::SchemaHandler do
+  shared_examples "handles valid input data correctly" do
+    it "genrates the expected output with valid input and without schema options" do
+      handler = testclass.new(schema: schema_without_options, data: data)
+      expect(handler.run).to eq(data)
+    end
+    it "genrates the expected output with valid input and with schema options" do
+      handler = testclass.new(schema: schema_with_options, schema_options: { testoption: 5 },  data: data)
+      expect(handler.run).to eq(data)
+    end
+  end
+  shared_examples "handles invalid input data correctly" do
+    it "raises an error with invalid input and without schema options" do
+      handler = testclass.new(schema: schema_without_options, data: data)
+      expect { handler.run }.to raise_error # TODO: Add Real Error here
+    end
+    it "raises an error with invalid input and with schema options" do
+      handler = testclass.new(schema: schema_without_options, schema_options: { testoption: 5 }, data: data)
+      expect { handler.run }.to raise_error # TODO: Add Real Error here
+    end
+  end
+
   let(:schema_without_options) do
     Dry::Validation.Schema do
       required(:test1).filled
@@ -49,9 +50,11 @@ describe Dry::RequestHandler::SchemaHandler do
       end
     end
   end
+
   it "fails if schema is nil" do
     expect { described_class.new(schema: nil) }.to raise_error(ArgumentError)
   end
+
   it "fails if schema_options is nil" do
     expect { described_class.new(schema: schema_without_options, schema_options: nil) }.to raise_error(ArgumentError)
   end
@@ -59,9 +62,11 @@ describe Dry::RequestHandler::SchemaHandler do
   it_behaves_like "handles valid input data correctly" do
     let(:data) { { test1: "t1", test2: 5 } }
   end
+
   it_behaves_like "handles invalid input data correctly" do
     let(:data) { { test1: "t1" } }
   end
+
   it_behaves_like "handles invalid input data correctly" do
     let(:data) { nil }
   end
