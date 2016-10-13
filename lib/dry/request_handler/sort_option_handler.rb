@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 require "dry/request_handler/option_handler"
+require "dry/request_handler/error"
 module Dry
   module RequestHandler
     class SortOptionHandler < OptionHandler
@@ -9,12 +10,14 @@ module Dry
           allowed_option(name)
           { name.to_sym => order }
         end
-        raise ArgumentError unless sort_options.uniq! { |hash| hash.keys[0] }.nil?
+        unless sort_options.uniq! { |hash| hash.keys[0] }.nil?
+          raise Dry::RequestHandler::InvalidArgumentError.new("sort_options", "not unique")
+        end
         sort_options
       end
 
       def parse_options(option)
-        raise ArgumentError if option.include? " "
+        raise Dry::RequestHandler::InvalidArgumentError.new("sort_options", "contains a space") if option.include? " "
         if option.start_with?("-")
           [option[1..-1], :desc]
         else
@@ -24,6 +27,8 @@ module Dry
 
       def allowed_option(name)
         allowed_options_type.call(name) if allowed_options_type
+      rescue Dry::Types::ConstraintError
+        raise Dry::RequestHandler::OptionNotAllowedError.new(name)
       end
     end
   end

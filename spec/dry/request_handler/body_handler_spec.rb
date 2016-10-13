@@ -250,7 +250,8 @@ describe Dry::RequestHandler::BodyHandler do
 
   it "fails if the request is nil" do
     schema = Dry::Validation.JSON {}
-    expect { described_class.new(schema: schema, request: nil) }.to raise_error(ArgumentError)
+    expect { described_class.new(schema: schema, request: nil) }
+      .to raise_error(Dry::RequestHandler::MissingArgumentError)
   end
 
   it "fails if the request body is nil" do
@@ -259,6 +260,6 @@ describe Dry::RequestHandler::BodyHandler do
       described_class.new(schema:  schema,
                           request: instance_double("Rack::Request", params: {}, env: {}, body: nil))
     end
-      .to raise_error(ArgumentError)
+      .to raise_error(Dry::RequestHandler::MissingArgumentError)
   end
 end

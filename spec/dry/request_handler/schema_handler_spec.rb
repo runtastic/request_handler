@@ -15,11 +15,11 @@ describe Dry::RequestHandler::SchemaHandler do
   shared_examples "handles invalid input data correctly" do
     it "raises an error with invalid input and without schema options" do
       handler = testclass.new(schema: schema_without_options, data: data)
-      expect { handler.run }.to raise_error # TODO: Add Real Error here
+      expect { handler.run }.to raise_error(error) # TODO: Add Real Error here
     end
     it "raises an error with invalid input and with schema options" do
       handler = testclass.new(schema: schema_without_options, schema_options: { testoption: 5 }, data: data)
-      expect { handler.run }.to raise_error # TODO: Add Real Error here
+      expect { handler.run }.to raise_error(error) # TODO: Add Real Error here
     end
   end
 
@@ -52,11 +52,12 @@ describe Dry::RequestHandler::SchemaHandler do
   end
 
   it "fails if schema is nil" do
-    expect { described_class.new(schema: nil) }.to raise_error(ArgumentError)
+    expect { described_class.new(schema: nil) }.to raise_error(Dry::RequestHandler::MissingArgumentError)
   end
 
   it "fails if schema_options is nil" do
-    expect { described_class.new(schema: schema_without_options, schema_options: nil) }.to raise_error(ArgumentError)
+    expect { described_class.new(schema: schema_without_options, schema_options: nil) }
+      .to raise_error(Dry::RequestHandler::MissingArgumentError)
   end
 
   it_behaves_like "handles valid input data correctly" do
@@ -65,9 +66,11 @@ describe Dry::RequestHandler::SchemaHandler do
 
   it_behaves_like "handles invalid input data correctly" do
     let(:data) { { test1: "t1" } }
+    let(:error) { Dry::RequestHandler::SchemaValidationError }
   end
 
   it_behaves_like "handles invalid input data correctly" do
     let(:data) { nil }
+    let(:error) { Dry::RequestHandler::MissingArgumentError }
   end
 end

@@ -50,24 +50,24 @@ describe Dry::RequestHandler::SortOptionHandler do
   # fails if the sort key is not unique and the order is different in the duplicate
   it_behaves_like "processes invalid sort options correctly" do
     let(:params) { { "sort" => "id,-id" } }
-    let(:error) { ArgumentError }
+    let(:error) { Dry::RequestHandler::InvalidArgumentError }
   end
 
   # fails if the sort key is not unique and the order is identical in the duplicate
   it_behaves_like "processes invalid sort options correctly" do
     let(:params) { { "sort" => "id,id" } }
-    let(:error) { ArgumentError }
+    let(:error) { Dry::RequestHandler::InvalidArgumentError }
   end
 
   # fails if one of the sort keys contains spaces
   it_behaves_like "processes invalid sort options correctly" do
     let(:params) { { "sort" => "id, foo" } }
-    let(:error) { ArgumentError }
+    let(:error) { Dry::RequestHandler::InvalidArgumentError }
   end
 
   # raises an contraint error if the option is not allowed
   it_behaves_like "processes invalid sort options correctly" do
     let(:params) { { "sort" => "user" } }
-    let(:error) { Dry::Types::ConstraintError }
+    let(:error) { Dry::RequestHandler::OptionNotAllowedError }
   end
 end

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 require "dry/request_handler/schema_handler"
+require "dry/request_handler/error"
 module Dry
   module RequestHandler
     class FilterHandler < SchemaHandler
@@ -8,7 +9,8 @@ module Dry
         super(schema: schema, schema_options: schema_options)
         Array(additional_url_filter).each do |key|
           key = key.to_s
-          raise ArgumentError unless @filter[key].nil?
+          raise Dry::RequestHandler::InvalidArgumentError
+            .new("filter[" + key.to_s + "]", "the filter key was set twice") unless @filter[key].nil?
           @filter[key] = params.fetch(key)
         end
       end

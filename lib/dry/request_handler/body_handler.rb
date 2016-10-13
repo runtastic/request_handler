@@ -1,11 +1,13 @@
 # frozen_string_literal: true
 require "dry/request_handler/schema_handler"
+require "dry/request_handler/error"
 module Dry
   module RequestHandler
     class BodyHandler < SchemaHandler
       def initialize(request:, schema:, schema_options: {})
         super(schema: schema, schema_options: schema_options)
-        raise ArgumentError if request.nil? || request.body.nil?
+        raise Dry::RequestHandler::MissingArgumentError.new(["request"]) if request.nil?
+        raise Dry::RequestHandler::MissingArgumentError.new(["reques.body"]) if request.body.nil?
         @request = request
       end
 

@@ -32,13 +32,13 @@ describe Dry::RequestHandler::IncludeOptionHandler do
     params = { "include" => "user, email" }
     handler = described_class.new(params:               params,
                                   allowed_options_type: Dry::Types["strict.string"].enum("user", "email"))
-    expect { handler.run }.to raise_error(ArgumentError)
+    expect { handler.run }.to raise_error(Dry::RequestHandler::InvalidArgumentError)
   end
 
   it "raises a contraint error if the option is not allowed" do
     params = { "include" => "user,password" }
     handler = described_class.new(params:               params,
                                   allowed_options_type: Dry::Types["strict.string"].enum("user", "email"))
-    expect { handler.run }.to raise_error(Dry::Types::ConstraintError)
+    expect { handler.run }.to raise_error(Dry::RequestHandler::OptionNotAllowedError)
   end
 end
