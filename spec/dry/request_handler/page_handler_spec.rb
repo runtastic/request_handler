@@ -148,8 +148,6 @@ describe Dry::RequestHandler::PageHandler do
       .to raise_error(Dry::RequestHandler::MissingArgumentError)
   end
 
-
-
   context "config with missing settings" do
     let(:config) do
       Confstruct::Configuration.new do
