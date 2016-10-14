@@ -1,15 +1,13 @@
 # Dry::RequestHandler
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/dry/request_handler`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+This gem allows easy and dry handling of requests based on the dry-validation gem, which is a replacement for virtus. It allows to handle authorization, filters, include_options, sorting and of course to validate the body.
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'dry-request_handler'
+gem 'dry-request_handler', source: "http://gems.example.com"
 ```
 
 And then execute:
@@ -18,11 +16,87 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install dry-request_handler
+    $ gem install dry-request_handler --source "http://gems.example.com"
 
 ## Usage
 
-TODO: Write usage instructions here
+In order to use the gem, you need to extend the `Dry::RequestHandler::Base class`, providing at least the options and and a to_dto method with the parts you want to use, and passing the handler your request, then access the processed data with the handler.dto method.
+Here is a short example, check `spec/dry/request_handler_spec.rb` for detailed one.
+```ruby
+require "dry-validation"
+require "dry/request_handler/base"
+class DemoHandler < Dry::RequestHandler::Base
+  options do
+    # pagination settings
+    page do
+      default_size 10
+      max_size 20
+      comments do
+        default_size 20
+        max_size 100
+      end
+    end
+    # acess with handler.page_params
+
+    # include options
+    include_options do
+      allowed Dry::Types["strict.string"].enum("comments", "author")
+    end
+    # acess with handler.include_params
+
+    # sort options
+    sort_options do
+      allowed Dry::Types["strict.string"].enum("age", "name")
+    end
+    # acess with handler.sort_params
+
+    # filters
+    filter do
+      schema(
+        Dry::Validation.Form do
+          configure do
+            option :foo
+          end
+          required(:name).filled(:str?)
+        end
+      )
+      additional_url_filter %i(user_id id)
+      options(->(_handler, _request) { { foo: "bar" } })
+      # options({foo: "bar"})
+    end
+    # acess with handler.filter_params
+
+    # body
+    body do
+      schema(
+        Dry::Validation.JSON do
+          configure do
+            option :foo
+          end
+          required(:id).filled(:str?)
+        end
+      )
+      options(->(_handler, _request) { { foo: "bar" } })
+      # options({foo: "bar"})
+    end
+    # acess via handler.body_params
+
+    # also available: handler.authorization_headers
+
+    def to_dto
+      OpenStruct.new(
+        body:    body_params,
+        page:    page_params,
+        include: include_params,
+        filter:  filter_params,
+        sort:    sort_params,
+        headers: authorization_headers
+      )
+    end
+  end
+end
+```
+
 
 ## Development
 
@@ -34,9 +108,4 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 Bug reports and requests are welcome on [jira](https://issues.example.com/projects/RBGEM/issues) with component `dry-request_handler`
 Pull requests are welcome on Stash at https://git.example.com/projects/GEM/repos/dry-request_handler/browse
-
-
-## License
-
-The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
 
