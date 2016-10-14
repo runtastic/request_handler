@@ -14,6 +14,13 @@ describe Dry::RequestHandler::PageHandler do
       expect { handler.run }.to raise_error(Dry::RequestHandler::InvalidArgumentError)
     end
   end
+  shared_examples "handles missing options correctly" do
+    it "prints a warning for a missing option" do
+      handler = Dry::RequestHandler::PageHandler.new(params: params, page_config: config.lookup!("page"))
+      expect(Dry::RequestHandler.configuration.logger).to receive(:warn).with(warning)
+      handler.run
+    end
+  end
 
   let(:config) do
     Confstruct::Configuration.new do
@@ -148,7 +155,7 @@ describe Dry::RequestHandler::PageHandler do
       .to raise_error(Dry::RequestHandler::MissingArgumentError)
   end
 
-  context "config with missing settings" do
+  context "config with missing options" do
     let(:config) do
       Confstruct::Configuration.new do
         page do
@@ -188,85 +195,6 @@ describe Dry::RequestHandler::PageHandler do
       end
     end
 
-    it "prints a warning if the max size is not set" do
-      config = Confstruct::Configuration.new do
-        page do
-          default_size 15
-          max_size 50
-          posts do
-            default_size 30
-          end
-        end
-      end
-      params = {
-        "page" => {
-          "posts_size"   => "500",
-          "posts_number" => "2"
-        }
-      }
-      handler = Dry::RequestHandler::PageHandler.new(params: params, page_config: config.lookup!("page"))
-      expect(Dry::RequestHandler.configuration.logger).to receive(:warn).with("posts max_size config not set")
-      handler.run
-    end
-
-    it "prints a warning if the default size is not set" do
-      config = Confstruct::Configuration.new do
-        page do
-          default_size 15
-          max_size 50
-          posts do
-            max_size 30
-          end
-        end
-      end
-      params = {
-        "page" => {
-          "posts_size"   => "500",
-          "posts_number" => "2"
-        }
-      }
-      handler = Dry::RequestHandler::PageHandler.new(params: params, page_config: config.lookup!("page"))
-      expect(Dry::RequestHandler.configuration.logger).to receive(:warn).with("posts default_size config not set")
-      handler.run
-    end
-
-    it "prints warnings if both sized are not set" do
-      config = Confstruct::Configuration.new do
-        page do
-          default_size 15
-          max_size 50
-          posts do
-          end
-        end
-      end
-      params = {
-        "page" => {
-          "posts_size"   => "500",
-          "posts_number" => "2"
-        }
-      }
-      handler = Dry::RequestHandler::PageHandler.new(params: params, page_config: config.lookup!("page"))
-      expect(Dry::RequestHandler.configuration.logger).to receive(:warn).twice
-      handler.run
-    end
-
-    it "prints warnings if both sized are not set" do
-      config = Confstruct::Configuration.new do
-        page do
-          default_size 15
-          max_size 50
-        end
-      end
-      params = {
-        "page" => {
-          "foo_size" => "3"
-        }
-      }
-      handler = Dry::RequestHandler::PageHandler.new(params: params, page_config: config.lookup!("page"))
-      expect(Dry::RequestHandler.configuration.logger).to receive(:warn).with("client sent unknown option foo_size")
-      handler.run
-    end
-
     it "raises an error if there is no way to determine the size of an option" do
       params = {
         "page" => {
@@ -277,5 +205,85 @@ describe Dry::RequestHandler::PageHandler do
       handler = Dry::RequestHandler::PageHandler.new(params: params, page_config: config.lookup!("page"))
       expect { handler.run }.to raise_error(Dry::RequestHandler::NoConfigAvailableError)
     end
+
+    it "prints warnings if both sized are not set" do
+      params = {
+        "page" => {
+          "comments_size"   => "500",
+          "comments_number" => "2"
+        }
+      }
+      handler = Dry::RequestHandler::PageHandler.new(params: params, page_config: config.lookup!("page"))
+      expect(Dry::RequestHandler.configuration.logger).to receive(:warn).twice
+      handler.run
+    end
+  end
+
+  # prints a warning if the max size is not set
+  it_behaves_like "handles missing options correctly" do
+    let(:config) do
+      Confstruct::Configuration.new do
+        page do
+          default_size 15
+          max_size 50
+          posts do
+            default_size 30
+          end
+        end
+      end
+    end
+    let(:params) do
+      {
+        "page" => {
+          "posts_size"   => "500",
+          "posts_number" => "2"
+        }
+      }
+    end
+    let(:warning) { "posts max_size config not set" }
+  end
+
+  # prints a warning if the default size is not set
+  it_behaves_like "handles missing options correctly" do
+    let(:config) do
+      Confstruct::Configuration.new do
+        page do
+          default_size 15
+          max_size 50
+          posts do
+            max_size 30
+          end
+        end
+      end
+    end
+    let(:params) do
+      {
+        "page" => {
+          "posts_size"   => "500",
+          "posts_number" => "2"
+        }
+      }
+    end
+    let(:warning) { "posts default_size config not set" }
+  end
+
+  # prints warnings if both sized are not set
+  it_behaves_like "handles missing options correctly" do
+    let(:config) do
+      Confstruct::Configuration.new do
+        page do
+          default_size 15
+          max_size 50
+        end
+      end
+    end
+    let(:params) do
+      {
+        "page" => {
+          "foo_size" => "3"
+        }
+      }
+    end
+    let(:warning) { "client sent unknown option foo_size" }
   end
 end
