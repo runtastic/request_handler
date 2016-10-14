@@ -7,10 +7,8 @@ module Dry
         missing_arguments = []
         missing_arguments << "schema" if schema.nil?
         missing_arguments << "schema_options" if schema_options.nil?
-        raise Dry::RequestHandler::MissingArgumentError.new(missing_arguments) if missing_arguments.length.positive?
-        unless schema.class.ancestors.include?(Dry::Validation::Schema)
-          raise Dry::RequestHandler::WrongArgumentTypeError
-        end
+        raise MissingArgumentError.new(missing_arguments) if missing_arguments.length.positive?
+        raise WrongArgumentTypeError  unless schema.kind_of?(Dry::Validation::Schema)
         @schema = schema
         @schema_options = schema_options
       end
@@ -18,9 +16,9 @@ module Dry
       private
 
       def validate_schema(data)
-        raise Dry::RequestHandler::MissingArgumentError.new(["data"]) if data.nil?
+        raise MissingArgumentError.new(["data"]) if data.nil?
         validator = schema.with(schema_options).call(data) # TODO: Check for performance impact
-        raise Dry::RequestHandler::SchemaValidationError if validator.failure?
+        raise SchemaValidationError if validator.failure?
         validator.output
       end
 

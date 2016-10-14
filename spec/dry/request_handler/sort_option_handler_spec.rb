@@ -13,7 +13,7 @@ describe Dry::RequestHandler::SortOptionHandler do
   end
   shared_examples "processes invalid sort options correctly" do
     it "raises an error with invalid sort options" do
-      expect { handler.run }.to raise_error(error) # TODO: Real Error
+      expect { handler.run }.to raise_error(error)
     end
   end
 

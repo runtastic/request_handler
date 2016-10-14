@@ -7,7 +7,7 @@ module Dry
         missing_arguments = []
         missing_arguments << "params" if params.nil?
         missing_arguments << "page_config" if page_config.nil?
-        raise Dry::RequestHandler::MissingArgumentError.new(missing_arguments) if missing_arguments.length.positive?
+        raise MissingArgumentError.new(missing_arguments) if missing_arguments.length.positive?
         @page_options = params.fetch("page") { {} }
         @config = page_config
       end
@@ -30,9 +30,7 @@ module Dry
 
       def check_for_missing_options(config)
         @page_options.each do |k, _v|
-          unless config.key?(k.to_sym)
-            ::Dry::RequestHandler.configuration.logger.warn "client sent unknown option #{k}"
-          end
+          warn "client sent unknown option #{k}" unless config.key?(k.to_sym)
         end
       end
 
@@ -41,19 +39,17 @@ module Dry
         raise ArgumentError unless number.positive?
         number
       rescue ArgumentError
-        raise Dry::RequestHandler::InvalidArgumentError.new("number", "is not a positive Integer")
+        raise InvalidArgumentError.new("number", "is not a positive Integer")
       end
 
       def extract_size(prefix: nil)
         size = fetch_and_check_size(prefix)
         default_size = lookup_nested_config_key("default_size", prefix)
-        if size.nil? || size.zero?
-          if default_size.nil? || default_size.zero?
-            raise Dry::RequestHandler::NoConfigAvailableError.new("#{prefix}_size")
-          end
+        unless size&.nonzero?
+          raise NoConfigAvailableError.new("#{prefix}_size") unless default_size&.nonzero?
           return lookup_nested_config_key("default_size", prefix)
         end
-        ::Dry::RequestHandler.configuration.logger.warn "#{prefix} default_size config not set" if default_size.nil?
+        warn "#{prefix} default_size config not set" if default_size.nil?
         apply_max_size_constraint(size, prefix)
       end
 
@@ -65,7 +61,7 @@ module Dry
             raise ArgumentError unless size.positive?
             size
           rescue ArgumentError
-            raise Dry::RequestHandler::InvalidArgumentError.new("number", "is not a positive Integer")
+            raise InvalidArgumentError.new("number", "is not a positive Integer")
           end
         end
       end
@@ -75,7 +71,7 @@ module Dry
         if max_size
           [max_size, size].min
         else
-          ::Dry::RequestHandler.configuration.logger.warn "#{prefix} max_size config not set"
+          warn "#{prefix} max_size config not set"
           size
         end
       end
@@ -88,6 +84,10 @@ module Dry
       def lookup_nested_params_key(key, prefix)
         key = prefix ? "#{prefix}_#{key}" : key
         page_options.fetch(key, nil)
+      end
+
+      def warn(message)
+        ::Dry::RequestHandler.configuration.logger.warn(message)
       end
     end
   end

@@ -15,11 +15,11 @@ describe Dry::RequestHandler::SchemaHandler do
   shared_examples "handles invalid input data correctly" do
     it "raises an error with invalid input and without schema options" do
       handler = testclass.new(schema: schema_without_options, data: data)
-      expect { handler.run }.to raise_error(error) # TODO: Add Real Error here
+      expect { handler.run }.to raise_error(error)
     end
     it "raises an error with invalid input and with schema options" do
       handler = testclass.new(schema: schema_without_options, schema_options: { testoption: 5 }, data: data)
-      expect { handler.run }.to raise_error(error) # TODO: Add Real Error here
+      expect { handler.run }.to raise_error(error)
     end
   end
 
