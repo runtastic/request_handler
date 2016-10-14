@@ -21,7 +21,7 @@ Or install it yourself as:
 ## Usage
 
 In order to use the gem, you need to extend the `Dry::RequestHandler::Base class`, providing at least the options and and a to_dto method with the parts you want to use, and passing the handler your request, then access the processed data with the handler.dto method.
-Here is a short example, check `spec/dry/request_handler_spec.rb` for detailed one.
+Here is a short example, check `spec/dry/request_handler_spec.rb` for a detailed one.
 ```ruby
 require "dry-validation"
 require "dry/request_handler/base"
