@@ -27,7 +27,7 @@ module Dry
 
       def allowed_option(name)
         allowed_options_type.call(name) if allowed_options_type
-      rescue Dry::Types::ConstraintError
+      rescue Types::ConstraintError
         raise OptionNotAllowedError.new(name)
       end
     end

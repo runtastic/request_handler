@@ -10,7 +10,7 @@ module Dry
         options.split(",").map do |option|
           begin
             allowed_options_type.call(option) if allowed_options_type
-          rescue Dry::Types::ConstraintError
+          rescue Types::ConstraintError
             raise OptionNotAllowedError.new(option)
           end
           option.to_sym
