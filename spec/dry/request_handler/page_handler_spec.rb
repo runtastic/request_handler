@@ -9,7 +9,7 @@ describe Dry::RequestHandler::PageHandler do
     end
   end
   shared_examples "handles invalid inputs correctly" do
-    it "raises the an Dry::RequestHandler::InvalidArgumentErrorerror for an invalid input" do
+    it "raises the an Dry::RequestHandler::InvalidArgumentError for an invalid input" do
       handler = Dry::RequestHandler::PageHandler.new(params: params, page_config: config.lookup!("page"))
       expect { handler.run }.to raise_error(Dry::RequestHandler::InvalidArgumentError)
     end
@@ -18,7 +18,7 @@ describe Dry::RequestHandler::PageHandler do
     it "prints a warning for a missing option" do
       handler = Dry::RequestHandler::PageHandler.new(params: params, page_config: config.lookup!("page"))
       expect(Dry::RequestHandler.configuration.logger).to receive(:warn).with(warning)
-      handler.run
+      expect(handler.run).to eq(output)
     end
   end
 
@@ -241,6 +241,14 @@ describe Dry::RequestHandler::PageHandler do
         }
       }
     end
+    let(:output) do
+      {
+        number:       1,
+        size:         15,
+        posts_number: 2,
+        posts_size:   500
+      }
+    end
     let(:warning) { "posts max_size config not set" }
     it_behaves_like "handles missing options correctly"
   end
@@ -265,6 +273,14 @@ describe Dry::RequestHandler::PageHandler do
         }
       }
     end
+    let(:output) do
+      {
+        number:       1,
+        size:         15,
+        posts_number: 2,
+        posts_size:   30
+      }
+    end
     let(:warning) { "posts default_size config not set" }
     it_behaves_like "handles missing options correctly"
   end
@@ -285,7 +301,13 @@ describe Dry::RequestHandler::PageHandler do
         }
       }
     end
-    let(:warning) { "client sent unknown option foo_size" }
+    let(:output) do
+      {
+        number: 1,
+        size:   15
+      }
+    end
+    let(:warning) { "client sent unknown option [\"foo_size\"]" }
     it_behaves_like "handles missing options correctly"
   end
 end

@@ -38,7 +38,8 @@ describe Dry::RequestHandler::SortOptionHandler do
   context "no sort options are specified" do
     let(:params) { { "sort" => "" } }
     let(:output) { [] }
-    it_behaves_like "processes valid sort options correctly"
+    let(:error) { Dry::RequestHandler::InvalidArgumentError }
+    it_behaves_like "processes invalid sort options correctly"
   end
 
   context "sort param is not set" do

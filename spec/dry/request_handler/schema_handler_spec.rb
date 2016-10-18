@@ -3,11 +3,11 @@ require "spec_helper"
 require "dry/request_handler/schema_handler"
 describe Dry::RequestHandler::SchemaHandler do
   shared_examples "handles valid input data correctly" do
-    it "genrates the expected output with valid input and without schema options" do
+    it "generates the expected output with valid input and without schema options" do
       handler = testclass.new(schema: schema_without_options, data: data)
       expect(handler.run).to eq(data)
     end
-    it "genrates the expected output with valid input and with schema options" do
+    it "generates the expected output with valid input and with schema options" do
       handler = testclass.new(schema: schema_with_options, schema_options: { testoption: 5 },  data: data)
       expect(handler.run).to eq(data)
     end

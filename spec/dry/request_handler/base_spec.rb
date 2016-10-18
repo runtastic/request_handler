@@ -62,7 +62,7 @@ describe Dry::RequestHandler::Base do
   let(:request) do
     instance_double("Rack::Request",
                     params: params,
-                    env:    {},
+                    env:    { "FOO" => "bar" },
                     body:   StringIO.new("body"))
   end
   let(:runstub) { double("Handler", run: { foo: "bar" }) }
@@ -94,6 +94,11 @@ describe Dry::RequestHandler::Base do
     let(:tested_handler) { Dry::RequestHandler::FilterHandler }
     context "with a proc as options" do
       let(:tested_options) { { input: ->(_handler, _request) { { body_user_id: 1 } }, output: { body_user_id: 1 } } }
+      it_behaves_like "correct_persistence"
+      it_behaves_like "correct_arguments_passed"
+    end
+    context "with a proc using the request as options" do
+      let(:tested_options) { { input: ->(_handler, request) { { foo: request.env["FOO"] } }, output: { foo: "bar" } } }
       it_behaves_like "correct_persistence"
       it_behaves_like "correct_arguments_passed"
     end
@@ -219,6 +224,11 @@ describe Dry::RequestHandler::Base do
     let(:tested_handler) { Dry::RequestHandler::BodyHandler }
     context "with a proc as options" do
       let(:tested_options) { { input: ->(_handler, _request) { { body_user_id: 1 } }, output: { body_user_id: 1 } } }
+      it_behaves_like "correct_persistence"
+      it_behaves_like "correct_arguments_passed"
+    end
+    context "with a proc using the request as options" do
+      let(:tested_options) { { input: ->(_handler, request) { { foo: request.env["FOO"] } }, output: { foo: "bar" } } }
       it_behaves_like "correct_persistence"
       it_behaves_like "correct_arguments_passed"
     end

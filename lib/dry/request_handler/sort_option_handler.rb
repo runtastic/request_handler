@@ -5,18 +5,25 @@ module Dry
   module RequestHandler
     class SortOptionHandler < OptionHandler
       def run
-        sort_options = params.fetch("sort") { "" }.split(",").map do |option|
-          name, order = parse_options(option)
-          allowed_option(name)
-          { name.to_sym => order }
-        end
-        unless sort_options.uniq! { |hash| hash.keys[0] }.nil?
-          raise InvalidArgumentError.new("sort_options", "not unique")
-        end
+        sort_options = parse_options(fetch_options)
+        raise InvalidArgumentError.new("sort_options", "not unique") if duplicates?(sort_options)
         sort_options
       end
 
-      def parse_options(option)
+      def fetch_options
+        raise InvalidArgumentError.new("sort_options", "query paramter is empty") if params.fetch("sort") { nil } == ""
+        params.fetch("sort") { "" }.split(",")
+      end
+
+      def parse_options(options)
+        options.map do |option|
+          name, order = parse_option(option)
+          allowed_option(name)
+          { name.to_sym => order }
+        end
+      end
+
+      def parse_option(option)
         raise InvalidArgumentError.new("sort_options", "contains a space") if option.include? " "
         if option.start_with?("-")
           [option[1..-1], :desc]
@@ -29,6 +36,10 @@ module Dry
         allowed_options_type.call(name) if allowed_options_type
       rescue Types::ConstraintError
         raise OptionNotAllowedError.new(name)
+      end
+
+      def duplicates?(options)
+        !!options.uniq! { |hash| hash.keys[0] }
       end
     end
   end

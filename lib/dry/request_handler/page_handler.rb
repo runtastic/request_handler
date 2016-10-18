@@ -29,14 +29,13 @@ module Dry
       attr_reader :page_options, :config
 
       def check_for_missing_options(config)
-        @page_options.each do |k, _v|
-          warn "client sent unknown option #{k}" unless config.key?(k.to_sym)
-        end
+        missing_arguments = page_options.keys - config.keys.map(&:to_s)
+        warn "client sent unknown option " + missing_arguments.to_s  unless missing_arguments.empty?
       end
 
       def extract_number(prefix: nil)
         number = Integer(lookup_nested_params_key("number", prefix) || 1)
-        raise ArgumentError unless number.positive?
+        raise InvalidArgumentError.new("number", "is not a positive Integer") unless number.positive?
         number
       rescue ArgumentError
         raise InvalidArgumentError.new("number", "is not a positive Integer")
@@ -45,8 +44,8 @@ module Dry
       def extract_size(prefix: nil)
         size = fetch_and_check_size(prefix)
         default_size = lookup_nested_config_key("default_size", prefix)
-        unless size&.nonzero?
-          raise NoConfigAvailableError.new("#{prefix}_size") unless default_size&.nonzero?
+        if size.nil? || size.zero?
+          raise NoConfigAvailableError.new("#{prefix}_size") if default_size.nil? || default_size.zero?
           return lookup_nested_config_key("default_size", prefix)
         end
         warn "#{prefix} default_size config not set" if default_size.nil?
@@ -58,7 +57,7 @@ module Dry
         unless size_string.nil?
           begin
             size = Integer(size_string)
-            raise ArgumentError unless size.positive?
+            raise InvalidArgumentError.new("number", "is not a positive Integer") unless size.positive?
             size
           rescue ArgumentError
             raise InvalidArgumentError.new("number", "is not a positive Integer")
