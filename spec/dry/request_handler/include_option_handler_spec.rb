@@ -10,22 +10,22 @@ describe Dry::RequestHandler::IncludeOptionHandler do
     end
   end
 
-  # return the right hash when the option is allowed
-  it_behaves_like "proccesses the include options correctly" do
+  context "option is allowed" do
     let(:params) { { "include" => "user,email" } }
     let(:output) { [:user, :email] }
+    it_behaves_like "proccesses the include options correctly"
   end
 
-  # returns an empty array when no include options are specified
-  it_behaves_like "proccesses the include options correctly" do
+  context "no include options are specified" do
     let(:params) { { "include" => "" } }
     let(:output) { [] }
+    it_behaves_like "proccesses the include options correctly"
   end
 
-  # return an empty array if the include param is not set
-  it_behaves_like "proccesses the include options correctly" do
+  context "include param is not set" do
     let(:params) { {} }
     let(:output) { [] }
+    it_behaves_like "proccesses the include options correctly"
   end
 
   it "raises a contraint error if the inlcude options contain a space" do

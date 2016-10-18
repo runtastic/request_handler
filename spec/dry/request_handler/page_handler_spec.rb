@@ -40,8 +40,8 @@ describe Dry::RequestHandler::PageHandler do
       end
     end
   end
-  # reads the size from the params if it is below the limit
-  it_behaves_like "uses the right values for page and size" do
+
+  context "size from the params is below the limit" do
     let(:params) do
       {
         "page" => {
@@ -62,10 +62,10 @@ describe Dry::RequestHandler::PageHandler do
         users_size:   25
       }
     end
+    it_behaves_like "uses the right values for page and size"
   end
 
-  # sets the size to the limit if the param requests a size bigger than allowed
-  it_behaves_like "uses the right values for page and size" do
+  context "param requests a size bigger than allowed" do
     let(:params) do
       {
         "page" => {
@@ -86,10 +86,10 @@ describe Dry::RequestHandler::PageHandler do
         users_size:   40
       }
     end
+    it_behaves_like "uses the right values for page and size"
   end
 
-  # defaults to the default if it is not configured in the params
-  it_behaves_like "uses the right values for page and size" do
+  context "size not defined in the params" do
     let(:params) do
       { "page" => {
         "users_size"   => "39",
@@ -104,45 +104,47 @@ describe Dry::RequestHandler::PageHandler do
         users_number: 2,
         users_size:   39 }
     end
+    it_behaves_like "uses the right values for page and size"
   end
 
-  # raises an Dry::RequestHandler::InvalidArgumentError if a number is set to a non integer string
-  it_behaves_like "handles invalid inputs correctly" do
+  context "number is set to a non integer string" do
     let(:params) do
       { "page" => {
         "users_size"   => "40",
         "users_number" => "asdf"
       } }
     end
+    it_behaves_like "handles invalid inputs correctly"
   end
 
-  # raises an Dry::RequestHandler::InvalidArgumentError if a number is set to a negative string
-  it_behaves_like "handles invalid inputs correctly" do
+  context "number is set to a negative string" do
     let(:params) do
       { "page" => {
         "users_size"   => "40",
         "users_number" => "-20"
       } }
     end
+    it_behaves_like "handles invalid inputs correctly"
   end
 
-  # raises an Dry::RequestHandler::InvalidArgumentError if a size is set to a negative string
-  it_behaves_like "handles invalid inputs correctly" do
+  context "size is set to a negative string" do
     let(:params) do
       { "page" => {
         "users_size"   => "-40",
         "users_number" => "20"
       } }
     end
+    it_behaves_like "handles invalid inputs correctly"
   end
 
-  it_behaves_like "handles invalid inputs correctly" do
+  context "size is set to a non integer string" do
     let(:params) do
       { "page" => {
         "users_size"   => "asdf",
         "users_number" => "2"
       } }
     end
+    it_behaves_like "handles invalid inputs correctly"
   end
 
   it "raises an error if page config is set to nil" do
@@ -171,8 +173,7 @@ describe Dry::RequestHandler::PageHandler do
       end
     end
 
-    # client sends the config options that are not set on the server
-    it_behaves_like "uses the right values for page and size" do
+    context "params contain config options that are not set on the server" do
       let(:params) do
         {
           "page" => {
@@ -193,6 +194,7 @@ describe Dry::RequestHandler::PageHandler do
           comments_number: 10
         }
       end
+      it_behaves_like "uses the right values for page and size"
     end
 
     it "raises an error if there is no way to determine the size of an option" do
@@ -219,8 +221,7 @@ describe Dry::RequestHandler::PageHandler do
     end
   end
 
-  # prints a warning if the max size is not set
-  it_behaves_like "handles missing options correctly" do
+  context "max size is not set" do
     let(:config) do
       Confstruct::Configuration.new do
         page do
@@ -241,10 +242,10 @@ describe Dry::RequestHandler::PageHandler do
       }
     end
     let(:warning) { "posts max_size config not set" }
+    it_behaves_like "handles missing options correctly"
   end
 
-  # prints a warning if the default size is not set
-  it_behaves_like "handles missing options correctly" do
+  context "default size is not set" do
     let(:config) do
       Confstruct::Configuration.new do
         page do
@@ -265,10 +266,10 @@ describe Dry::RequestHandler::PageHandler do
       }
     end
     let(:warning) { "posts default_size config not set" }
+    it_behaves_like "handles missing options correctly"
   end
 
-  # prints warnings if both sized are not set
-  it_behaves_like "handles missing options correctly" do
+  context "default and max size are not set" do
     let(:config) do
       Confstruct::Configuration.new do
         page do
@@ -285,5 +286,6 @@ describe Dry::RequestHandler::PageHandler do
       }
     end
     let(:warning) { "client sent unknown option foo_size" }
+    it_behaves_like "handles missing options correctly"
   end
 end

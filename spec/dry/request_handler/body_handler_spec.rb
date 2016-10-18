@@ -18,8 +18,7 @@ describe Dry::RequestHandler::BodyHandler do
     instance_double("Rack::Request", params: params, env: headers, body: StringIO.new(body))
   end
 
-  # flattens the body correctly with one relationships
-  it_behaves_like "flattens the body as expected" do
+  context "one relationships" do
     let(:raw_body) do
       <<~JSON
       {
@@ -56,10 +55,10 @@ describe Dry::RequestHandler::BodyHandler do
         }
       }
     end
+    it_behaves_like "flattens the body as expected"
   end
 
-  # flattens the body correctly with multiple relationships
-  it_behaves_like "flattens the body as expected" do
+  context "multiple relationships" do
     let(:raw_body) do
       <<~JSON
       {
@@ -106,10 +105,10 @@ describe Dry::RequestHandler::BodyHandler do
         }
       }
     end
+    it_behaves_like "flattens the body as expected"
   end
 
-  # flattens the body correctly with an array in a relationship
-  it_behaves_like "flattens the body as expected" do
+  context "array in a relationship" do
     let(:raw_body) do
       <<~JSON
       {
@@ -158,10 +157,10 @@ describe Dry::RequestHandler::BodyHandler do
         ]
       }
     end
+    it_behaves_like "flattens the body as expected"
   end
 
-  # flattens the body correctly without relationships
-  it_behaves_like "flattens the body as expected" do
+  context "without relationships" do
     let(:raw_body) do
       <<~JSON
       {
@@ -186,10 +185,10 @@ describe Dry::RequestHandler::BodyHandler do
         "publish_on" => "2016-09-26T12:23:55Z"
       }
     end
+    it_behaves_like "flattens the body as expected"
   end
 
-  # flattens the body correctly without relationships and with different types of Inputs
-  it_behaves_like "flattens the body as expected" do
+  context "different types of Inputs" do
     let(:raw_body) do
       <<~JSON
       {
@@ -214,10 +213,10 @@ describe Dry::RequestHandler::BodyHandler do
         "published" => false
       }
     end
+    it_behaves_like "flattens the body as expected"
   end
 
-  # flattens the body correctly without attributes
-  it_behaves_like "flattens the body as expected" do
+  context "without attributes" do
     let(:raw_body) do
       <<~JSON
       {
@@ -246,6 +245,7 @@ describe Dry::RequestHandler::BodyHandler do
         }
       }
     end
+    it_behaves_like "flattens the body as expected"
   end
 
   it "fails if the request is nil" do

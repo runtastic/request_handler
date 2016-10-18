@@ -20,7 +20,8 @@ Or install it yourself as:
 
 ## Usage
 
-In order to use the gem, you need to extend the `Dry::RequestHandler::Base class`, providing at least the options and and a to_dto method with the parts you want to use, and passing the handler your request, then access the processed data with the handler.dto method.
+To set up a handler, you need to extend the `Dry::RequestHandler::Base class`, providing at least the options block and a to_dto method with the parts you want to use.
+To use it, create a new instance of the handler passing in the request, after that you can use the handler.dto method to process and access the data.
 Here is a short example, check `spec/dry/request_handler_spec.rb` for a detailed one.
 ```ruby
 require "dry-validation"
@@ -36,19 +37,19 @@ class DemoHandler < Dry::RequestHandler::Base
         max_size 100
       end
     end
-    # acess with handler.page_params
+    # access with handler.page_params
 
     # include options
     include_options do
       allowed Dry::Types["strict.string"].enum("comments", "author")
     end
-    # acess with handler.include_params
+    # access with handler.include_params
 
     # sort options
     sort_options do
       allowed Dry::Types["strict.string"].enum("age", "name")
     end
-    # acess with handler.sort_params
+    # access with handler.sort_params
 
     # filters
     filter do
@@ -62,9 +63,9 @@ class DemoHandler < Dry::RequestHandler::Base
       )
       additional_url_filter %i(user_id id)
       options(->(_handler, _request) { { foo: "bar" } })
-      # options({foo: "bar"})
+      # options({foo: "bar"}) # also works for hash options instead of procs
     end
-    # acess with handler.filter_params
+    # access with handler.filter_params
 
     # body
     body do
@@ -77,9 +78,9 @@ class DemoHandler < Dry::RequestHandler::Base
         end
       )
       options(->(_handler, _request) { { foo: "bar" } })
-      # options({foo: "bar"})
+      # options({foo: "bar"}) # also works for hash options instead of procs
     end
-    # acess via handler.body_params
+    # access via handler.body_params
 
     # also available: handler.authorization_headers
 

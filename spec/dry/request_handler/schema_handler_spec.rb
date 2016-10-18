@@ -64,13 +64,15 @@ describe Dry::RequestHandler::SchemaHandler do
     let(:data) { { test1: "t1", test2: 5 } }
   end
 
-  it_behaves_like "handles invalid input data correctly" do
+  context "data is mising something required in the schema" do
     let(:data) { { test1: "t1" } }
     let(:error) { Dry::RequestHandler::SchemaValidationError }
+    it_behaves_like "handles invalid input data correctly"
   end
 
-  it_behaves_like "handles invalid input data correctly" do
+  context "data is missing completely" do
     let(:data) { nil }
     let(:error) { Dry::RequestHandler::MissingArgumentError }
+    it_behaves_like "handles invalid input data correctly"
   end
 end

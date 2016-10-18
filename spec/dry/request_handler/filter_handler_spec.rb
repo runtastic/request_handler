@@ -11,8 +11,7 @@ describe Dry::RequestHandler::FilterHandler do
 
   let(:additional_url_filter) { [] }
 
-  # generates the right output with one normal filter
-  it_behaves_like "proccesses the filters correctly" do
+  context "one normal filter" do
     let(:params) do
       { "filter" => { "name" => "foo" } }
     end
@@ -24,10 +23,10 @@ describe Dry::RequestHandler::FilterHandler do
     let(:output)  do
       { "name" => "foo" }
     end
+    it_behaves_like "proccesses the filters correctly"
   end
 
-  # generates the right output with one additional_url_filter
-  it_behaves_like "proccesses the filters correctly" do
+  context "one additional_url_filter" do
     let(:params) do
       {
         "name" => "foo"
@@ -44,10 +43,10 @@ describe Dry::RequestHandler::FilterHandler do
         "name" => "foo"
       }
     end
+    it_behaves_like "proccesses the filters correctly"
   end
 
-  # generates the right output with one additional_url_filter and one normal filter
-  it_behaves_like "proccesses the filters correctly" do
+  context "one additional_url_filter and one normal filter" do
     let(:params) do
       {
         "name"   => "foo",
@@ -68,10 +67,10 @@ describe Dry::RequestHandler::FilterHandler do
         "test" => "bar"
       }
     end
+    it_behaves_like "proccesses the filters correctly"
   end
 
-  # outputs nothing with no filter set
-  it_behaves_like "proccesses the filters correctly" do
+  context "no filter set" do
     let(:params) do
       {
         "filter" => {
@@ -80,16 +79,17 @@ describe Dry::RequestHandler::FilterHandler do
     end
     let(:schema) { Dry::Validation.Schema {} }
     let(:output) { {} }
+    it_behaves_like "proccesses the filters correctly"
   end
 
-  # outputs nothing without the filter hash
-  it_behaves_like "proccesses the filters correctly" do
+  context "without the filter hash" do
     let(:params) do
       {
       }
     end
     let(:schema) { Dry::Validation.Schema {} }
     let(:output) { {} }
+    it_behaves_like "proccesses the filters correctly"
   end
 
   it "fails for a filter that was set twice" do
