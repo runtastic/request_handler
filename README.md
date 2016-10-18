@@ -24,7 +24,7 @@ To set up a handler, you need to extend the `Dry::RequestHandler::Base class`, p
 To use it, create a new instance of the handler passing in the request, after that you can use the handler.dto method to process and access the data.
 Here is a short example, check `spec/dry/request_handler_spec.rb` for a detailed one.
 
-Please note that pagination only considers options that are configured on the server (at least an empty configuration block int the page block), other options sent by the client are ignored.  
+Please note that pagination only considers options that are configured on the server (at least an empty configuration block int the page block), other options sent by the client are ignored and will cause a warning.
 
 ```ruby
 require "dry-validation"
