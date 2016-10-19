@@ -3,35 +3,6 @@ require "spec_helper"
 require "dry/request_handler/base"
 
 describe Dry::RequestHandler::Base do
-  class Parent < Dry::RequestHandler::Base
-    options do
-      level0_overwritten "parent_0_o"
-      level0_parent "parent_0_n"
-      level_1 do
-        level1_overwritten "parent_1_o"
-        level1_parent "parent_1_n"
-        level_2 do
-          level2_overwritten "parent_2_o"
-          level2_parent "parent_2_n"
-        end
-      end
-    end
-  end
-  class Child < Parent
-    options do
-      level0_overwritten "child_0_o"
-      level0_child "child_0_c"
-      level_1 do
-        level1_overwritten "child_1_o"
-        level1_child "child_1_c"
-        level_2 do
-          level2_overwritten "child_2_o"
-          level2_child "child_2_c"
-        end
-      end
-    end
-  end
-
   shared_examples "correct_arguments_passed" do
     it "passes the right arguments to the handler" do
       expect(tested_handler).to receive(:new).with(expected_args).and_return(runstub)
@@ -263,6 +234,34 @@ describe Dry::RequestHandler::Base do
     end
   end
   context "the parentclass" do
+    class Parent < Dry::RequestHandler::Base
+      options do
+        level0_overwritten "parent_0_o"
+        level0_parent "parent_0_n"
+        level_1 do
+          level1_overwritten "parent_1_o"
+          level1_parent "parent_1_n"
+          level_2 do
+            level2_overwritten "parent_2_o"
+            level2_parent "parent_2_n"
+          end
+        end
+      end
+    end
+    class Child < Parent
+      options do
+        level0_overwritten "child_0_o"
+        level0_child "child_0_c"
+        level_1 do
+          level1_overwritten "child_1_o"
+          level1_child "child_1_c"
+          level_2 do
+            level2_overwritten "child_2_o"
+            level2_child "child_2_c"
+          end
+        end
+      end
+    end
     it "still has the correct not nested attribute after being inherited" do
       expect(parent.send(:config).lookup!("level0_overwritten")).to eq("parent_0_o")
     end

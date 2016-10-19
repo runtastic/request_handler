@@ -5,9 +5,9 @@ module Dry
   module RequestHandler
     class BodyHandler < SchemaHandler
       def initialize(request:, schema:, schema_options: {})
-        super(schema: schema, schema_options: schema_options)
         raise MissingArgumentError.new(["request"]) if request.nil?
         raise MissingArgumentError.new(["reques.body"]) if request.body.nil?
+        super(schema: schema, schema_options: schema_options)
         @request = request
       end
 
