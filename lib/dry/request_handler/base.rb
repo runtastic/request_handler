@@ -23,6 +23,7 @@ module Dry
         attr_accessor :config
       end
       def initialize(request:)
+        raise MissingArgumentError.new(["request"]) if request.nil?
         @request = request
       end
 
@@ -84,6 +85,8 @@ module Dry
       end
 
       def params
+        raise MissingArgumentError.new(["params"]) if request.params.nil?
+        raise WrongArgumentTypeError.new("params") unless request.params.is_a?(Hash)
         @params ||= _deep_transform_keys_in_object(request.params) { |k| k.tr(".", "_") }
       end
 

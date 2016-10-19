@@ -6,8 +6,6 @@ module Dry
       def initialize(params:, allowed_options_type:)
         @params = params
         @allowed_options_type = allowed_options_type
-        raise MissingArgumentError.new(["params"]) if @params.nil?
-        raise WrongArgumentTypeError.new("params") unless @params.class.equal?(Hash)
         raise WrongArgumentTypeError.new("allowed_options_type") unless enum?
       end
 

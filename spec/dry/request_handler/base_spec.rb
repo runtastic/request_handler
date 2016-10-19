@@ -233,6 +233,24 @@ describe Dry::RequestHandler::Base do
                "nested_twice" => { "nested_twice_foo_bar" =>{ "nested_again" => "test3" } })
     end
   end
+
+  context "errorhandling" do
+    testclass = Class.new(described_class)
+    it "raises a MissingArgumentError if request is nil" do
+      expect { testclass.new(request: nil) }.to raise_error(Dry::RequestHandler::MissingArgumentError)
+    end
+    it "raises a MissingArgumentError if params is nil" do
+      request = instance_double("Rack::Request", params: nil, env: {}, body: "")
+      testedhandler = testclass.new(request: request)
+      expect { testedhandler.send(:params) }.to raise_error(Dry::RequestHandler::MissingArgumentError)
+    end
+    it "raises a MissingArgumentError if params is not a Hash" do
+      request = instance_double("Rack::Request", params: "Foo", env: {}, body: "")
+      testedhandler = testclass.new(request: request)
+      expect { testedhandler.send(:params) }.to raise_error(Dry::RequestHandler::WrongArgumentTypeError)
+    end
+  end
+
   context "the parentclass" do
     class Parent < Dry::RequestHandler::Base
       options do
