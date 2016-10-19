@@ -33,7 +33,7 @@ module Dry
         end
       end
 
-      def request_body # TODO: check if this is the best way to get the body -> Commonly used this way
+      def request_body
         b = request.body
         b.rewind
         b = b.read

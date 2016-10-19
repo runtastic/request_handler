@@ -17,7 +17,11 @@ module Dry
 
       def validate_schema(data)
         raise MissingArgumentError.new(["data"]) if data.nil?
-        validator = schema.with(schema_options).call(data) # TODO: Check for performance impact
+        validator = if schema_options.empty?
+                      schema.call(data)
+                    else
+                      schema.with(schema_options).call(data)
+                    end
         raise SchemaValidationError if validator.failure?
         validator.output
       end

@@ -43,24 +43,33 @@ module Dry
 
       def extract_size(prefix: nil)
         size = fetch_and_check_size(prefix)
-        default_size = lookup_nested_config_key("default_size", prefix)
+        default_size = fetch_and_check_default_size(prefix)
         if size.nil? || size.zero?
           raise NoConfigAvailableError.new("#{prefix}_size") if default_size.nil? || default_size.zero?
-          return lookup_nested_config_key("default_size", prefix)
+          return default_size
         end
         warn "#{prefix} default_size config not set" if default_size.nil?
         apply_max_size_constraint(size, prefix)
       end
 
+      def fetch_and_check_default_size(prefix)
+        default_size_string = lookup_nested_config_key("default_size", prefix)
+        check_size(size_string: default_size_string, size_key: "default_size")
+      end
+
       def fetch_and_check_size(prefix)
         size_string = lookup_nested_params_key("size", prefix)
+        check_size(size_string: size_string, size_key: "size")
+      end
+
+      def check_size(size_string:, size_key:)
         unless size_string.nil?
           begin
             size = Integer(size_string)
-            raise InvalidArgumentError.new("number", "is not a positive Integer") unless size.positive?
+            raise InvalidArgumentError.new(size_key, "is not a positive Integer") unless size.positive?
             size
           rescue ArgumentError
-            raise InvalidArgumentError.new("number", "is not a positive Integer")
+            raise InvalidArgumentError.new(size_key, "is not a positive Integer")
           end
         end
       end
@@ -77,7 +86,7 @@ module Dry
 
       def lookup_nested_config_key(key, prefix)
         key = prefix ? "#{prefix}.#{key}" : key
-        config.lookup!(key) # || warning
+        config.lookup!(key)
       end
 
       def lookup_nested_params_key(key, prefix)

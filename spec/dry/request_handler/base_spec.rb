@@ -35,7 +35,7 @@ describe Dry::RequestHandler::Base do
   shared_examples "correct_arguments_passed" do
     it "passes the right arguments to the handler" do
       expect(tested_handler).to receive(:new).with(expected_args).and_return(runstub)
-      testclass.new(request: request).send(tested_method)
+      expect(testclass.new(request: request).send(tested_method)).to eq(runstub.run)
     end
   end
 

@@ -14,7 +14,6 @@ describe Dry::RequestHandler::BodyHandler do
 
   let(:schema) { Dry::Validation.JSON {} }
   def build_mock_request(params:, headers:, body: "")
-    # TODO: check if this double is close enough to a real Rack::Request
     instance_double("Rack::Request", params: params, env: headers, body: StringIO.new(body))
   end
 

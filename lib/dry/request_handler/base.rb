@@ -79,10 +79,7 @@ module Dry
       def execute_options(options)
         return {} if options.nil?
         return options unless options.respond_to?(:call)
-        # TODO: not sure about this yet.
-        # request isn't enough if I want to access body options for filter schema validation w/o reparsing the raw body
-        # handler isn't enough if I want or need to access the raw request (to avoid a dependency loop)
-        # Right now also the user has to take care of not creating a dependency loop between the parts
+        # https://issues.example.com/browse/NFCO-297
         options.call(self, request)
       end
 
