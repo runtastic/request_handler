@@ -5,12 +5,14 @@ module Dry
   module RequestHandler
     class FilterHandler < SchemaHandler
       def initialize(params:, schema:, additional_url_filter:, schema_options: {})
-        @filter = params.fetch("filter") { {} }
         super(schema: schema, schema_options: schema_options)
+        raise WrongArgumentTypeError.new(params: "must be a Hash") unless params.is_a?(Hash)
+        @filter = params.fetch("filter") { {} }
+        raise WrongArgumentTypeError.new(filter: "must be a Hash") unless @filter.is_a?(Hash)
         Array(additional_url_filter).each do |key|
           key = key.to_s
           raise build_error(key) unless @filter[key].nil?
-          @filter[key] = params.fetch(key)
+          @filter[key] = params.fetch(key) { nil }
         end
       end
 
@@ -21,7 +23,7 @@ module Dry
       private
 
       def build_error(key)
-        InvalidArgumentError.new("filter[" + key + "]", "the filter key was set twice")
+        InvalidArgumentError.new(filter: "the filter key was set twice")
       end
 
       attr_reader :filter

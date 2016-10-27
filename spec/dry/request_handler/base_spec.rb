@@ -108,6 +108,7 @@ describe Dry::RequestHandler::Base do
   end
 
   context "#include_params" do
+    let(:runstub) { double("Handler", run: [{ foo: "bar" }]) }
     let(:testclass) do
       Class.new(Dry::RequestHandler::Base) do
         options do
@@ -130,6 +131,7 @@ describe Dry::RequestHandler::Base do
   end
 
   context "#sort_params" do
+    let(:runstub) { double("Handler", run: [{ foo: "bar" }]) }
     let(:testclass) do
       Class.new(Dry::RequestHandler::Base) do
         options do

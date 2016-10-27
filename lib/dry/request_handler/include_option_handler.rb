@@ -5,13 +5,14 @@ module Dry
   module RequestHandler
     class IncludeOptionHandler < OptionHandler
       def run
+        return [] unless params.key?("include")
         options = fetch_options
-        raise InvalidArgumentError.new("include", "contains a space") if options.include? " "
+        raise InvalidArgumentError.new(include: "must not contain a space") if options.include? " "
         options.split(",").map do |option|
           begin
             allowed_options_type.call(option) if allowed_options_type
           rescue Types::ConstraintError
-            raise OptionNotAllowedError.new(option)
+            raise OptionNotAllowedError.new(option.to_sym => "is not an allowed include option")
           end
           option.to_sym
         end
@@ -19,7 +20,7 @@ module Dry
 
       def fetch_options
         if params.fetch("include") { nil } == ""
-          raise InvalidArgumentError.new("include_options", "query paramter is empty")
+          raise InvalidArgumentError.new(include_options: "query paramter must not be empty")
         end
         params.fetch("include") { "" }
       end

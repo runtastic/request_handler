@@ -6,7 +6,7 @@ module Dry
       def initialize(params:, allowed_options_type:)
         @params = params
         @allowed_options_type = allowed_options_type
-        raise WrongArgumentTypeError.new("allowed_options_type") unless enum?
+        raise WrongArgumentTypeError.new(allowed_options_type: "must be a Enum") unless enum?
       end
 
       private

@@ -5,10 +5,11 @@ module Dry
     class PageHandler
       def initialize(params:, page_config:)
         missing_arguments = []
-        missing_arguments << "params" if params.nil?
-        missing_arguments << "page_config" if page_config.nil?
+        missing_arguments << { params: "is missing" } if params.nil?
+        missing_arguments << { page_config: "is missing" } if page_config.nil?
         raise MissingArgumentError.new(missing_arguments) if missing_arguments.length.positive?
         @page_options = params.fetch("page") { {} }
+        raise WrongArgumentTypeError.new(page: "must be a Hash") unless @page_options.is_a?(Hash)
         @config = page_config
       end
 
@@ -35,17 +36,17 @@ module Dry
 
       def extract_number(prefix: nil)
         number = Integer(lookup_nested_params_key("number", prefix) || 1)
-        raise InvalidArgumentError.new("number", "is not a positive Integer") unless number.positive?
+        raise InvalidArgumentError.new("#{prefix}_number".to_sym => "must be a positive Integer") unless number.positive?
         number
       rescue ArgumentError
-        raise InvalidArgumentError.new("number", "is not a positive Integer")
+        raise WrongArgumentTypeError.new("#{prefix}_number".to_sym => "must be a positive Integer")
       end
 
       def extract_size(prefix: nil)
         size = fetch_and_check_size(prefix)
         default_size = fetch_and_check_default_size(prefix)
         if size.nil? || size.zero?
-          raise NoConfigAvailableError.new("#{prefix}_size") if default_size.nil? || default_size.zero?
+          raise NoConfigAvailableError.new("#{prefix}_size".to_sym => "is defined nowhere") if default_size.nil? || default_size.zero?
           return default_size
         end
         warn "#{prefix} default_size config not set" if default_size.nil?
@@ -59,17 +60,17 @@ module Dry
 
       def fetch_and_check_size(prefix)
         size_string = lookup_nested_params_key("size", prefix)
-        check_size(size_string: size_string, size_key: "size")
+        check_size(size_string: size_string, size_key: "#{prefix}_size")
       end
 
       def check_size(size_string:, size_key:)
         unless size_string.nil?
           begin
             size = Integer(size_string)
-            raise InvalidArgumentError.new(size_key, "is not a positive Integer") unless size.positive?
+            raise InvalidArgumentError.new(size_key.to_sym => "must be a positive Integer") unless size.positive?
             size
           rescue ArgumentError
-            raise InvalidArgumentError.new(size_key, "is not a positive Integer")
+            raise WrongArgumentTypeError.new(size_key.to_sym => "must be a positive Integer")
           end
         end
       end

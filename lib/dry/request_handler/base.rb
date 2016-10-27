@@ -23,38 +23,27 @@ module Dry
         attr_accessor :config
       end
       def initialize(request:)
-        raise MissingArgumentError.new(["request"]) if request.nil?
+        raise MissingArgumentError.new(request: "is missing") if request.nil?
         @request = request
       end
 
       def filter_params
-        @filter_params ||= FilterHandler.new(
-          params:                params,
-          schema:                config.lookup!("filter.schema"),
-          additional_url_filter: config.lookup!("filter.additional_url_filter"),
-          schema_options:        execute_options(config.lookup!("filter.options"))
-        ).run
+        @filter_params ||= handle_filter_params
       end
 
       def page_params
-        @page_handler ||= PageHandler.new(
+        @page_params ||= PageHandler.new(
           params:      params,
           page_config: config.lookup!("page")
         ).run
       end
 
       def include_params
-        @include_params ||= IncludeOptionHandler.new(
-          params:               params,
-          allowed_options_type: config.lookup!("include_options.allowed")
-        ).run
+        @include_params ||= handle_include_params
       end
 
       def sort_params
-        @sort_params ||= SortOptionHandler.new(
-          params:               params,
-          allowed_options_type: config.lookup!("sort_options.allowed")
-        ).run
+        @sort_params ||= handle_sort_params
       end
 
       def authorization_headers
@@ -62,11 +51,7 @@ module Dry
       end
 
       def body_params
-        @body_params ||= BodyHandler.new(
-          request:        request,
-          schema:         config.lookup!("body.schema"),
-          schema_options: execute_options(config.lookup!("body.options"))
-        ).run
+        @body_params ||= handle_body_params
       end
 
       # @abstract Subclass is expected to implement #to_dto
@@ -77,6 +62,49 @@ module Dry
 
       attr_reader :request
 
+      def handle_filter_params
+        defaults = fetch_defaults("filter.defaults", {})
+        defaults.merge(FilterHandler.new(
+          params:                params,
+          schema:                config.lookup!("filter.schema"),
+          additional_url_filter: config.lookup!("filter.additional_url_filter"),
+          schema_options:        execute_options(config.lookup!("filter.options"))
+        ).run)
+      end
+
+      def handle_include_params
+        defaults = fetch_defaults("include_options.defaults", [])
+        defaults | IncludeOptionHandler.new(
+          params:               params,
+          allowed_options_type: config.lookup!("include_options.allowed")
+        ).run
+      end
+
+      def handle_sort_params
+        defaults = fetch_defaults("sort_options.defaults", [])
+        result = SortOptionHandler.new(
+          params:               params,
+          allowed_options_type: config.lookup!("sort_options.allowed")
+        ).run
+        defaults | result
+      end
+
+      def handle_body_params
+        defaults = fetch_defaults("body.defaults", {})
+        defaults.merge(BodyHandler.new(
+          request:        request,
+          schema:         config.lookup!("body.schema"),
+          schema_options: execute_options(config.lookup!("body.options"))
+        ).run)
+      end
+
+      def fetch_defaults(key, default)
+        value = config.lookup!(key)
+        return default if value.nil?
+        return value unless value.respond_to?(:call)
+        value.call(request)
+      end
+
       def execute_options(options)
         return {} if options.nil?
         return options unless options.respond_to?(:call)
@@ -85,8 +113,8 @@ module Dry
       end
 
       def params
-        raise MissingArgumentError.new(["params"]) if request.params.nil?
-        raise WrongArgumentTypeError.new("params") unless request.params.is_a?(Hash)
+        raise MissingArgumentError.new(params: "is missing") if request.params.nil?
+        raise WrongArgumentTypeError.new(params: "must be a Hash") unless request.params.is_a?(Hash)
         @params ||= _deep_transform_keys_in_object(request.params) { |k| k.tr(".", "_") }
       end
 

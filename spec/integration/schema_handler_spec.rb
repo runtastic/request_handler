@@ -106,6 +106,7 @@ describe Dry::RequestHandler do
                 schema(Dry::Validation.Form do
                   required(:name).filled(:str?)
                 end)
+              defaults ({foo: "bar"})
               end
             end
             def to_dto
@@ -130,7 +131,7 @@ describe Dry::RequestHandler do
         it "works for valid data" do
           request = build_mock_request(params: valid_params, headers: {}, body: "")
           testhandler = testclass.new(request: request)
-          expect(testhandler.to_dto).to eq(OpenStruct.new(filter: { name: "foo" }))
+          expect(testhandler.to_dto).to eq(OpenStruct.new(filter: { name: "foo", foo: "bar" }))
         end
       end
       context "invalid schema" do

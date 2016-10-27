@@ -11,7 +11,7 @@ describe Dry::RequestHandler::PageHandler do
   shared_examples "handles invalid inputs correctly" do
     it "raises the an Dry::RequestHandler::InvalidArgumentError for an invalid input" do
       handler = Dry::RequestHandler::PageHandler.new(params: params, page_config: config.lookup!("page"))
-      expect { handler.run }.to raise_error(Dry::RequestHandler::InvalidArgumentError)
+      expect { handler.run }.to raise_error(error)
     end
   end
   shared_examples "handles missing options correctly" do
@@ -108,6 +108,7 @@ describe Dry::RequestHandler::PageHandler do
   end
 
   context "number is set to a non integer string" do
+    let(:error) { Dry::RequestHandler::WrongArgumentTypeError }
     let(:params) do
       { "page" => {
         "users_size"   => "40",
@@ -118,6 +119,7 @@ describe Dry::RequestHandler::PageHandler do
   end
 
   context "number is set to a negative string" do
+    let(:error) { Dry::RequestHandler::InvalidArgumentError }
     let(:params) do
       { "page" => {
         "users_size"   => "40",
@@ -128,6 +130,7 @@ describe Dry::RequestHandler::PageHandler do
   end
 
   context "size is set to a negative string" do
+    let(:error) { Dry::RequestHandler::InvalidArgumentError }
     let(:params) do
       { "page" => {
         "users_size"   => "-40",
@@ -138,6 +141,7 @@ describe Dry::RequestHandler::PageHandler do
   end
 
   context "size is set to a non integer string" do
+    let(:error) { Dry::RequestHandler::WrongArgumentTypeError }
     let(:params) do
       { "page" => {
         "users_size"   => "asdf",

@@ -1,40 +1,29 @@
 # frozen_string_literal: true
 module Dry
   module RequestHandler
-    class MissingArgumentError < StandardError
-      def initialize(arguments)
-        @arguments = arguments
+    class BaseError < StandardError
+      attr_reader :errors
+      def initialize(errors)
+        @errors = errors
         super(message)
       end
-
       def message
-        "The arguments #{@arguments} are missing."
+        @errors.each_with_object("") do |(key, value), memo|
+          memo+=key.to_s+": "+value.to_s+", "
+        end
       end
     end
-    class WrongArgumentTypeError < StandardError
-      def initialize(argument)
-        super("The argument #{argument} has the wrong type")
-      end
+    class MissingArgumentError < BaseError
     end
-    class InvalidArgumentError < StandardError
-      def initialize(argument, message = nil)
-        super("The argument #{argument} is invalid. (#{message || 'No further information given'})")
-      end
+    class WrongArgumentTypeError < BaseError
     end
-    class SchemaValidationError < StandardError
-      def initialize(message = nil)
-        super(message || "There was a validation error with the data passed to the schema.")
-      end
+    class InvalidArgumentError < BaseError
     end
-    class OptionNotAllowedError < StandardError
-      def initialize(option)
-        super("The option #{option} is not allowed.")
-      end
+    class SchemaValidationError < BaseError
     end
-    class NoConfigAvailableError < StandardError
-      def initialize(option)
-        super("There is no config available for #{option} in any source.")
-      end
+    class OptionNotAllowedError < BaseError
+    end
+    class NoConfigAvailableError < BaseError
     end
   end
 end
