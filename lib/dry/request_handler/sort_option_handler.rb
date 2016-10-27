@@ -12,7 +12,7 @@ module Dry
       end
 
       def fetch_options
-        raise InvalidArgumentError.new(sort_options: "the query paramter must not be empty") if params.fetch("sort") { nil } == ""
+        raise InvalidArgumentError.new(sort_options: "the query paramter must not be empty") if empty_param?("sort")
         params.fetch("sort") { "" }.split(",")
       end
 

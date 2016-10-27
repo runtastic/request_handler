@@ -25,6 +25,56 @@ describe Dry::RequestHandler::Base do
     end
   end
 
+  shared_examples "default_handling" do
+    it "uses the default values if no value is given" do
+      instance = testclass.new(request: request)
+      expect(tested_handler).to receive(:new).and_return(runstub)
+      expect(instance.send(tested_method)).to eq(tested_defaults[:output])
+    end
+  end
+
+  shared_examples "correct_default_handling_hash" do
+    context "without defaults" do
+      let(:tested_defaults) { { input: nil, output: runstub.run } }
+      it_behaves_like "default_handling"
+    end
+    context "with hash defaults" do
+      let(:tested_defaults) { { input: { default_foo: "bar" }, output: { default_foo: "bar" }.merge(runstub.run) } }
+      it_behaves_like "default_handling"
+    end
+    context "with proc defaults" do
+      let(:tested_defaults) do
+        { input:  ->(_request) { { default_foo: "bar" } },
+          output: { default_foo: "bar" }.merge(runstub.run) }
+      end
+      it_behaves_like "default_handling"
+    end
+    context "with proc using request as defaults" do
+      let(:tested_defaults) do
+        { input:  ->(request) { { default_foo: request.env["FOO"] } },
+          output: { default_foo: "bar" }.merge(runstub.run) }
+      end
+      it_behaves_like "default_handling"
+    end
+  end
+  shared_examples "correct_default_handling_array" do
+    context "without defaults" do
+      it_behaves_like "default_handling"
+    end
+    context "with hash defaults" do
+      let(:tested_defaults) { { input: [:test1, :test2], output: [:test1, :test2] | runstub.run } }
+      it_behaves_like "default_handling"
+    end
+    context "with proc defaults" do
+      let(:tested_defaults) { { input: ->(_request) { [:test1, :test2] }, output: [:test1, :test2] | runstub.run } }
+      it_behaves_like "default_handling"
+    end
+    context "with proc using request as defaults" do
+      let(:tested_defaults) { { input: ->(request) { [request.env["FOO"].to_sym] }, output: [:bar] | runstub.run } }
+      it_behaves_like "default_handling"
+    end
+  end
+
   let(:params) do
     {
       "url_filter" => "bar"
@@ -43,12 +93,14 @@ describe Dry::RequestHandler::Base do
   context "#filter_params" do
     let(:testclass) do
       opts = tested_options[:input]
+      defs = tested_defaults[:input]
       Class.new(Dry::RequestHandler::Base) do
         options do
           filter do
             schema "schema"
             additional_url_filter "url_filter"
             options(opts)
+            defaults(defs)
           end
         end
       end
@@ -63,25 +115,36 @@ describe Dry::RequestHandler::Base do
     end
     let(:tested_method)  { :filter_params }
     let(:tested_handler) { Dry::RequestHandler::FilterHandler }
+    let(:tested_defaults) { { input: nil, output: runstub.run } }
     context "with a proc as options" do
-      let(:tested_options) { { input: ->(_handler, _request) { { body_user_id: 1 } }, output: { body_user_id: 1 } } }
+      let(:tested_options) do
+        { input:  ->(_handler, _request) { { body_user_id: 1 } },
+          output: { body_user_id: 1 } }
+      end
       it_behaves_like "correct_persistence"
       it_behaves_like "correct_arguments_passed"
+      it_behaves_like "correct_default_handling_hash"
     end
     context "with a proc using the request as options" do
-      let(:tested_options) { { input: ->(_handler, request) { { foo: request.env["FOO"] } }, output: { foo: "bar" } } }
+      let(:tested_options) do
+        { input:  ->(_handler, request) { { foo: request.env["FOO"] } },
+          output: { foo: "bar" } }
+      end
       it_behaves_like "correct_persistence"
       it_behaves_like "correct_arguments_passed"
+      it_behaves_like "correct_default_handling_hash"
     end
     context "with a hash options" do
       let(:tested_options) { { input: { foo: "bar" }, output: { foo: "bar" } } }
       it_behaves_like "correct_persistence"
       it_behaves_like "correct_arguments_passed"
+      it_behaves_like "correct_default_handling_hash"
     end
     context "with nil as options" do
       let(:tested_options) { { input: nil, output: {} } }
       it_behaves_like "correct_persistence"
       it_behaves_like "correct_arguments_passed"
+      it_behaves_like "correct_default_handling_hash"
     end
   end
 
@@ -110,10 +173,12 @@ describe Dry::RequestHandler::Base do
   context "#include_params" do
     let(:runstub) { double("Handler", run: [{ foo: "bar" }]) }
     let(:testclass) do
+      defs = tested_defaults[:input]
       Class.new(Dry::RequestHandler::Base) do
         options do
           include_options do
             allowed "allowed_options"
+            defaults(defs)
           end
         end
       end
@@ -126,17 +191,21 @@ describe Dry::RequestHandler::Base do
     end
     let(:tested_method)  { :include_params }
     let(:tested_handler) { Dry::RequestHandler::IncludeOptionHandler }
+    let(:tested_defaults) { { input: nil, output: runstub.run } }
     it_behaves_like "correct_persistence"
     it_behaves_like "correct_arguments_passed"
+    it_behaves_like "correct_default_handling_array"
   end
 
   context "#sort_params" do
     let(:runstub) { double("Handler", run: [{ foo: "bar" }]) }
     let(:testclass) do
+      defs = tested_defaults[:input]
       Class.new(Dry::RequestHandler::Base) do
         options do
           sort_options do
             allowed "allowed_options"
+            defaults(defs)
           end
         end
       end
@@ -149,8 +218,10 @@ describe Dry::RequestHandler::Base do
     end
     let(:tested_method)  { :sort_params }
     let(:tested_handler) { Dry::RequestHandler::SortOptionHandler }
+    let(:tested_defaults) { { input: nil, output: runstub.run } }
     it_behaves_like "correct_persistence"
     it_behaves_like "correct_arguments_passed"
+    it_behaves_like "correct_default_handling_array"
   end
 
   context "#authorization_headers" do
@@ -177,11 +248,13 @@ describe Dry::RequestHandler::Base do
   context "#body_params" do
     let(:testclass) do
       opts = tested_options[:input]
+      defs = tested_defaults[:input]
       Class.new(Dry::RequestHandler::Base) do
         options do
           body do
             schema "schema"
             options(opts)
+            defaults(defs)
           end
         end
       end
@@ -195,25 +268,36 @@ describe Dry::RequestHandler::Base do
     end
     let(:tested_method)  { :body_params }
     let(:tested_handler) { Dry::RequestHandler::BodyHandler }
+    let(:tested_defaults) { { input: nil, output: runstub.run } }
     context "with a proc as options" do
-      let(:tested_options) { { input: ->(_handler, _request) { { body_user_id: 1 } }, output: { body_user_id: 1 } } }
+      let(:tested_options) do
+        { input:  ->(_handler, _request) { { body_user_id: 1 } },
+          output: { body_user_id: 1 } }
+      end
       it_behaves_like "correct_persistence"
       it_behaves_like "correct_arguments_passed"
+      it_behaves_like "correct_default_handling_hash"
     end
     context "with a proc using the request as options" do
-      let(:tested_options) { { input: ->(_handler, request) { { foo: request.env["FOO"] } }, output: { foo: "bar" } } }
+      let(:tested_options) do
+        { input:  ->(_handler, request) { { foo: request.env["FOO"] } },
+          output: { foo: "bar" } }
+      end
       it_behaves_like "correct_persistence"
       it_behaves_like "correct_arguments_passed"
+      it_behaves_like "correct_default_handling_hash"
     end
     context "with a hash as options" do
       let(:tested_options) { { input: { body_user_id: 1 }, output: { body_user_id: 1 } } }
       it_behaves_like "correct_persistence"
       it_behaves_like "correct_arguments_passed"
+      it_behaves_like "correct_default_handling_hash"
     end
     context "with nil as options" do
       let(:tested_options) { { input: nil, output: {} } }
       it_behaves_like "correct_persistence"
       it_behaves_like "correct_arguments_passed"
+      it_behaves_like "correct_default_handling_hash"
     end
   end
 
@@ -246,7 +330,7 @@ describe Dry::RequestHandler::Base do
       testedhandler = testclass.new(request: request)
       expect { testedhandler.send(:params) }.to raise_error(Dry::RequestHandler::MissingArgumentError)
     end
-    it "raises a MissingArgumentError if params is not a Hash" do
+    it "raises a WrongArgumentTypeError if params is not a Hash" do
       request = instance_double("Rack::Request", params: "Foo", env: {}, body: "")
       testedhandler = testclass.new(request: request)
       expect { testedhandler.send(:params) }.to raise_error(Dry::RequestHandler::WrongArgumentTypeError)

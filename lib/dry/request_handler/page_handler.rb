@@ -36,7 +36,9 @@ module Dry
 
       def extract_number(prefix: nil)
         number = Integer(lookup_nested_params_key("number", prefix) || 1)
-        raise InvalidArgumentError.new("#{prefix}_number".to_sym => "must be a positive Integer") unless number.positive?
+        unless number.positive?
+          raise InvalidArgumentError.new("#{prefix}_number".to_sym => "must be a positive Integer")
+        end
         number
       rescue ArgumentError
         raise WrongArgumentTypeError.new("#{prefix}_number".to_sym => "must be a positive Integer")
@@ -46,7 +48,9 @@ module Dry
         size = fetch_and_check_size(prefix)
         default_size = fetch_and_check_default_size(prefix)
         if size.nil? || size.zero?
-          raise NoConfigAvailableError.new("#{prefix}_size".to_sym => "is defined nowhere") if default_size.nil? || default_size.zero?
+          if default_size.nil? || default_size.zero?
+            raise NoConfigAvailableError.new("#{prefix}_size".to_sym => "is not defined anywhere")
+          end
           return default_size
         end
         warn "#{prefix} default_size config not set" if default_size.nil?

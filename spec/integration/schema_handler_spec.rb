@@ -106,7 +106,7 @@ describe Dry::RequestHandler do
                 schema(Dry::Validation.Form do
                   required(:name).filled(:str?)
                 end)
-              defaults ({foo: "bar"})
+                defaults(foo: "bar")
               end
             end
             def to_dto

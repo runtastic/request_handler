@@ -6,7 +6,6 @@ module Dry
     class FilterHandler < SchemaHandler
       def initialize(params:, schema:, additional_url_filter:, schema_options: {})
         super(schema: schema, schema_options: schema_options)
-        raise WrongArgumentTypeError.new(params: "must be a Hash") unless params.is_a?(Hash)
         @filter = params.fetch("filter") { {} }
         raise WrongArgumentTypeError.new(filter: "must be a Hash") unless @filter.is_a?(Hash)
         Array(additional_url_filter).each do |key|
@@ -22,7 +21,7 @@ module Dry
 
       private
 
-      def build_error(key)
+      def build_error(_key)
         InvalidArgumentError.new(filter: "the filter key was set twice")
       end
 

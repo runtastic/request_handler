@@ -107,4 +107,16 @@ describe Dry::RequestHandler::FilterHandler do
     expect { described_class.new(schema: schema, params: params, additional_url_filter: additional_url_filter) }
       .to raise_error(Dry::RequestHandler::InvalidArgumentError)
   end
+
+  it "fails if params.filter is not a Hash" do
+    params =
+      {
+        "filter" => "nope"
+      }
+    schema = Dry::Validation.Schema do
+      required("name").filled
+    end
+    expect { described_class.new(schema: schema, params: params, additional_url_filter: additional_url_filter) }
+      .to raise_error(Dry::RequestHandler::WrongArgumentTypeError)
+  end
 end

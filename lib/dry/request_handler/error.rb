@@ -7,9 +7,10 @@ module Dry
         @errors = errors
         super(message)
       end
+
       def message
         @errors.each_with_object("") do |(key, value), memo|
-          memo+=key.to_s+": "+value.to_s+", "
+          memo + key.to_s + ": " + value.to_s + ", "
         end
       end
     end

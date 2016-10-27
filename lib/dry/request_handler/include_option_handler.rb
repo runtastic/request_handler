@@ -8,7 +8,11 @@ module Dry
         return [] unless params.key?("include")
         options = fetch_options
         raise InvalidArgumentError.new(include: "must not contain a space") if options.include? " "
-        options.split(",").map do |option|
+        allowed_options(options.split(","))
+      end
+
+      def allowed_options(options)
+        options.map do |option|
           begin
             allowed_options_type.call(option) if allowed_options_type
           rescue Types::ConstraintError
@@ -19,9 +23,7 @@ module Dry
       end
 
       def fetch_options
-        if params.fetch("include") { nil } == ""
-          raise InvalidArgumentError.new(include_options: "query paramter must not be empty")
-        end
+        raise InvalidArgumentError.new(include_options: "query paramter must not be empty") if empty_param?("include")
         params.fetch("include") { "" }
       end
     end

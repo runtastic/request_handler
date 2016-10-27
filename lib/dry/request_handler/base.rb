@@ -8,6 +8,7 @@ require "dry/request_handler/body_handler"
 require "confstruct"
 module Dry
   module RequestHandler
+    # rubocop:disable Metrics/ClassLength
     class Base
       class << self
         def options(&block)

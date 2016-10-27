@@ -14,6 +14,10 @@ module Dry
       def enum?
         @allowed_options_type.class.equal?(Dry::Types::Enum)
       end
+
+      def empty_param?(param)
+        params.fetch(param) { nil } == ""
+      end
       attr_reader :params, :allowed_options_type
     end
   end
