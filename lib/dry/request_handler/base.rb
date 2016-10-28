@@ -115,7 +115,7 @@ module Dry
 
       def params
         raise MissingArgumentError.new(params: "is missing") if request.params.nil?
-        raise WrongArgumentTypeError.new(params: "must be a Hash") unless request.params.is_a?(Hash)
+        raise ExternalArgumentError.new(params: "must be a Hash") unless request.params.is_a?(Hash)
         @params ||= _deep_transform_keys_in_object(request.params) { |k| k.tr(".", "_") }
       end
 

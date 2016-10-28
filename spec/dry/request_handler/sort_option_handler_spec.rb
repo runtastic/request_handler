@@ -38,7 +38,7 @@ describe Dry::RequestHandler::SortOptionHandler do
   context "no sort options are specified" do
     let(:params) { { "sort" => "" } }
     let(:output) { [] }
-    let(:error) { Dry::RequestHandler::InvalidArgumentError }
+    let(:error) { Dry::RequestHandler::ExternalArgumentError }
     it_behaves_like "processes invalid sort options correctly"
   end
 
@@ -50,19 +50,19 @@ describe Dry::RequestHandler::SortOptionHandler do
 
   context "sort key is not unique and the order is different in the duplicate" do
     let(:params) { { "sort" => "id,-id" } }
-    let(:error) { Dry::RequestHandler::InvalidArgumentError }
+    let(:error) { Dry::RequestHandler::ExternalArgumentError }
     it_behaves_like "processes invalid sort options correctly"
   end
 
   context "sort key is not unique and the order is identical in the duplicate" do
     let(:params) { { "sort" => "id,id" } }
-    let(:error) { Dry::RequestHandler::InvalidArgumentError }
+    let(:error) { Dry::RequestHandler::ExternalArgumentError }
     it_behaves_like "processes invalid sort options correctly"
   end
 
   context "one of the sort keys contains spaces" do
     let(:params) { { "sort" => "id, foo" } }
-    let(:error) { Dry::RequestHandler::InvalidArgumentError }
+    let(:error) { Dry::RequestHandler::ExternalArgumentError }
     it_behaves_like "processes invalid sort options correctly"
   end
 

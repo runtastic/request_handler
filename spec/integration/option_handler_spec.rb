@@ -23,20 +23,20 @@ describe Dry::RequestHandler do
         testhandler = testclass.new(request: request)
         expect { testhandler.to_dto }.to raise_error(Dry::RequestHandler::OptionNotAllowedError)
       end
-      it "raises an InvalidArgumentError if the query parameter contains as space" do
+      it "raises an ExternalArgumentError if the query parameter contains as space" do
         request = build_mock_request(params: { "include" => "user, groups" }, headers: {}, body: "")
         testhandler = testclass.new(request: request)
-        expect { testhandler.to_dto }.to raise_error(Dry::RequestHandler::InvalidArgumentError)
+        expect { testhandler.to_dto }.to raise_error(Dry::RequestHandler::ExternalArgumentError)
       end
-      it "raises a MissingArgumentError if params is set to nil" do
+      it "raises a InternalArgumentError if params is set to nil" do
         request = build_mock_request(params: nil, headers: {}, body: "")
         testhandler = testclass.new(request: request)
         expect { testhandler.to_dto }.to raise_error(Dry::RequestHandler::MissingArgumentError)
       end
-      it "raises a WrongArgumentTypeError if params is no Hash" do
+      it "raises a ExternalArgumentError if params is no Hash" do
         request = build_mock_request(params: "Foo", headers: {}, body: "")
         testhandler = testclass.new(request: request)
-        expect { testhandler.to_dto }.to raise_error(Dry::RequestHandler::WrongArgumentTypeError)
+        expect { testhandler.to_dto }.to raise_error(Dry::RequestHandler::ExternalArgumentError)
       end
       it "works for valid paramaters and settings" do
         request = build_mock_request(params: { "include" => "user" }, headers: {}, body: "")
@@ -64,20 +64,20 @@ describe Dry::RequestHandler do
         testhandler = testclass.new(request: request)
         expect { testhandler.to_dto }.to raise_error(Dry::RequestHandler::OptionNotAllowedError)
       end
-      it "raises an InvalidArgumentError if the query parameter contains as space" do
+      it "raises an ExternalArgumentError if the query parameter contains as space" do
         request = build_mock_request(params: { "sort" => "name, age" }, headers: {}, body: "")
         testhandler = testclass.new(request: request)
-        expect { testhandler.to_dto }.to raise_error(Dry::RequestHandler::InvalidArgumentError)
+        expect { testhandler.to_dto }.to raise_error(Dry::RequestHandler::ExternalArgumentError)
       end
       it "raises an MissingArgumentError if params is set to nil" do
         request = build_mock_request(params: nil, headers: {}, body: "")
         testhandler = testclass.new(request: request)
         expect { testhandler.to_dto }.to raise_error(Dry::RequestHandler::MissingArgumentError)
       end
-      it "raises an WrongArgumentTypeError if params is not a Hash" do
+      it "raises an ExternalArgumentError if params is not a Hash" do
         request = build_mock_request(params: "Foo", headers: {}, body: "")
         testhandler = testclass.new(request: request)
-        expect { testhandler.to_dto }.to raise_error(Dry::RequestHandler::WrongArgumentTypeError)
+        expect { testhandler.to_dto }.to raise_error(Dry::RequestHandler::ExternalArgumentError)
       end
       it "works for valid paramaters and settings" do
         request = build_mock_request(params: { "sort" => "-name" }, headers: {}, body: "")

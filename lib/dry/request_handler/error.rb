@@ -14,17 +14,21 @@ module Dry
         end
       end
     end
-    class MissingArgumentError < BaseError
+    class InternalBaseError < BaseError
     end
-    class WrongArgumentTypeError < BaseError
+    class ExternalBaseError < BaseError
     end
-    class InvalidArgumentError < BaseError
+    class MissingArgumentError < InternalBaseError
     end
-    class SchemaValidationError < BaseError
+    class ExternalArgumentError < ExternalBaseError
     end
-    class OptionNotAllowedError < BaseError
+    class InternalArgumentError < InternalBaseError
     end
-    class NoConfigAvailableError < BaseError
+    class SchemaValidationError < ExternalBaseError
+    end
+    class OptionNotAllowedError < ExternalBaseError
+    end
+    class NoConfigAvailableError < InternalBaseError
     end
   end
 end

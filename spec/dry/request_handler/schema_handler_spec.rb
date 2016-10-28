@@ -55,6 +55,10 @@ describe Dry::RequestHandler::SchemaHandler do
     expect { described_class.new(schema: nil) }.to raise_error(Dry::RequestHandler::MissingArgumentError)
   end
 
+  it "fails for an invalid schema" do
+    expect { described_class.new(schema: "foo") }.to raise_error(Dry::RequestHandler::InternalArgumentError)
+  end
+
   it "fails if schema_options is nil" do
     expect { described_class.new(schema: schema_without_options, schema_options: nil) }
       .to raise_error(Dry::RequestHandler::MissingArgumentError)

@@ -8,7 +8,7 @@ module Dry
         missing_arguments << { schema: "is missing" } if schema.nil?
         missing_arguments << { schema_options: "is missing" } if schema_options.nil?
         raise MissingArgumentError.new(missing_arguments) if missing_arguments.length.positive?
-        raise WrongArgumentTypeError.new(schema: "must be a Schema")  unless schema.is_a?(Dry::Validation::Schema)
+        raise InternalArgumentError.new(schema: "must be a Schema")  unless schema.is_a?(Dry::Validation::Schema)
         @schema = schema
         @schema_options = schema_options
       end
@@ -18,7 +18,7 @@ module Dry
       def validate_schema(data)
         raise MissingArgumentError.new(data: "is missing") if data.nil?
         validator = validate(data)
-        raise SchemaValidationError.new(validator.errors) if validation_failure?(validator)
+        validation_failure?(validator)
         validator.output
       end
 
@@ -32,9 +32,10 @@ module Dry
 
       def validation_failure?(validator)
         if validator.failure?
-          validator.errors.each_with_object({}) do |(k, v), memo|
+          errors = validator.errors.each_with_object({}) do |(k, v), memo|
             memo[k] = v.join(" ")
           end
+          raise SchemaValidationError.new(errors)
         end
       end
 

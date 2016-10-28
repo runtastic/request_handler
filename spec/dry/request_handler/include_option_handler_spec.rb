@@ -31,7 +31,7 @@ describe Dry::RequestHandler::IncludeOptionHandler do
   context "no include options are specified" do
     let(:params) { { "include" => "" } }
     let(:output) { [] }
-    let(:error) { Dry::RequestHandler::InvalidArgumentError }
+    let(:error) { Dry::RequestHandler::ExternalArgumentError }
     it_behaves_like "proccesses invalid options correctly"
   end
 
@@ -41,7 +41,7 @@ describe Dry::RequestHandler::IncludeOptionHandler do
       described_class.new(params:               params,
                           allowed_options_type: Dry::Types["strict.string"].enum("user", "email"))
     end
-    let(:error) { Dry::RequestHandler::InvalidArgumentError }
+    let(:error) { Dry::RequestHandler::ExternalArgumentError }
     it_behaves_like "proccesses invalid options correctly"
   end
 

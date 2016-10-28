@@ -7,7 +7,7 @@ module Dry
       def run
         return [] unless params.key?("include")
         options = fetch_options
-        raise InvalidArgumentError.new(include: "must not contain a space") if options.include? " "
+        raise ExternalArgumentError.new(include: "must not contain a space") if options.include? " "
         allowed_options(options.split(","))
       end
 
@@ -23,7 +23,7 @@ module Dry
       end
 
       def fetch_options
-        raise InvalidArgumentError.new(include_options: "query paramter must not be empty") if empty_param?("include")
+        raise ExternalArgumentError.new(include_options: "query paramter must not be empty") if empty_param?("include")
         params.fetch("include") { "" }
       end
     end

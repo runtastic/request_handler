@@ -108,7 +108,7 @@ describe Dry::RequestHandler::PageHandler do
   end
 
   context "number is set to a non integer string" do
-    let(:error) { Dry::RequestHandler::WrongArgumentTypeError }
+    let(:error) { Dry::RequestHandler::ExternalArgumentError }
     let(:params) do
       { "page" => {
         "users_size"   => "40",
@@ -119,7 +119,7 @@ describe Dry::RequestHandler::PageHandler do
   end
 
   context "number is set to a negative string" do
-    let(:error) { Dry::RequestHandler::InvalidArgumentError }
+    let(:error) { Dry::RequestHandler::ExternalArgumentError }
     let(:params) do
       { "page" => {
         "users_size"   => "40",
@@ -130,7 +130,7 @@ describe Dry::RequestHandler::PageHandler do
   end
 
   context "size is set to a negative string" do
-    let(:error) { Dry::RequestHandler::InvalidArgumentError }
+    let(:error) { Dry::RequestHandler::ExternalArgumentError }
     let(:params) do
       { "page" => {
         "users_size"   => "-40",
@@ -141,7 +141,7 @@ describe Dry::RequestHandler::PageHandler do
   end
 
   context "size is set to a non integer string" do
-    let(:error) { Dry::RequestHandler::WrongArgumentTypeError }
+    let(:error) { Dry::RequestHandler::ExternalArgumentError }
     let(:params) do
       { "page" => {
         "users_size"   => "asdf",

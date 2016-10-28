@@ -75,10 +75,10 @@ describe Dry::RequestHandler do
             end
           end
         end
-        it "raises a WrongArgumentTypeError valid data" do
+        it "raises a InternalArgumentError valid data" do
           request = build_mock_request(params: {}, headers: {}, body: valid_body)
           testhandler = testclass.new(request: request)
-          expect { testhandler.to_dto }.to raise_error(Dry::RequestHandler::WrongArgumentTypeError)
+          expect { testhandler.to_dto }.to raise_error(Dry::RequestHandler::InternalArgumentError)
         end
       end
     end
@@ -149,10 +149,10 @@ describe Dry::RequestHandler do
             end
           end
         end
-        it "raises a WrongArgumentTypeError with valid data" do
+        it "raises a InternalArgumentError with valid data" do
           request = build_mock_request(params: valid_params, headers: {}, body: "")
           testhandler = testclass.new(request: request)
-          expect { testhandler.to_dto }.to raise_error(Dry::RequestHandler::WrongArgumentTypeError)
+          expect { testhandler.to_dto }.to raise_error(Dry::RequestHandler::InternalArgumentError)
         end
       end
     end

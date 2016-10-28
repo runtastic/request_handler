@@ -330,10 +330,10 @@ describe Dry::RequestHandler::Base do
       testedhandler = testclass.new(request: request)
       expect { testedhandler.send(:params) }.to raise_error(Dry::RequestHandler::MissingArgumentError)
     end
-    it "raises a WrongArgumentTypeError if params is not a Hash" do
+    it "raises a ExternalArgumentError if params is not a Hash" do
       request = instance_double("Rack::Request", params: "Foo", env: {}, body: "")
       testedhandler = testclass.new(request: request)
-      expect { testedhandler.send(:params) }.to raise_error(Dry::RequestHandler::WrongArgumentTypeError)
+      expect { testedhandler.send(:params) }.to raise_error(Dry::RequestHandler::ExternalArgumentError)
     end
   end
 

@@ -9,7 +9,7 @@ module Dry
         missing_arguments << { page_config: "is missing" } if page_config.nil?
         raise MissingArgumentError.new(missing_arguments) if missing_arguments.length.positive?
         @page_options = params.fetch("page") { {} }
-        raise WrongArgumentTypeError.new(page: "must be a Hash") unless @page_options.is_a?(Hash)
+        raise ExternalArgumentError.new(page: "must be a Hash") unless @page_options.is_a?(Hash)
         @config = page_config
       end
 
@@ -37,11 +37,11 @@ module Dry
       def extract_number(prefix: nil)
         number = Integer(lookup_nested_params_key("number", prefix) || 1)
         unless number.positive?
-          raise InvalidArgumentError.new("#{prefix}_number".to_sym => "must be a positive Integer")
+          raise ExternalArgumentError.new("#{prefix}_number".to_sym => "must be a positive Integer")
         end
         number
       rescue ArgumentError
-        raise WrongArgumentTypeError.new("#{prefix}_number".to_sym => "must be a positive Integer")
+        raise ExternalArgumentError.new("#{prefix}_number".to_sym => "must be a positive Integer")
       end
 
       def extract_size(prefix: nil)
@@ -71,10 +71,10 @@ module Dry
         unless size_string.nil?
           begin
             size = Integer(size_string)
-            raise InvalidArgumentError.new(size_key.to_sym => "must be a positive Integer") unless size.positive?
+            raise ExternalArgumentError.new(size_key.to_sym => "must be a positive Integer") unless size.positive?
             size
           rescue ArgumentError
-            raise WrongArgumentTypeError.new(size_key.to_sym => "must be a positive Integer")
+            raise ExternalArgumentError.new(size_key.to_sym => "must be a positive Integer")
           end
         end
       end

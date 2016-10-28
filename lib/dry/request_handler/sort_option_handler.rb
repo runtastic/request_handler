@@ -7,12 +7,12 @@ module Dry
       def run
         return [] unless params.key?("sort")
         sort_options = parse_options(fetch_options)
-        raise InvalidArgumentError.new(sort_options: "must be unique") if duplicates?(sort_options)
+        raise ExternalArgumentError.new(sort_options: "must be unique") if duplicates?(sort_options)
         sort_options
       end
 
       def fetch_options
-        raise InvalidArgumentError.new(sort_options: "the query paramter must not be empty") if empty_param?("sort")
+        raise ExternalArgumentError.new(sort_options: "the query paramter must not be empty") if empty_param?("sort")
         params.fetch("sort") { "" }.split(",")
       end
 
@@ -25,7 +25,7 @@ module Dry
       end
 
       def parse_option(option)
-        raise InvalidArgumentError.new(sort_options: "must not contain a space") if option.include? " "
+        raise ExternalArgumentError.new(sort_options: "must not contain a space") if option.include? " "
         if option.start_with?("-")
           [option[1..-1], :desc]
         else
