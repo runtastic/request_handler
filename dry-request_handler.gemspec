@@ -7,8 +7,8 @@ require "dry/request_handler/version"
 Gem::Specification.new do |spec|
   spec.name          = "dry-request_handler"
   spec.version       = Dry::RequestHandler::VERSION
-  spec.authors       = ["Andreas Eger"]
-  spec.email         = ["andreas.eger@runtastic.com"]
+  spec.authors       = ["Andreas Eger", "Raphael Hetzel"]
+  spec.email         = ["andreas.eger@runtastic.com", "raphael.hetzel@runtastic.com"]
 
   spec.summary       = "shared base for request_handler using dry-* gems"
   spec.description   = "shared base for request_handler using dry-* gems"
@@ -18,12 +18,7 @@ Gem::Specification.new do |spec|
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
   # to allow pushing to a single host or delete this section to allow pushing to any host.
-  if spec.respond_to?(:metadata)
-    spec.metadata["allowed_push_host"] = "http://gems.example.com"
-  else
-    raise "RubyGems 2.0 or newer is required to protect against " \
-      "public gem pushes."
-  end
+  spec.metadata["allowed_push_host"] = "http://gems.example.com"
 
   spec.files = `git ls-files -z`.split("\x0").reject do |f|
     f.match(%r{^(test|spec|features)/})
@@ -32,7 +27,7 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "dry-validation", "~> 0.10.0"
+  spec.add_dependency "dry-validation", "~> 0.10.3"
   spec.add_dependency "confstruct", "~> 1.0.2"
   spec.add_dependency "multi_json", "~> 1.12"
 

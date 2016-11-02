@@ -109,11 +109,6 @@ describe Dry::RequestHandler do
     expect(described_class::VERSION).not_to be_nil
   end
 
-  def build_mock_request(params:, headers:, body: "")
-    # TODO: check if this double is close enough to a real Rack::Request
-    instance_double("Rack::Request", params: params, env: headers, body: StringIO.new(body))
-  end
-
   let(:headers) do
     {
       "HTTP_AUTH"  => "some.app.key",
