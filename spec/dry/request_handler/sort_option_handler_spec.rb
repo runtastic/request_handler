@@ -1,5 +1,6 @@
 
 # frozen_string_literal: true
+require "data_transfer_object"
 require "spec_helper"
 require "dry/request_handler/sort_option_handler"
 describe Dry::RequestHandler::SortOptionHandler do
@@ -19,19 +20,22 @@ describe Dry::RequestHandler::SortOptionHandler do
 
   context "one ascending sort order for an allowed option" do
     let(:params) { { "sort" => "id" } }
-    let(:output) { [{ id: :asc }] }
+    let(:output) { [DataTransferObject.new(field: "id", direction: :asc)] }
     it_behaves_like "processes valid sort options correctly"
   end
 
   context "one ascending sort order for an allowed option" do
     let(:params) { { "sort" => "-id" } }
-    let(:output) { [{ id: :desc }] }
+    let(:output) { [DataTransferObject.new(field: "id", direction: :desc)] }
     it_behaves_like "processes valid sort options correctly"
   end
 
   context "one ascending and one descending order for allowed options" do
     let(:params) { { "sort" => "id,-date" } }
-    let(:output) { [{ id: :asc }, { date: :desc }] }
+    let(:output) do
+      [DataTransferObject.new(field: "id", direction: :asc),
+       DataTransferObject.new(field: "date", direction: :desc)]
+    end
     it_behaves_like "processes valid sort options correctly"
   end
 

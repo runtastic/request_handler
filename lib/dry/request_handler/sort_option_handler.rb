@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require "data_transfer_object"
 require "dry/request_handler/option_handler"
 require "dry/request_handler/error"
 module Dry
@@ -20,7 +21,7 @@ module Dry
         options.map do |option|
           name, order = parse_option(option)
           allowed_option(name)
-          { name.to_sym => order }
+          DataTransferObject.new(field: name, direction: order)
         end
       end
 
@@ -40,7 +41,7 @@ module Dry
       end
 
       def duplicates?(options)
-        !!options.uniq! { |hash| hash.keys[0] }
+        !!options.uniq!(&:field)
       end
     end
   end
