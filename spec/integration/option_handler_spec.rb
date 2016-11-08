@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require "data_transfer_object"
 require "spec_helper"
 describe Dry::RequestHandler do
   context "Option Handler" do
@@ -82,7 +83,8 @@ describe Dry::RequestHandler do
       it "works for valid paramaters and settings" do
         request = build_mock_request(params: { "sort" => "-name" }, headers: {}, body: "")
         testhandler = testclass.new(request: request)
-        expect(testhandler.to_dto).to eq(OpenStruct.new(sort: [{ name: :desc }]))
+        expect(testhandler.to_dto)
+          .to eq(OpenStruct.new(sort: [DataTransferObject.new(field: "name", direction: :desc)]))
       end
     end
   end

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 require "spec_helper"
 require "ostruct"
+require "data_transfer_object"
 
 class IntegrationTestRequestHandler < Dry::RequestHandler::Base
   options do
@@ -219,8 +220,8 @@ describe Dry::RequestHandler do
 
       expect(dto.include).to eq(%i(user groups))
 
-      expect(dto.sort).to eq([{ name: :asc },
-                              { age: :desc }])
+      expect(dto.sort).to eq([DataTransferObject.new(field: "name", direction: :asc),
+                              DataTransferObject.new(field: "age", direction: :desc)])
 
       expect(dto.header).to eq(expected_headers)
     end
