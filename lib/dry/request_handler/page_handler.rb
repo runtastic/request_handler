@@ -36,51 +36,50 @@ module Dry
 
       def extract_number(prefix: nil)
         number_string = lookup_nested_params_key("number", prefix) || 1
-        check_int(string: number_string, key: "#{prefix}_number")
+        error = ExternalArgumentError.new("#{prefix}_number"=> "must be a positive Integer")
+        check_int(string: number_string, error: error)
       end
 
       def extract_size(prefix: nil)
         size = fetch_and_check_size(prefix)
         default_size = fetch_and_check_default_size(prefix)
-        if size.nil? || size.zero?
-          if default_size.nil? || default_size.zero?
-            raise NoConfigAvailableError.new("#{prefix}_size".to_sym => "is not defined anywhere")
-          end
-          return default_size
-        end
-        warn "#{prefix} default_size config not set" if default_size.nil?
+        return default_size if size.nil?
         apply_max_size_constraint(size, prefix)
       end
 
       def fetch_and_check_default_size(prefix)
-        default_size_string = lookup_nested_config_key("default_size", prefix)
-        check_int(string: default_size_string, key: "default_size")
+        default_size = lookup_nested_config_key("default_size", prefix)
+        raise NoConfigAvailableError.new("#{prefix}_size".to_sym => "has no default_size") if default_size.nil?
+        error = InternalArgumentError.new("#{prefix}_size" => "must be a positive Integer")
+        raise error unless default_size.is_a?(Integer) && default_size.positive?
+        default_size
       end
 
       def fetch_and_check_size(prefix)
         size_string = lookup_nested_params_key("size", prefix)
-        check_int(string: size_string, key: "#{prefix}_size")
+        return nil if size_string.nil?
+        error = ExternalArgumentError.new("#{prefix}_size".to_sym => "must be a positive Integer")
+        return check_int(string: size_string, error: error) unless size_string.nil?
       end
 
-      def check_int(string:, key:)
-        unless string.nil?
-          begin
-            output = Integer(string)
-            raise ExternalArgumentError.new(key.to_sym => "must be a positive Integer") unless output.positive?
-            output
-          rescue ArgumentError
-            raise ExternalArgumentError.new(key.to_sym => "must be a positive Integer")
-          end
-        end
+      def check_int(string:, error:)
+        output = Integer(string)
+        raise error unless output.positive?
+        output
+      rescue ArgumentError
+        raise error
       end
 
       def apply_max_size_constraint(size, prefix)
         max_size = lookup_nested_config_key("max_size", prefix)
-        if max_size
+        case max_size
+        when Integer
           [max_size, size].min
-        else
+        when nil
           warn "#{prefix} max_size config not set"
           size
+        else
+          raise InternalArgumentError.new("#{prefix} max_size".to_sym => "must be a positive Integer")
         end
       end
 
