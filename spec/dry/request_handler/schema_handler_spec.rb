@@ -23,19 +23,39 @@ describe Dry::RequestHandler::SchemaHandler do
     end
   end
 
+  module Types
+    require "dry-types"
+    include Dry::Types.module
+    ArrayFromCSV = Strict::Array.constructor do |val|
+      val.is_a?(::Array) ? val : val.to_s.split(",")
+    end
+    SupportedFilterKeys = Strict::String.enum("some", "none")
+  end
+
   let(:schema_without_options) do
     Dry::Validation.Schema do
+      configure do
+        option :testoption
+        config.type_specs = true
+      end
       required(:test1).filled
       required(:test2).filled
+      optional(:filter_type_in, Types::ArrayFromCSV).each(Types::SupportedFilterKeys)
     end
   end
   let(:schema_with_options) do
     Dry::Validation.Schema do
       configure do
         option :testoption
+        config.type_specs = true
       end
-      required(:test1).filled
-      required(:test2).value(eql?: testoption)
+      required(:test1, :string).filled
+      required(:test2, :string).value(eql?: testoption)
+      optional(:filter_type_in, Types::ArrayFromCSV).each(Types::SupportedFilterKeys)
+    end
+  end
+  let(:schema_with_type_specs) do
+    Dry::Validation.Schema do
     end
   end
   let(:testclass) do
@@ -65,7 +85,7 @@ describe Dry::RequestHandler::SchemaHandler do
   end
 
   it_behaves_like "handles valid input data correctly" do
-    let(:data) { { test1: "t1", test2: 5 } }
+    let(:data) { { test1: "t1", test2: 5, filter_type_in: ["some"] } }
   end
 
   context "data is mising something required in the schema" do
@@ -77,6 +97,18 @@ describe Dry::RequestHandler::SchemaHandler do
   context "data is missing completely" do
     let(:data) { nil }
     let(:error) { Dry::RequestHandler::MissingArgumentError }
+    it_behaves_like "handles invalid input data correctly"
+  end
+
+  context "filter value is invalid" do
+    let(:data) { { test1: "t1", test2: 5, filter_type_in: ["invalid"] } }
+    let(:error) { Dry::RequestHandler::SchemaValidationError }
+    it_behaves_like "handles invalid input data correctly"
+  end
+
+  context "filter type is invalid" do
+    let(:data) { { test1: "t1", test2: 5, filter_type_in: "invalid" } }
+    let(:error) { Dry::RequestHandler::SchemaValidationError }
     it_behaves_like "handles invalid input data correctly"
   end
 end
