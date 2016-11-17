@@ -203,10 +203,29 @@ describe Dry::RequestHandler::PageHandler do
       it_behaves_like "input that causes an error"
     end
 
+    context "default size is not set on the top level" do
+      let(:config) do
+        context_config.page.default_size = nil
+        context_config
+      end
+      let(:error) { Dry::RequestHandler::NoConfigAvailableError }
+      it_behaves_like "input that causes an error"
+    end
+
     context "both sizes are not set" do
       let(:config) do
         context_config.page.posts.max_size = nil
         context_config.page.posts.default_size = nil
+        context_config
+      end
+      let(:error) { Dry::RequestHandler::NoConfigAvailableError }
+      it_behaves_like "input that causes an error"
+    end
+
+    context "both sizes are not set on the top level" do
+      let(:config) do
+        context_config.page.max_size = nil
+        context_config.page.default_size = nil
         context_config
       end
       let(:error) { Dry::RequestHandler::NoConfigAvailableError }

@@ -33,10 +33,19 @@ module Dry
       def validation_failure?(validator)
         if validator.failure?
           errors = validator.errors.each_with_object({}) do |(k, v), memo|
-            memo[k] = v.join(" ")
+            add_note(v, k, memo)
           end
           raise SchemaValidationError.new(errors)
         end
+      end
+
+      def add_note(v, k, memo)
+        memo[k] = if v.is_a? Array
+                    v.join(" ")
+                  elsif v.is_a? Hash
+                    v.each { |(val, key)| add_note(val, key, memo) }
+                  end
+        memo
       end
 
       attr_reader :schema, :schema_options
