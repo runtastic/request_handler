@@ -36,9 +36,8 @@ module Dry
 
       def extract_number(prefix: nil)
         number_string = lookup_nested_params_key("number", prefix) || 1
-        error_klass = ExternalArgumentError
         error_msg = { "#{prefix}_number"=> "must be a positive Integer" }
-        check_int(string: number_string, error_klass: error_klass, error_msg: error_msg)
+        check_int(string: number_string, error_msg: error_msg)
       end
 
       def extract_size(prefix: nil)
@@ -59,17 +58,16 @@ module Dry
       def fetch_and_check_size(prefix)
         size_string = lookup_nested_params_key("size", prefix)
         return nil if size_string.nil?
-        error_klass = ExternalArgumentError
         error_msg = { "#{prefix}_size".to_sym => "must be a positive Integer" }
-        check_int(string: size_string, error_klass: error_klass, error_msg: error_msg) unless size_string.nil?
+        check_int(string: size_string, error_msg: error_msg) unless size_string.nil?
       end
 
-      def check_int(string:, error_klass:, error_msg:)
+      def check_int(string:, error_msg:)
         output = Integer(string)
-        raise error_klass.new(error_msg) unless output.positive?
+        raise ExternalArgumentError.new(error_msg) unless output.positive?
         output
       rescue ArgumentError
-        raise error_klass.new(error_msg)
+        raise ExternalArgumentError.new(error_msg)
       end
 
       def apply_max_size_constraint(size, prefix)

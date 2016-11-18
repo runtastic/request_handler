@@ -80,7 +80,7 @@ describe Dry::RequestHandler::SchemaHandler do
   end
 
   it_behaves_like "handles valid input data correctly" do
-    let(:data) { { test1: "t1", test2: "5", filter_type_in: ["some"] } }
+    let(:data) { { test1: "t1", test2: "5", filter_type_in: "some" } }
     let(:output) { { test1: "t1", test2: 5, filter_type_in: ["some"] } }
   end
 
