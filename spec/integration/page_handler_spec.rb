@@ -21,7 +21,7 @@ describe Dry::RequestHandler do
       it "raises an ExternalArgumentError for invalid page options" do
         request = build_mock_request(params: {}, headers: {}, body: "")
         testhandler = testclass.new(request: request)
-        expect { testhandler.to_dto }.to raise_error(Dry::RequestHandler::ExternalArgumentError)
+        expect { testhandler.to_dto }.to raise_error(Dry::RequestHandler::InternalArgumentError)
       end
     end
     context "valid settings" do

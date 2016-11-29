@@ -1,4 +1,6 @@
 #Changelog
+##0.5
+```default_size``` is now mandatory, ```default_size``` and ```max_size``` now must be Integers
 ##0.4 Bugfix
 fix error messages to also work with nested error messages
 
