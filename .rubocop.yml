@@ -8,3 +8,6 @@ Metrics/MethodLength:
 Style/ClassAndModuleChildren:
   Exclude:
     - test/**/*
+Style/FileName:
+  Exclude:
+    - lib/dry-request_handler.rb

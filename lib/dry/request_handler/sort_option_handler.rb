@@ -35,7 +35,7 @@ module Dry
       end
 
       def allowed_option(name)
-        allowed_options_type.call(name) if allowed_options_type
+        allowed_options_type&.call(name)
       rescue Types::ConstraintError
         raise OptionNotAllowedError.new(name.to_sym => "is not an allowed sort option")
       end

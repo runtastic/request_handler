@@ -5,6 +5,7 @@ require "dry/request_handler/include_option_handler"
 require "dry/request_handler/sort_option_handler"
 require "dry/request_handler/authorization_handler"
 require "dry/request_handler/body_handler"
+require "dry/request_handler/field_set_handler"
 require "confstruct"
 module Dry
   module RequestHandler
@@ -55,6 +56,10 @@ module Dry
         @body_params ||= handle_body_params
       end
 
+      def field_set_params
+        @field_set_params ||= handle_field_set_params
+      end
+
       # @abstract Subclass is expected to implement #to_dto
       # !method to_dto
       #   take the parsed values and return as application specific data transfer object
@@ -97,6 +102,12 @@ module Dry
           schema:         config.lookup!("body.schema"),
           schema_options: execute_options(config.lookup!("body.options"))
         ).run)
+      end
+
+      def handle_field_set_params
+        FieldSetHandler.new(params:   params,
+                            allowed:  config.lookup!("field_set.allowed"),
+                            required: config.lookup!("field_set.required")).run
       end
 
       def fetch_defaults(key, default)

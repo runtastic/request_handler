@@ -48,15 +48,23 @@ class IntegrationTestRequestHandler < Dry::RequestHandler::Base
     sort_options do
       allowed Dry::Types["strict.string"].enum("name", "age")
     end
+
+    field_set do
+      allowed do
+        posts Dry::Types["strict.string"].enum("awesome", "samples")
+      end
+      required [:posts]
+    end
   end
 
   def to_dto
     OpenStruct.new(
-      filter:  filter_params,
-      page:    page_params,
-      include: include_params,
-      sort:    sort_params,
-      header:  authorization_headers
+      filter:    filter_params,
+      page:      page_params,
+      include:   include_params,
+      sort:      sort_params,
+      field_set: field_set_params,
+      header:    authorization_headers
     )
   end
 end
@@ -194,7 +202,10 @@ describe Dry::RequestHandler do
           "posts.samples.photos.size" => "4"
         },
         "include" => "user,groups",
-        "sort"    => "name,-age"
+        "sort"    => "name,-age",
+        "fields"  => {
+          "posts" => "samples,awesome"
+        }
       }
       request = build_mock_request(params: params, headers: headers)
 
@@ -224,6 +235,7 @@ describe Dry::RequestHandler do
                               DataTransferObject.new(field: "age", direction: :desc)])
 
       expect(dto.header).to eq(expected_headers)
+      expect(dto.field_set).to eq(posts: [:samples, :awesome])
     end
   end
 end

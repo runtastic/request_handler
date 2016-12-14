@@ -14,7 +14,7 @@ module Dry
       def allowed_options(options)
         options.map do |option|
           begin
-            allowed_options_type.call(option) if allowed_options_type
+            allowed_options_type&.call(option)
           rescue Types::ConstraintError
             raise OptionNotAllowedError.new(option.to_sym => "is not an allowed include option")
           end

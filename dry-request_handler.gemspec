@@ -4,7 +4,7 @@ lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require "dry/request_handler/version"
 
-Gem::Specification.new do |spec|
+Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength:
   spec.name          = "dry-request_handler"
   spec.version       = Dry::RequestHandler::VERSION
   spec.authors       = ["Andreas Eger", "Raphael Hetzel"]
@@ -27,7 +27,7 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "dry-validation", "~> 0.10.3"
+  spec.add_dependency "dry-validation", "~> 0.10.4"
   spec.add_dependency "confstruct", "~> 1.0.2"
   spec.add_dependency "multi_json", "~> 1.12"
   spec.add_dependency "data_transfer_object", "~> 1.1.0"

@@ -31,12 +31,11 @@ module Dry
       end
 
       def validation_failure?(validator)
-        if validator.failure?
-          errors = validator.errors.each_with_object({}) do |(k, v), memo|
-            add_note(v, k, memo)
-          end
-          raise SchemaValidationError.new(errors)
+        return unless validator.failure?
+        errors = validator.errors.each_with_object({}) do |(k, v), memo|
+          add_note(v, k, memo)
         end
+        raise SchemaValidationError.new(errors)
       end
 
       def add_note(v, k, memo)
