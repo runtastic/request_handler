@@ -11,4 +11,5 @@ gemspec
 group :development do
   gem "pry"
   gem "pry-byebug", platform: :ruby
+  gem "rubocop", "~> 0.46", require: false
 end

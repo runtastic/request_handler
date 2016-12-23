@@ -13,7 +13,7 @@ node {
     stage 'Rubocop'
     using_mri "bundle exec rake rubocop"
 
-    for(ruby_version in ["ruby-2.3.1", "jruby-9.1.5.0"]) {
+    for(ruby_version in ["ruby-2.3.3", "jruby-9.1.6.0"]) {
       test_with_ruby(ruby_version)
     }
 
