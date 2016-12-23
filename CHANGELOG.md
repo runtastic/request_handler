@@ -1,4 +1,9 @@
-#Changelog
+Changelog
+===
+
+## master
+
+- fix error message building
 
 ##0.5
 
