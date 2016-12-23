@@ -9,9 +9,9 @@ module Dry
       end
 
       def message
-        @errors.each_with_object("") do |(key, value), memo|
-          memo + key.to_s + ": " + value.to_s + ", "
-        end
+        errors.map do |key, value|
+          "#{key}: #{value}"
+        end.join(", ")
       end
     end
     class InternalBaseError < BaseError
