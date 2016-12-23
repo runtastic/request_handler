@@ -4,6 +4,7 @@ Changelog
 ## master
 
 - fix error message building
+- sort_params returns an array of SortOption structs now
 
 ##0.5
 
