@@ -1,7 +1,7 @@
 # frozen_string_literal: true
-require "data_transfer_object"
 require "dry/request_handler/option_handler"
 require "dry/request_handler/error"
+require "dry/request_handler/sort_option"
 module Dry
   module RequestHandler
     class SortOptionHandler < OptionHandler
@@ -21,7 +21,7 @@ module Dry
         options.map do |option|
           name, order = parse_option(option)
           allowed_option(name)
-          DataTransferObject.new(field: name, direction: order)
+          SortOption.new(name, order)
         end
       end
 
