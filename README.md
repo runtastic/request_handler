@@ -1,6 +1,8 @@
 # Dry::RequestHandler
 
-This gem allows easy and dry handling of requests based on the dry-validation gem, which is a replacement for virtus. It allows to handle authorization, filters, include_options, sorting and of course to validate the body.
+This gem allows easy and dry handling of requests based on the dry-validation gem for validation and
+data coersion. It allows to handle headers, filters, include_options, sorting and of course to
+validate the body.
 
 ## Installation
 
@@ -85,7 +87,7 @@ class DemoHandler < Dry::RequestHandler::Base
     end
     # access via handler.body_params
 
-    # also available: handler.authorization_headers
+    # also available: handler.headers
 
     def to_dto
       OpenStruct.new(
@@ -94,12 +96,17 @@ class DemoHandler < Dry::RequestHandler::Base
         include: include_params,
         filter:  filter_params,
         sort:    sort_params,
-        headers: authorization_headers
+        headers: headers
       )
     end
   end
 end
 ```
+
+## ToDo
+
+- identify missing features compared to []jsonapi](https://jsonapi.org)
+- rename gem (wasn't a good idea to polute the `dry-` namespace)
 
 ## Development
 
