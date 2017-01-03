@@ -41,7 +41,7 @@ describe Dry::RequestHandler do
       it "works for valid paramaters and settings" do
         request = build_mock_request(params: { "include" => "user" }, headers: {}, body: "")
         testhandler = testclass.new(request: request)
-        expect(testhandler.to_dto).to eq(OpenStruct.new(include: [:foo, :bar, :user]))
+        expect(testhandler.to_dto).to eq(OpenStruct.new(include: [:user]))
       end
     end
     context "SortOptionHandler" do

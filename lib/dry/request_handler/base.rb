@@ -80,10 +80,11 @@ module Dry
 
       def handle_include_params
         defaults = fetch_defaults("include_options.defaults", [])
-        defaults | IncludeOptionHandler.new(
+        result = IncludeOptionHandler.new(
           params:               params,
           allowed_options_type: config.lookup!("include_options.allowed")
         ).run
+        result.empty? ? defaults : result
       end
 
       def handle_sort_params
@@ -92,7 +93,7 @@ module Dry
           params:               params,
           allowed_options_type: config.lookup!("sort_options.allowed")
         ).run
-        defaults | result
+        result.empty? ? defaults : result
       end
 
       def handle_body_params

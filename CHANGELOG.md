@@ -6,6 +6,7 @@ Changelog
 - fix error message building
 - sort_params returns an array of SortOption structs now
 - general `headers` method for all headers (removes `authorization_headers` method)
+- sort and include options will use only the values from the request if they exist and the defaults if there are no values set in the request
 
 ##0.6
 

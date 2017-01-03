@@ -62,15 +62,30 @@ describe Dry::RequestHandler::Base do
       it_behaves_like "default_handling"
     end
     context "with hash defaults" do
-      let(:tested_defaults) { { input: [:test1, :test2], output: [:test1, :test2] | runstub.run } }
+      let(:tested_defaults) do
+        {
+          input:  [:test1, :test2],
+          output: (runstub.run.empty? ? [:test1, :test2] : runstub.run)
+        }
+      end
       it_behaves_like "default_handling"
     end
     context "with proc defaults" do
-      let(:tested_defaults) { { input: ->(_request) { [:test1, :test2] }, output: [:test1, :test2] | runstub.run } }
+      let(:tested_defaults) do
+        {
+          input:  ->(_request) { [:test1, :test2] },
+          output: (runstub.run.empty? ? [:test1, :test2] : runstub.run)
+        }
+      end
       it_behaves_like "default_handling"
     end
     context "with proc using request as defaults" do
-      let(:tested_defaults) { { input: ->(request) { [request.env["FOO"].to_sym] }, output: [:bar] | runstub.run } }
+      let(:tested_defaults) do
+        {
+          input:  ->(request) { [request.env["FOO"].to_sym] },
+          output: (runstub.run.empty? ? [:bar] : runstub.run)
+        }
+      end
       it_behaves_like "default_handling"
     end
   end
