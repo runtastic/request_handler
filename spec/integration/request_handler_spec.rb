@@ -62,7 +62,7 @@ class IntegrationTestRequestHandler < Dry::RequestHandler::Base
       include:   include_params,
       sort:      sort_params,
       field_set: field_set_params,
-      header:    authorization_headers
+      headers:   headers
     )
   end
 end
@@ -106,7 +106,7 @@ class IntegrationTestRequestHandlerWithBody < Dry::RequestHandler::Base
     OpenStruct.new(
       body:    body_params,
       filter:  filter_params,
-      headers: authorization_headers
+      headers: headers
     )
   end
 end
@@ -125,8 +125,9 @@ describe Dry::RequestHandler do
   end
   let(:expected_headers) do
     {
-      auth: "some.app.key",
-      accept: "345"
+      auth:  "some.app.key",
+      accept:  "345",
+      some_other_stuff: "doesn't matter"
     }
   end
 
@@ -232,7 +233,7 @@ describe Dry::RequestHandler do
       expect(dto.sort).to eq([Dry::RequestHandler::SortOption.new("name", :asc),
                               Dry::RequestHandler::SortOption.new("age", :desc)])
 
-      expect(dto.header).to eq(expected_headers)
+      expect(dto.headers).to eq(expected_headers)
       expect(dto.field_set).to eq(posts: [:samples, :awesome])
     end
   end

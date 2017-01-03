@@ -36,7 +36,7 @@ module Dry
 
       def extract_number(prefix: nil)
         number_string = lookup_nested_params_key("number", prefix) || 1
-        error_msg = { "#{prefix}_number"=> "must be a positive Integer" }
+        error_msg = { :"#{prefix}_number"=> "must be a positive Integer" }
         check_int(string: number_string, error_msg: error_msg)
       end
 
@@ -50,7 +50,7 @@ module Dry
       def fetch_and_check_default_size(prefix)
         default_size = lookup_nested_config_key("default_size", prefix)
         raise NoConfigAvailableError.new("#{prefix}_size".to_sym => "has no default_size") if default_size.nil?
-        error_msg = { "#{prefix}_size" => "must be a positive Integer" }
+        error_msg = { :"#{prefix}_size" => "must be a positive Integer" }
         raise InternalArgumentError.new(error_msg) unless default_size.is_a?(Integer) && default_size.positive?
         default_size
       end
@@ -58,7 +58,7 @@ module Dry
       def fetch_and_check_size(prefix)
         size_string = lookup_nested_params_key("size", prefix)
         return nil if size_string.nil?
-        error_msg = { "#{prefix}_size".to_sym => "must be a positive Integer" }
+        error_msg = { :"#{prefix}_size" => "must be a positive Integer" }
         check_int(string: size_string, error_msg: error_msg) unless size_string.nil?
       end
 

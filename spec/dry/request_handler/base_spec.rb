@@ -222,14 +222,9 @@ describe Dry::RequestHandler::Base do
     it_behaves_like "correct_default_handling_array"
   end
 
-  context "#authorization_headers" do
+  context "#headers" do
     let(:testclass) do
       Class.new(Dry::RequestHandler::Base) do
-        options do
-          sort_options do
-            allowed "allowed_options"
-          end
-        end
       end
     end
     let(:expected_args) do
@@ -237,8 +232,8 @@ describe Dry::RequestHandler::Base do
         env: request.env
       }
     end
-    let(:tested_method)  { :authorization_headers }
-    let(:tested_handler) { Dry::RequestHandler::AuthorizationHandler }
+    let(:tested_method)  { :headers }
+    let(:tested_handler) { Dry::RequestHandler::HeaderHandler }
     it_behaves_like "correct_persistence"
     it_behaves_like "correct_arguments_passed"
   end

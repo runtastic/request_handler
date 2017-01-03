@@ -3,13 +3,13 @@ require "dry/request_handler/filter_handler"
 require "dry/request_handler/page_handler"
 require "dry/request_handler/include_option_handler"
 require "dry/request_handler/sort_option_handler"
-require "dry/request_handler/authorization_handler"
+require "dry/request_handler/header_handler"
 require "dry/request_handler/body_handler"
 require "dry/request_handler/field_set_handler"
+require "dry/request_handler/helper"
 require "confstruct"
 module Dry
   module RequestHandler
-    # rubocop:disable Metrics/ClassLength
     class Base
       class << self
         def options(&block)
@@ -48,8 +48,8 @@ module Dry
         @sort_params ||= handle_sort_params
       end
 
-      def authorization_headers
-        @authorization_headers ||= AuthorizationHandler.new(env: request.env).run
+      def headers
+        @headers ||= HeaderHandler.new(env: request.env).run
       end
 
       def body_params
@@ -127,26 +127,11 @@ module Dry
       def params
         raise MissingArgumentError.new(params: "is missing") if request.params.nil?
         raise ExternalArgumentError.new(params: "must be a Hash") unless request.params.is_a?(Hash)
-        @params ||= _deep_transform_keys_in_object(request.params) { |k| k.tr(".", "_") }
+        @params ||= Helper.deep_transform_keys_in_object(request.params) { |k| k.tr(".", "_") }
       end
 
       def config
         self.class.instance_variable_get("@config")
-      end
-
-      # extracted out of active_support
-      # https://github.com/rails/rails/blob/master/activesupport/lib/active_support/core_ext/hash/keys.rb#L143
-      def _deep_transform_keys_in_object(object, &block)
-        case object
-        when Hash
-          object.each_with_object({}) do |(key, value), result|
-            result[yield(key)] = _deep_transform_keys_in_object(value, &block)
-          end
-        when Array
-          object.map { |e| _deep_transform_keys_in_object(e, &block) }
-        else
-          object
-        end
       end
     end
   end
