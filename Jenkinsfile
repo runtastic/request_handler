@@ -42,7 +42,7 @@ def bash(command) {
 
 def using_mri(command) {
   bash """
-    rvm use ruby-2.3.1
+    rvm use ruby-2.3.3
     ${command}
   """
 }
