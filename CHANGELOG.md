@@ -2,6 +2,9 @@ Changelog
 ===
 
 ## master
+
+## 0.7.1
+
 - fix usage of struct to be unambiguous if dry-struct is used
 
 ## 0.7

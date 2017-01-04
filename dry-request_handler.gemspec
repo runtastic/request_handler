@@ -38,6 +38,7 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength:
 
   spec.add_development_dependency "rubocop_runner"
   spec.add_development_dependency "rubocop-defaults"
+  spec.add_development_dependency "rubocop", "~> 0.46.0"
   spec.add_development_dependency "geminabox-release"
 
   spec.add_development_dependency "guard"
