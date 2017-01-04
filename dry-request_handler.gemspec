@@ -4,7 +4,7 @@ lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require "dry/request_handler/version"
 
-Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength:
+Gem::Specification.new do |spec|
   spec.name          = "dry-request_handler"
   spec.version       = Dry::RequestHandler::VERSION
   spec.authors       = ["Andreas Eger", "Raphael Hetzel"]
@@ -38,7 +38,7 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength:
 
   spec.add_development_dependency "rubocop_runner"
   spec.add_development_dependency "rubocop-defaults"
-  spec.add_development_dependency "rubocop", "~> 0.46.0"
+  spec.add_development_dependency "rubocop"
   spec.add_development_dependency "geminabox-release"
 
   spec.add_development_dependency "guard"

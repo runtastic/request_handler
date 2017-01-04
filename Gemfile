@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 source "https://rubygems.org"
 source "http://gems.example.com" do
-  gem "rubocop-defaults", "~> 2.0"
+  gem "rubocop-defaults", "~> 2.2"
   gem "rubocop_runner", "~> 2.0"
 end
 
