@@ -33,6 +33,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec', '~> 3.5'
   spec.add_development_dependency 'fuubar', '~> 2.2'
 
+  spec.add_development_dependency 'rubocop_runner', '~> 2.0'
   spec.add_development_dependency 'rubocop', '~> 0.46.0'
 
   spec.add_development_dependency 'guard'

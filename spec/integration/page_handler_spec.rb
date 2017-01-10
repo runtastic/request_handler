@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 require 'spec_helper'
+
 describe RequestHandler do
   context 'PageHandler' do
     context 'invalid settings' do

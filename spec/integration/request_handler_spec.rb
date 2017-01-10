@@ -207,6 +207,7 @@ describe RequestHandler do
         }
       }
       request = build_mock_request(params: params, headers: headers)
+      allow(RequestHandler.configuration.logger).to receive(:warn)
 
       handler = IntegrationTestRequestHandler.new(request: request)
       dto = handler.to_dto

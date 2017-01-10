@@ -4,6 +4,7 @@ $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'request_handler'
 require_relative 'support/helper'
 require 'pry'
+require 'ostruct'
 
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|
