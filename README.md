@@ -3,6 +3,8 @@
 [![Gem Version](https://badge.fury.io/rb/request_handler.svg)](https://badge.fury.io/rb/request_handler)
 [![Build Status](https://travis-ci.org/runtastic/request_handler.svg?branch=master)](https://travis-ci.org/runtastic/request_handler)
 [![Code Climate](https://codeclimate.com/github/runtastic/request_handler/badges/gpa.svg)](https://codeclimate.com/github/runtastic/request_handler)
+[![codecov](https://codecov.io/gh/runtastic/request_handler/branch/master/graph/badge.svg)](https://codecov.io/gh/runtastic/request_handler)
+
 
 This gem allows easy and dry handling of requests based on the dry-validation gem for validation and
 data coersion. It allows to handle headers, filters, include_options, sorting and of course to
