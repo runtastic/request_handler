@@ -1,22 +1,21 @@
 # frozen_string_literal: true
-require "geminabox-release"
-GeminaboxRelease.patch(host: "http://gems.example.com/")
+require 'bundler/gem_tasks'
 
 task :init do
-  Rake::Task["rubocop:install"].execute
+  Rake::Task['rubocop:install'].execute
 end
 
-require "rubocop/rake_task"
+require 'rubocop/rake_task'
 RuboCop::RakeTask.new
 namespace :rubocop do
-  desc "Install Rubocop as pre-commit hook"
+  desc 'Install Rubocop as pre-commit hook'
   task :install do
-    require "rubocop_runner"
+    require 'rubocop_runner'
     RubocopRunner.install
   end
 end
 
-require "rspec/core/rake_task"
+require 'rspec/core/rake_task'
 RSpec::Core::RakeTask.new(:spec)
 
 task default: :spec

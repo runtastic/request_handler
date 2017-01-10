@@ -1,13 +1,14 @@
-require:
-  - rubocop-defaults
-
 # minitest specifics
+AllCops:
+  TargetRubyVersion: 2.3
+Metrics/LineLength:
+  Max: 119
 Metrics/MethodLength:
   Exclude:
     - test/**/*
 Style/ClassAndModuleChildren:
   Exclude:
     - test/**/*
-Style/FileName:
-  Exclude:
-    - lib/dry-request_handler.rb
+
+Style/Documentation:
+  Enabled: false

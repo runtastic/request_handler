@@ -1,9 +1,9 @@
 # frozen_string_literal: true
-ENV["RACK_ENV"] = ENV["ENVIRONMENT"] ||= "test"
-$LOAD_PATH.unshift File.expand_path("../../lib", __FILE__)
-require "dry/request_handler"
-require_relative "support/helper"
-require "pry"
+ENV['RACK_ENV'] = ENV['ENVIRONMENT'] ||= 'test'
+$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+require 'request_handler'
+require_relative 'support/helper'
+require 'pry'
 
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|
@@ -17,7 +17,7 @@ RSpec.configure do |config|
   config.filter_run :focus
   config.run_all_when_everything_filtered = true
 
-  config.example_status_persistence_file_path = "spec/examples.txt"
+  config.example_status_persistence_file_path = 'spec/examples.txt'
 
   # Limits the available syntax to the non-monkey patched syntax that is
   # recommended. For more details, see:
@@ -30,7 +30,7 @@ RSpec.configure do |config|
   # be too noisy due to issues in dependencies.
   # config.warnings = true
 
-  config.default_formatter = "doc" if config.files_to_run.one?
+  config.default_formatter = 'doc' if config.files_to_run.one?
   config.profile_examples = 10
 
   # Run specs in random order to surface order dependencies. If you find an

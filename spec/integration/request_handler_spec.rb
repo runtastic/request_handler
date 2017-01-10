@@ -1,7 +1,7 @@
 # frozen_string_literal: true
-require "spec_helper"
-require "ostruct"
-class IntegrationTestRequestHandler < Dry::RequestHandler::Base
+require 'spec_helper'
+require 'ostruct'
+class IntegrationTestRequestHandler < RequestHandler::Base
   options do
     page do
       default_size 15
@@ -40,16 +40,16 @@ class IntegrationTestRequestHandler < Dry::RequestHandler::Base
     end
 
     include_options do
-      allowed Dry::Types["strict.string"].enum("user", "user.avatar", "groups")
+      allowed Dry::Types['strict.string'].enum('user', 'user.avatar', 'groups')
     end
 
     sort_options do
-      allowed Dry::Types["strict.string"].enum("name", "age")
+      allowed Dry::Types['strict.string'].enum('name', 'age')
     end
 
     field_set do
       allowed do
-        posts Dry::Types["strict.string"].enum("awesome", "samples")
+        posts Dry::Types['strict.string'].enum('awesome', 'samples')
       end
       required [:posts]
     end
@@ -67,7 +67,7 @@ class IntegrationTestRequestHandler < Dry::RequestHandler::Base
   end
 end
 
-class IntegrationTestRequestHandlerWithBody < Dry::RequestHandler::Base
+class IntegrationTestRequestHandlerWithBody < RequestHandler::Base
   options do
     body do
       schema(Dry::Validation.JSON do
@@ -75,18 +75,18 @@ class IntegrationTestRequestHandlerWithBody < Dry::RequestHandler::Base
                  option :query_id
                end
                required(:id).value(eql?: query_id)
-               required(:type).value(eql?: "post")
+               required(:type).value(eql?: 'post')
                required(:user_id).filled(:str?)
                required(:name).filled(:str?)
                optional(:publish_on).filled(:time?)
 
                required(:category).schema do
                  required(:id).filled(:str?)
-                 required(:type).value(eql?: "category")
+                 required(:type).value(eql?: 'category')
                end
              end)
 
-      options(->(_handler, request) { { query_id: request.params["id"] } })
+      options(->(_handler, request) { { query_id: request.params['id'] } })
     end
 
     filter do
@@ -111,28 +111,28 @@ class IntegrationTestRequestHandlerWithBody < Dry::RequestHandler::Base
   end
 end
 
-describe Dry::RequestHandler do
-  it "has a version" do
+describe RequestHandler do
+  it 'has a version' do
     expect(described_class::VERSION).not_to be_nil
   end
 
   let(:headers) do
     {
-      "HTTP_AUTH"  => "some.app.key",
-      "ACCEPT"  => "345",
-      "HTTP_SOME_OTHER_STUFF" => "doesn't matter"
+      'HTTP_APP_KEY'          => 'some.app.key',
+      'HTTP_USER_ID'          => '345',
+      'HTTP_SOME_OTHER_STUFF' => "doesn't matter"
     }
   end
   let(:expected_headers) do
     {
-      auth:  "some.app.key",
-      accept:  "345",
+      app_key:          'some.app.key',
+      user_id:          '345',
       some_other_stuff: "doesn't matter"
     }
   end
 
-  context "w/ body" do
-    it "works" do
+  context 'w/ body' do
+    it 'works' do
       raw_body = <<~JSON
       {
         "data": {
@@ -156,8 +156,8 @@ describe Dry::RequestHandler do
     JSON
 
       params = {
-        "user_id" => "awesome_user_id",
-        "id"      => "fer342ref"
+        'user_id' => 'awesome_user_id',
+        'id'      => 'fer342ref'
       }
 
       # api call looks for example like:
@@ -167,43 +167,43 @@ describe Dry::RequestHandler do
       handler = IntegrationTestRequestHandlerWithBody.new(request: request)
       dto = handler.to_dto
 
-      expect(dto.body).to eq(id:         "fer342ref",
-                             type:       "post",
-                             user_id:    "awesome_user_id",
-                             name:       "About naming stuff and cache invalidation",
-                             publish_on: Time.iso8601("2016-09-26T12:23:55Z"),
+      expect(dto.body).to eq(id:         'fer342ref',
+                             type:       'post',
+                             user_id:    'awesome_user_id',
+                             name:       'About naming stuff and cache invalidation',
+                             publish_on: Time.iso8601('2016-09-26T12:23:55Z'),
                              category:   {
-                               id:   "54",
-                               type: "category"
+                               id:   '54',
+                               type: 'category'
                              })
 
-      expect(dto.filter).to eq(id: "fer342ref", user_id: "awesome_user_id")
+      expect(dto.filter).to eq(id: 'fer342ref', user_id: 'awesome_user_id')
       expect(dto.headers).to eq(expected_headers)
     end
   end
-  context "w/o body" do
-    it "works" do
+  context 'w/o body' do
+    it 'works' do
       params = {
-        "user_id" => "234",
-        "filter"  => {
-          "name"                               => "foo",
-          "posts.awesome"                      => "true",
-          "other_param"                        => "value",
-          "age.gt"                             => "5",
-          "posts.samples.photos.has_thumbnail" => "false"
+        'user_id' => '234',
+        'filter'  => {
+          'name'                               => 'foo',
+          'posts.awesome'                      => 'true',
+          'other_param'                        => 'value',
+          'age.gt'                             => '5',
+          'posts.samples.photos.has_thumbnail' => 'false'
         },
-        "page"    => {
-          "posts.size"                => "34",
-          "posts.number"              => "2",
-          "number"                    => "3",
-          "users.size"                => "50",
-          "users.number"              => "1",
-          "posts.samples.photos.size" => "4"
+        'page' => {
+          'posts.size'                => '34',
+          'posts.number'              => '2',
+          'number'                    => '3',
+          'users.size'                => '50',
+          'users.number'              => '1',
+          'posts.samples.photos.size' => '4'
         },
-        "include" => "user,groups",
-        "sort"    => "name,-age",
-        "fields"  => {
-          "posts" => "samples,awesome"
+        'include' => 'user,groups',
+        'sort'    => 'name,-age',
+        'fields'  => {
+          'posts' => 'samples,awesome'
         }
       }
       request = build_mock_request(params: params, headers: headers)
@@ -212,7 +212,7 @@ describe Dry::RequestHandler do
       dto = handler.to_dto
 
       expect(dto.filter).to eq(user_id:                            234,
-                               name:                               "foo",
+                               name:                               'foo',
                                posts_awesome:                      true,
                                age_gt:                             5,
                                posts_samples_photos_has_thumbnail: false)
@@ -230,8 +230,8 @@ describe Dry::RequestHandler do
 
       expect(dto.include).to eq(%i(user groups))
 
-      expect(dto.sort).to eq([Dry::RequestHandler::SortOption.new("name", :asc),
-                              Dry::RequestHandler::SortOption.new("age", :desc)])
+      expect(dto.sort).to eq([RequestHandler::SortOption.new('name', :asc),
+                              RequestHandler::SortOption.new('age', :desc)])
 
       expect(dto.headers).to eq(expected_headers)
       expect(dto.field_set).to eq(posts: [:samples, :awesome])

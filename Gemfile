@@ -1,15 +1,5 @@
 # frozen_string_literal: true
-source "https://rubygems.org"
-source "http://gems.example.com" do
-  gem "rubocop-defaults", "~> 2.2"
-  gem "rubocop_runner", "~> 2.0"
-end
+source 'https://rubygems.org'
 
 # Specify your gem's dependencies in dry-request_handler.gemspec
 gemspec
-
-group :development do
-  gem "pry"
-  gem "pry-byebug", platform: :ruby
-  gem "rubocop", "~> 0.46", require: false
-end

@@ -1,15 +1,20 @@
-# Dry::RequestHandler
+# RequestHandler
 
 This gem allows easy and dry handling of requests based on the dry-validation gem for validation and
 data coersion. It allows to handle headers, filters, include_options, sorting and of course to
 validate the body.
+
+## ToDo
+
+- update documentation
+- identify missing features compared to []jsonapi](https://jsonapi.org)
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'dry-request_handler', source: "http://gems.example.com"
+gem 'request_handler'
 ```
 
 And then execute:
@@ -18,7 +23,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install dry-request_handler --source "http://gems.example.com"
+    $ gem install request_handler
 
 ## Usage
 
@@ -30,8 +35,8 @@ Please note that pagination only considers options that are configured on the se
 
 ```ruby
 require "dry-validation"
-require "dry/request_handler/base"
-class DemoHandler < Dry::RequestHandler::Base
+require "request_handler"
+class DemoHandler < RequestHandler::Base
   options do
     # pagination settings
     page do
@@ -103,19 +108,11 @@ class DemoHandler < Dry::RequestHandler::Base
 end
 ```
 
-## ToDo
-
-- identify missing features compared to []jsonapi](https://jsonapi.org)
-- rename gem (wasn't a good idea to polute the `dry-` namespace)
-
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake inabox:release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [gems.example.com](http://gems.example.com).
+To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
 ## Contributing
-
-Bug reports and requests are welcome on [jira](https://issues.example.com/projects/RBGEM/issues) with component `dry-request_handler`
-Pull requests are welcome on Stash at https://git.example.com/projects/GEM/repos/dry-request_handler/browse
-
+Bug reports and pull requests are welcome on GitHub at https://github.com/runtastic/request_handler. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the Contributor Covenant code of conduct.

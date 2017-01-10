@@ -1,8 +1,8 @@
 # frozen_string_literal: true
-require "spec_helper"
-describe Dry::RequestHandler do
-  context "SchemaHandler" do
-    context "BodyHandler" do
+require 'spec_helper'
+describe RequestHandler do
+  context 'SchemaHandler' do
+    context 'BodyHandler' do
       let(:valid_body) do
         <<~JSON
       {
@@ -25,9 +25,9 @@ describe Dry::RequestHandler do
       }
       JSON
       end
-      context "valid schema" do
+      context 'valid schema' do
         let(:testclass) do
-          Class.new(Dry::RequestHandler::Base) do
+          Class.new(RequestHandler::Base) do
             options do
               body do
                 schema(Dry::Validation.JSON do
@@ -42,30 +42,30 @@ describe Dry::RequestHandler do
             end
           end
         end
-        it "raises a SchemaValidationError with invalid data" do
+        it 'raises a SchemaValidationError with invalid data' do
           request = build_mock_request(params: {}, headers: {}, body: invalid_body)
           testhandler = testclass.new(request: request)
-          expect { testhandler.to_dto }.to raise_error(Dry::RequestHandler::SchemaValidationError)
+          expect { testhandler.to_dto }.to raise_error(RequestHandler::SchemaValidationError)
         end
 
-        it "raises a MissingArgumentError with missing data" do
-          request = instance_double("Rack::Request", params: {}, env: {}, body: nil)
+        it 'raises a MissingArgumentError with missing data' do
+          request = instance_double('Rack::Request', params: {}, env: {}, body: nil)
           testhandler = testclass.new(request: request)
-          expect { testhandler.to_dto }.to raise_error(Dry::RequestHandler::MissingArgumentError)
+          expect { testhandler.to_dto }.to raise_error(RequestHandler::MissingArgumentError)
         end
 
-        it "works for valid data" do
+        it 'works for valid data' do
           request = build_mock_request(params: {}, headers: {}, body: valid_body)
           testhandler = testclass.new(request: request)
-          expect(testhandler.to_dto).to eq(OpenStruct.new(body: { name: "About naming stuff and cache invalidation" }))
+          expect(testhandler.to_dto).to eq(OpenStruct.new(body: { name: 'About naming stuff and cache invalidation' }))
         end
       end
-      context "invalid schema" do
+      context 'invalid schema' do
         let(:testclass) do
-          Class.new(Dry::RequestHandler::Base) do
+          Class.new(RequestHandler::Base) do
             options do
               body do
-                schema "Foo"
+                schema 'Foo'
               end
             end
             def to_dto
@@ -75,38 +75,38 @@ describe Dry::RequestHandler do
             end
           end
         end
-        it "raises a InternalArgumentError valid data" do
+        it 'raises a InternalArgumentError valid data' do
           request = build_mock_request(params: {}, headers: {}, body: valid_body)
           testhandler = testclass.new(request: request)
-          expect { testhandler.to_dto }.to raise_error(Dry::RequestHandler::InternalArgumentError)
+          expect { testhandler.to_dto }.to raise_error(RequestHandler::InternalArgumentError)
         end
       end
     end
 
-    context "FilterHandler" do
+    context 'FilterHandler' do
       let(:valid_params) do
         {
-          "filter" => {
-            "name" => "foo"
+          'filter' => {
+            'name' => 'foo'
           }
         }
       end
       let(:invalid_params) do
         {
-          "filter" => {
-            "bar" => "foo"
+          'filter' => {
+            'bar' => 'foo'
           }
         }
       end
-      context "valid schema" do
+      context 'valid schema' do
         let(:testclass) do
-          Class.new(Dry::RequestHandler::Base) do
+          Class.new(RequestHandler::Base) do
             options do
               filter do
                 schema(Dry::Validation.Form do
                   required(:name).filled(:str?)
                 end)
-                defaults(foo: "bar")
+                defaults(foo: 'bar')
               end
             end
             def to_dto
@@ -116,43 +116,43 @@ describe Dry::RequestHandler do
             end
           end
         end
-        it "raises a SchemaValidationError with invalid data" do
-          request = build_mock_request(params: invalid_params, headers: {}, body: "")
+        it 'raises a SchemaValidationError with invalid data' do
+          request = build_mock_request(params: invalid_params, headers: {}, body: '')
           testhandler = testclass.new(request: request)
-          expect { testhandler.to_dto }.to raise_error(Dry::RequestHandler::SchemaValidationError)
+          expect { testhandler.to_dto }.to raise_error(RequestHandler::SchemaValidationError)
         end
 
-        it "raises a MissingArgumentError with missing data" do
-          request = build_mock_request(params: nil, headers: {}, body: "")
+        it 'raises a MissingArgumentError with missing data' do
+          request = build_mock_request(params: nil, headers: {}, body: '')
           testhandler = testclass.new(request: request)
-          expect { testhandler.to_dto }.to raise_error(Dry::RequestHandler::MissingArgumentError)
+          expect { testhandler.to_dto }.to raise_error(RequestHandler::MissingArgumentError)
         end
 
-        it "works for valid data" do
-          request = build_mock_request(params: valid_params, headers: {}, body: "")
+        it 'works for valid data' do
+          request = build_mock_request(params: valid_params, headers: {}, body: '')
           testhandler = testclass.new(request: request)
-          expect(testhandler.to_dto).to eq(OpenStruct.new(filter: { name: "foo", foo: "bar" }))
+          expect(testhandler.to_dto).to eq(OpenStruct.new(filter: { name: 'foo', foo: 'bar' }))
         end
       end
-      context "invalid schema" do
+      context 'invalid schema' do
         let(:testclass) do
-          Class.new(Dry::RequestHandler::Base) do
+          Class.new(RequestHandler::Base) do
             options do
               filter do
-                schema "Foo"
+                schema 'Foo'
               end
             end
             def to_dto
               OpenStruct.new(
-                filter:  filter_params
+                filter: filter_params
               )
             end
           end
         end
-        it "raises a InternalArgumentError with valid data" do
-          request = build_mock_request(params: valid_params, headers: {}, body: "")
+        it 'raises a InternalArgumentError with valid data' do
+          request = build_mock_request(params: valid_params, headers: {}, body: '')
           testhandler = testclass.new(request: request)
-          expect { testhandler.to_dto }.to raise_error(Dry::RequestHandler::InternalArgumentError)
+          expect { testhandler.to_dto }.to raise_error(RequestHandler::InternalArgumentError)
         end
       end
     end

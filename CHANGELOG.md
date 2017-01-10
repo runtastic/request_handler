@@ -2,6 +2,8 @@ Changelog
 ===
 
 ## master
+- rename gem (dry-request_handler --> request_handler)
+- remove env based config for logger
 
 ## 0.7.1
 
@@ -33,7 +35,7 @@ sort_params returns an array of dtos now `DataTransferObject.new(field: "test", 
 
 ## 0.2
 
-version bump for publishing 
+version bump for publishing
 
 ## 0.1
 
