@@ -7,7 +7,7 @@ validate the body.
 ## ToDo
 
 - update documentation
-- identify missing features compared to []jsonapi](https://jsonapi.org)
+- identify missing features compared to [jsonapi](https://jsonapi.org)
 
 ## Installation
 
