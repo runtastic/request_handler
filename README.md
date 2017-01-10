@@ -1,5 +1,8 @@
 # RequestHandler
 
+[![Gem Version](https://badge.fury.io/rb/request_handler.svg)](https://badge.fury.io/rb/request_handler)
+[![Build Status](https://travis-ci.org/runtastic/request_handler.svg?branch=master)](https://travis-ci.org/runtastic/request_handler)
+
 This gem allows easy and dry handling of requests based on the dry-validation gem for validation and
 data coersion. It allows to handle headers, filters, include_options, sorting and of course to
 validate the body.
@@ -116,3 +119,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 Bug reports and pull requests are welcome on GitHub at https://github.com/runtastic/request_handler. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the Contributor Covenant code of conduct.
+
+## License
+
+The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
