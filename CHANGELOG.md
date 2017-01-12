@@ -2,6 +2,10 @@ Changelog
 ===
 
 ## master
+
+- change nesting separator from `_` to `__` and use it consistently (also in sorting fields)
+
+## 0.8.0
 - rename gem (dry-request_handler --> request_handler)
 - remove env based config for logger
 
