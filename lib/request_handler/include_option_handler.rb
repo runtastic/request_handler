@@ -17,7 +17,7 @@ module RequestHandler
         rescue Dry::Types::ConstraintError
           raise OptionNotAllowedError, option.to_sym => 'is not an allowed include option'
         end
-        option.to_sym
+        option.gsub('.', '__').to_sym
       end
     end
 
