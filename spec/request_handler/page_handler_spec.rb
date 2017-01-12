@@ -45,10 +45,10 @@ describe RequestHandler::PageHandler do
       let(:params) do
         {
           'page' => {
-            'posts_size'   => '34',
-            'posts_number' => '2',
-            'users_size'   => '25',
-            'users_number' => '2'
+            'posts__size'   => '34',
+            'posts__number' => '2',
+            'users__size'   => '25',
+            'users__number' => '2'
           }
         }
       end
@@ -56,10 +56,10 @@ describe RequestHandler::PageHandler do
         {
           number:       1,
           size:         15,
-          posts_number: 2,
-          posts_size:   34,
-          users_number: 2,
-          users_size:   25
+          posts__number: 2,
+          posts__size:   34,
+          users__number: 2,
+          users__size:   25
         }
       end
       it_behaves_like 'valid input'
@@ -69,10 +69,10 @@ describe RequestHandler::PageHandler do
       let(:params) do
         {
           'page' => {
-            'posts_size'   => '34',
-            'posts_number' => '2',
-            'users_size'   => '100',
-            'users_number' => '2'
+            'posts__size'   => '34',
+            'posts__number' => '2',
+            'users__size'   => '100',
+            'users__number' => '2'
           }
         }
       end
@@ -80,10 +80,10 @@ describe RequestHandler::PageHandler do
         {
           number:       1,
           size:         15,
-          posts_number: 2,
-          posts_size:   34,
-          users_number: 2,
-          users_size:   40
+          posts__number: 2,
+          posts__size:   34,
+          users__number: 2,
+          users__size:   40
         }
       end
       it_behaves_like 'valid input'
@@ -93,17 +93,17 @@ describe RequestHandler::PageHandler do
     context 'size not defined in the params' do
       let(:params) do
         { 'page' => {
-          'users_size'   => '39',
-          'users_number' => '2'
+          'users__size'   => '39',
+          'users__number' => '2'
         } }
       end
       let(:output) do
         { number:       1,
           size:         15,
-          posts_number: 1,
-          posts_size:   30,
-          users_number: 2,
-          users_size:   39 }
+          posts__number: 1,
+          posts__size:   30,
+          users__number: 2,
+          users__size:   39 }
       end
       it_behaves_like 'valid input'
     end
@@ -112,8 +112,8 @@ describe RequestHandler::PageHandler do
       let(:error) { RequestHandler::ExternalArgumentError }
       let(:params) do
         { 'page' => {
-          'users_size'   => '40',
-          'users_number' => 'asdf'
+          'users__size'   => '40',
+          'users__number' => 'asdf'
         } }
       end
       it_behaves_like 'input that causes an error'
@@ -123,8 +123,8 @@ describe RequestHandler::PageHandler do
       let(:error) { RequestHandler::ExternalArgumentError }
       let(:params) do
         { 'page' => {
-          'users_size'   => '40',
-          'users_number' => '-20'
+          'users__size'   => '40',
+          'users__number' => '-20'
         } }
       end
       it_behaves_like 'input that causes an error'
@@ -134,8 +134,8 @@ describe RequestHandler::PageHandler do
       let(:error) { RequestHandler::ExternalArgumentError }
       let(:params) do
         { 'page' => {
-          'users_size'   => '-40',
-          'users_number' => '20'
+          'users__size'   => '-40',
+          'users__number' => '20'
         } }
       end
       it_behaves_like 'input that causes an error'
@@ -145,8 +145,8 @@ describe RequestHandler::PageHandler do
       let(:error) { RequestHandler::ExternalArgumentError }
       let(:params) do
         { 'page' => {
-          'users_size'   => 'asdf',
-          'users_number' => '2'
+          'users__size'   => 'asdf',
+          'users__number' => '2'
         } }
       end
       it_behaves_like 'input that causes an error'
@@ -170,8 +170,8 @@ describe RequestHandler::PageHandler do
         'page' => {
           'size'         => '20',
           'number'       => '2',
-          'posts_size'   => '500',
-          'posts_number' => '2'
+          'posts__size'   => '500',
+          'posts__number' => '2'
         }
       }
     end
@@ -240,8 +240,8 @@ describe RequestHandler::PageHandler do
       let(:params) do
         {
           'page' => {
-            'posts_size'   => '500',
-            'posts_number' => '2'
+            'posts__size'   => '500',
+            'posts__number' => '2'
           }
         }
       end
@@ -249,8 +249,8 @@ describe RequestHandler::PageHandler do
         {
           number:       1,
           size:         15,
-          posts_number: 2,
-          posts_size:   500
+          posts__number: 2,
+          posts__size:   500
         }
       end
       let(:warning) { 'posts max_size config not set' }
@@ -262,7 +262,7 @@ describe RequestHandler::PageHandler do
       let(:params) do
         {
           'page' => {
-            'foo_size' => '3'
+            'foo__size' => '3'
           }
         }
       end
@@ -270,11 +270,11 @@ describe RequestHandler::PageHandler do
         {
           number:       1,
           size:         15,
-          posts_number: 1,
-          posts_size:   30
+          posts__number: 1,
+          posts__size:   30
         }
       end
-      let(:warning) { 'client sent unknown option ["foo_size"]' }
+      let(:warning) { 'client sent unknown option ["foo.size"]' }
       it_behaves_like 'input that causes a warning'
     end
   end

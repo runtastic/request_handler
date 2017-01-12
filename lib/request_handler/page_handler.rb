@@ -16,8 +16,8 @@ module RequestHandler
       base = { number: extract_number, size: extract_size }
       cfg = config.keys.reduce(base) do |memo, key|
         next memo if TOP_LEVEL_PAGE_KEYS.include?(key)
-        memo.merge!("#{key}_number".to_sym => extract_number(prefix: key),
-                    "#{key}_size".to_sym   => extract_size(prefix: key))
+        memo.merge!("#{key}__number".to_sym => extract_number(prefix: key),
+                    "#{key}__size".to_sym   => extract_size(prefix: key))
       end
       check_for_missing_options(cfg)
       cfg
@@ -30,12 +30,14 @@ module RequestHandler
 
     def check_for_missing_options(config)
       missing_arguments = page_options.keys - config.keys.map(&:to_s)
+      return if missing_arguments.empty?
+      missing_arguments.map! { |e| e.gsub('__', '.') }
       warn 'client sent unknown option ' + missing_arguments.to_s unless missing_arguments.empty?
     end
 
     def extract_number(prefix: nil)
       number_string = lookup_nested_params_key('number', prefix) || 1
-      error_msg = { :"#{prefix}_number" => 'must be a positive Integer' }
+      error_msg = { :"#{prefix}__number" => 'must be a positive Integer' }
       check_int(string: number_string, error_msg: error_msg)
     end
 
@@ -48,7 +50,7 @@ module RequestHandler
 
     def fetch_and_check_default_size(prefix)
       default_size = lookup_nested_config_key('default_size', prefix)
-      raise NoConfigAvailableError, "#{prefix}_size".to_sym => 'has no default_size' if default_size.nil?
+      raise NoConfigAvailableError, "#{prefix}__size".to_sym => 'has no default_size' if default_size.nil?
       error_msg = { :"#{prefix}_size" => 'must be a positive Integer' }
       raise InternalArgumentError, error_msg unless default_size.is_a?(Integer) && default_size.positive?
       default_size
@@ -57,7 +59,7 @@ module RequestHandler
     def fetch_and_check_size(prefix)
       size_string = lookup_nested_params_key('size', prefix)
       return nil if size_string.nil?
-      error_msg = { :"#{prefix}_size" => 'must be a positive Integer' }
+      error_msg = { :"#{prefix}__size" => 'must be a positive Integer' }
       check_int(string: size_string, error_msg: error_msg) unless size_string.nil?
     end
 
@@ -88,7 +90,7 @@ module RequestHandler
     end
 
     def lookup_nested_params_key(key, prefix)
-      key = prefix ? "#{prefix}_#{key}" : key
+      key = prefix ? "#{prefix}__#{key}" : key
       page_options.fetch(key, nil)
     end
 

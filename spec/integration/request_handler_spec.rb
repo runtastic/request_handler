@@ -12,7 +12,7 @@ class IntegrationTestRequestHandler < RequestHandler::Base
         max_size 50
       end
 
-      posts_samples_photos do
+      posts__samples__photos do
         default_size 3
       end
 
@@ -31,10 +31,10 @@ class IntegrationTestRequestHandler < RequestHandler::Base
       schema(Dry::Validation.Form do
                required(:user_id).filled(:int?)
                required(:name).filled(:str?)
-               optional(:age_gt).filled(:int?)
-               optional(:age_gte).filled(:int?)
-               optional(:posts_awesome).filled(:bool?)
-               optional(:posts_samples_photos_has_thumbnail).filled(:bool?)
+               optional(:age__gt).filled(:int?)
+               optional(:age__gte).filled(:int?)
+               optional(:posts__awesome).filled(:bool?)
+               optional(:posts__samples__photos__has_thumbnail).filled(:bool?)
              end)
       additional_url_filter %i(user_id)
     end
@@ -214,20 +214,20 @@ describe RequestHandler do
 
       expect(dto.filter).to eq(user_id:                            234,
                                name:                               'foo',
-                               posts_awesome:                      true,
-                               age_gt:                             5,
-                               posts_samples_photos_has_thumbnail: false)
+                               posts__awesome:                      true,
+                               age__gt:                             5,
+                               posts__samples__photos__has_thumbnail: false)
 
-      expect(dto.page).to eq(posts_size:                  34,
-                             posts_number:                2,
+      expect(dto.page).to eq(posts__size:                  34,
+                             posts__number:                2,
                              number:                      3,
                              size:                        15,
-                             users_size:                  40,
-                             users_number:                1,
-                             posts_samples_photos_size:   4,
-                             posts_samples_photos_number: 1,
-                             assets_size:                 10,
-                             assets_number:               1)
+                             users__size:                  40,
+                             users__number:                1,
+                             posts__samples__photos__size:   4,
+                             posts__samples__photos__number: 1,
+                             assets__size:                 10,
+                             assets__number:               1)
 
       expect(dto.include).to eq(%i(user groups))
 

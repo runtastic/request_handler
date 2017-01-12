@@ -3,7 +3,9 @@ require 'spec_helper'
 require 'request_handler/sort_option_handler'
 describe RequestHandler::SortOptionHandler do
   let(:handler) do
-    described_class.new(params: params, allowed_options_type: Dry::Types['strict.string'].enum('id', 'date'))
+    options_type = Dry::Types['strict.string'].enum('id', 'date', 'posts.created_at')
+    described_class.new(params: params,
+                        allowed_options_type: options_type)
   end
   shared_examples 'processes valid sort options correctly' do
     it 'returns the right sort options' do
@@ -33,6 +35,14 @@ describe RequestHandler::SortOptionHandler do
     let(:output) do
       [RequestHandler::SortOption.new('id', :asc),
        RequestHandler::SortOption.new('date', :desc)]
+    end
+    it_behaves_like 'processes valid sort options correctly'
+  end
+
+  context 'nested attributes as sort options are correctly transformed' do
+    let(:params) { { 'sort' => 'posts.created_at' } }
+    let(:output) do
+      [RequestHandler::SortOption.new('posts__created_at', :asc)]
     end
     it_behaves_like 'processes valid sort options correctly'
   end
