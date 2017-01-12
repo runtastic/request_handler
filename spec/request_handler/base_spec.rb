@@ -317,14 +317,18 @@ describe RequestHandler::Base do
                                         {
                                           'foo.bar'      => 'test',
                                           'nested'       => { 'nested.foo.bar' => 'test2' },
-                                          'nested.twice' => { 'nested.twice.foo.bar' => { 'nested.again' => 'test3' } }
+                                          'nested.twice' => {
+                                            'nested.twice.foo.bar_underscored' => {
+                                              'nested.again' => 'test3'
+                                            }
+                                          }
                                         },
                                 env:    {},
                                 body:   StringIO.new('body'))
       expect(testclass.new(request: request).send(:params))
-        .to eq('foo_bar'      => 'test',
-               'nested'       => { 'nested_foo_bar' => 'test2' },
-               'nested_twice' => { 'nested_twice_foo_bar' => { 'nested_again' => 'test3' } })
+        .to eq('foo__bar' => 'test',
+               'nested' => { 'nested__foo__bar' => 'test2' },
+               'nested__twice' => { 'nested__twice__foo__bar_underscored' => { 'nested__again' => 'test3' } })
     end
   end
 
