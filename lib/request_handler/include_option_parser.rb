@@ -1,8 +1,8 @@
 # frozen_string_literal: true
-require 'request_handler/option_handler'
+require 'request_handler/option_parser'
 require 'request_handler/error'
 module RequestHandler
-  class IncludeOptionHandler < OptionHandler
+  class IncludeOptionParser < OptionParser
     def run
       return [] unless params.key?('include')
       options = fetch_options

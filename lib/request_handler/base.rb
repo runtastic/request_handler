@@ -1,11 +1,11 @@
 # frozen_string_literal: true
-require 'request_handler/filter_handler'
-require 'request_handler/page_handler'
-require 'request_handler/include_option_handler'
-require 'request_handler/sort_option_handler'
-require 'request_handler/header_handler'
-require 'request_handler/body_handler'
-require 'request_handler/field_set_handler'
+require 'request_handler/filter_parser'
+require 'request_handler/page_parser'
+require 'request_handler/include_option_parser'
+require 'request_handler/sort_option_parser'
+require 'request_handler/header_parser'
+require 'request_handler/body_parser'
+require 'request_handler/fieldsets_parser'
 require 'request_handler/helper'
 require 'confstruct'
 module RequestHandler
@@ -29,34 +29,34 @@ module RequestHandler
     end
 
     def filter_params
-      @filter_params ||= handle_filter_params
+      @filter_params ||= parse_filter_params
     end
 
     def page_params
-      @page_params ||= PageHandler.new(
+      @page_params ||= PageParser.new(
         params:      params,
         page_config: config.lookup!('page')
       ).run
     end
 
     def include_params
-      @include_params ||= handle_include_params
+      @include_params ||= parse_include_params
     end
 
     def sort_params
-      @sort_params ||= handle_sort_params
+      @sort_params ||= parse_sort_params
     end
 
     def headers
-      @headers ||= HeaderHandler.new(env: request.env).run
+      @headers ||= HeaderParser.new(env: request.env).run
     end
 
     def body_params
-      @body_params ||= handle_body_params
+      @body_params ||= parse_body_params
     end
 
-    def field_set_params
-      @field_set_params ||= handle_field_set_params
+    def fieldsets_params
+      @fieldsets_params ||= parse_fieldsets_params
     end
 
     # @abstract Subclass is expected to implement #to_dto
@@ -67,9 +67,9 @@ module RequestHandler
 
     attr_reader :request
 
-    def handle_filter_params
+    def parse_filter_params
       defaults = fetch_defaults('filter.defaults', {})
-      defaults.merge(FilterHandler.new(
+      defaults.merge(FilterParser.new(
         params:                params,
         schema:                config.lookup!('filter.schema'),
         additional_url_filter: config.lookup!('filter.additional_url_filter'),
@@ -77,37 +77,36 @@ module RequestHandler
       ).run)
     end
 
-    def handle_include_params
-      defaults = fetch_defaults('include_options.defaults', [])
-      result = IncludeOptionHandler.new(
+    def parse_include_params
+      parse_options(type: 'include_options', parser: IncludeOptionParser)
+    end
+
+    def parse_sort_params
+      parse_options(type: 'sort_options', parser: SortOptionParser)
+    end
+
+    def parse_options(type:, parser:)
+      defaults = fetch_defaults("#{type}.defaults", [])
+      result = parser.new(
         params:               params,
-        allowed_options_type: config.lookup!('include_options.allowed')
+        allowed_options_type: config.lookup!("#{type}.allowed")
       ).run
       result.empty? ? defaults : result
     end
 
-    def handle_sort_params
-      defaults = fetch_defaults('sort_options.defaults', [])
-      result = SortOptionHandler.new(
-        params:               params,
-        allowed_options_type: config.lookup!('sort_options.allowed')
-      ).run
-      result.empty? ? defaults : result
-    end
-
-    def handle_body_params
+    def parse_body_params
       defaults = fetch_defaults('body.defaults', {})
-      defaults.merge(BodyHandler.new(
+      defaults.merge(BodyParser.new(
         request:        request,
         schema:         config.lookup!('body.schema'),
         schema_options: execute_options(config.lookup!('body.options'))
       ).run)
     end
 
-    def handle_field_set_params
-      FieldSetHandler.new(params:   params,
-                          allowed:  config.lookup!('field_set.allowed'),
-                          required: config.lookup!('field_set.required')).run
+    def parse_fieldsets_params
+      FieldsetsParser.new(params:   params,
+                          allowed:  config.lookup!('fieldsets.allowed'),
+                          required: config.lookup!('fieldsets.required')).run
     end
 
     def fetch_defaults(key, default)

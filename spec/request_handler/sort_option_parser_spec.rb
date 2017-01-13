@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
-require 'request_handler/sort_option_handler'
-describe RequestHandler::SortOptionHandler do
+require 'request_handler/sort_option_parser'
+describe RequestHandler::SortOptionParser do
   let(:handler) do
     options_type = Dry::Types['strict.string'].enum('id', 'date', 'posts.created_at')
     described_class.new(params: params,

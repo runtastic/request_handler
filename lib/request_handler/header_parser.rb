@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'request_handler/error'
 module RequestHandler
-  class HeaderHandler
+  class HeaderParser
     def initialize(env:)
       raise MissingArgumentError, env: 'is missing' if env.nil?
       @headers = Helper.deep_transform_keys_in_object(env.select { |k, _v| k.start_with?('HTTP_') }) do |k|

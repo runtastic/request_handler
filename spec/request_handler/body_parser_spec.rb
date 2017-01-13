@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
-require 'request_handler/body_handler'
-describe RequestHandler::BodyHandler do
+require 'request_handler/body_parser'
+describe RequestHandler::BodyParser do
   let(:handler) do
     described_class.new(schema: schema, request: build_mock_request(params: {}, headers: {}, body: raw_body))
   end

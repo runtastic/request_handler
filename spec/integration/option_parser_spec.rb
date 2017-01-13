@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 require 'spec_helper'
 describe RequestHandler do
-  context 'Option Handler' do
-    context 'IncludeOptionHandler' do
+  context 'Option Parser' do
+    context 'IncludeOptionParser' do
       let(:testclass) do
         Class.new(RequestHandler::Base) do
           options do
@@ -44,7 +44,7 @@ describe RequestHandler do
         expect(testhandler.to_dto).to eq(OpenStruct.new(include: [:user]))
       end
     end
-    context 'SortOptionHandler' do
+    context 'SortOptionParser' do
       let(:testclass) do
         Class.new(RequestHandler::Base) do
           options do

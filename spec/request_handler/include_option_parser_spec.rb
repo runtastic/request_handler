@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
-require 'request_handler/include_option_handler'
-describe RequestHandler::IncludeOptionHandler do
+require 'request_handler/include_option_parser'
+describe RequestHandler::IncludeOptionParser do
   let(:handler) do
     options_type = Dry::Types['strict.string'].enum('user', 'email', 'user.posts')
     described_class.new(params:               params,

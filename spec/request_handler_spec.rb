@@ -47,7 +47,7 @@ class IntegrationTestRequestHandler < RequestHandler::Base
       allowed Dry::Types['strict.string'].enum('name', 'age')
     end
 
-    field_set do
+    fieldsets do
       allowed do
         posts Dry::Types['strict.string'].enum('awesome', 'samples')
       end
@@ -61,7 +61,7 @@ class IntegrationTestRequestHandler < RequestHandler::Base
       page:      page_params,
       include:   include_params,
       sort:      sort_params,
-      field_set: field_set_params,
+      fieldsets: fieldsets_params,
       headers:   headers
     )
   end
@@ -86,7 +86,7 @@ class IntegrationTestRequestHandlerWithBody < RequestHandler::Base
                end
              end)
 
-      options(->(_handler, request) { { query_id: request.params['id'] } })
+      options(->(_parser, request) { { query_id: request.params['id'] } })
     end
 
     filter do
@@ -235,7 +235,7 @@ describe RequestHandler do
                               RequestHandler::SortOption.new('age', :desc)])
 
       expect(dto.headers).to eq(expected_headers)
-      expect(dto.field_set).to eq(posts: [:samples, :awesome])
+      expect(dto.fieldsets).to eq(posts: [:samples, :awesome])
     end
   end
 end

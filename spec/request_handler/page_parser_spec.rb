@@ -1,22 +1,22 @@
 # frozen_string_literal: true
 require 'spec_helper'
-require 'request_handler/page_handler'
-describe RequestHandler::PageHandler do
+require 'request_handler/page_parser'
+describe RequestHandler::PageParser do
   shared_examples 'valid input' do
     it 'uses the value from the params if its within the limits' do
-      handler = RequestHandler::PageHandler.new(params: params, page_config: config.lookup!('page'))
+      handler = RequestHandler::PageParser.new(params: params, page_config: config.lookup!('page'))
       expect(handler.run).to eq(output)
     end
   end
   shared_examples 'input that causes an error' do
     it 'raises an error' do
-      handler = RequestHandler::PageHandler.new(params: params, page_config: config.lookup!('page'))
+      handler = RequestHandler::PageParser.new(params: params, page_config: config.lookup!('page'))
       expect { handler.run }.to raise_error(error)
     end
   end
   shared_examples 'input that causes a warning' do
     it 'prints a warning' do
-      handler = RequestHandler::PageHandler.new(params: params, page_config: config.lookup!('page'))
+      handler = RequestHandler::PageParser.new(params: params, page_config: config.lookup!('page'))
       expect(RequestHandler.configuration.logger).to receive(:warn).with(warning)
       expect(handler.run).to eq(output)
     end

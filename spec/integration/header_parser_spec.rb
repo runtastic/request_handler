@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
 describe RequestHandler do
-  context 'HeaderHandler' do
+  context 'HeaderParser' do
     let(:testclass) do
       Class.new(RequestHandler::Base) do
         def to_dto

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
-require 'request_handler/schema_handler'
-describe RequestHandler::SchemaHandler do
+require 'request_handler/schema_parser'
+describe RequestHandler::SchemaParser do
   shared_examples 'handles valid input data correctly' do
     it 'generates the expected output with valid input and without schema options' do
       handler = testclass.new(schema: schema_without_options, data: data)

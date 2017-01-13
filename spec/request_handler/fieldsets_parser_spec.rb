@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 require 'spec_helper'
-describe RequestHandler::FieldSetHandler do
+describe RequestHandler::FieldsetsParser do
   let(:opts) do
     Confstruct::Configuration.new do
-      field_set do
+      fieldsets do
         allowed do
           posts Dry::Types['strict.string'].enum('awesome', 'samples')
           photos Dry::Types['strict.string'].enum('foo', 'bar')
@@ -12,9 +12,9 @@ describe RequestHandler::FieldSetHandler do
       end
     end
   end
-  shared_examples 'returns field_set' do
-    let(:allowed) { opts.lookup!('field_set.allowed') }
-    let(:required) { opts.lookup!('field_set.required') }
+  shared_examples 'returns fieldsets' do
+    let(:allowed) { opts.lookup!('fieldsets.allowed') }
+    let(:required) { opts.lookup!('fieldsets.required') }
     let(:expected) { {} }
     it 'returns the hash' do
       expect(described_class.new(params: params, allowed: allowed, required: required).run)
@@ -26,35 +26,35 @@ describe RequestHandler::FieldSetHandler do
     it 'raises an error' do
       expect do
         described_class.new(params:   params,
-                            allowed:  opts.lookup!('field_set.allowed'),
-                            required: opts.lookup!('field_set.required')).run
+                            allowed:  opts.lookup!('fieldsets.allowed'),
+                            required: opts.lookup!('fieldsets.required')).run
       end
         .to raise_error(error)
     end
   end
   context 'no fieldset settings in the config or request' do
-    it_behaves_like 'returns field_set' do
+    it_behaves_like 'returns fieldsets' do
       let(:allowed) { {} }
       let(:required) { [] }
       let(:params) { {} }
     end
   end
   context 'fieldset settings and the parameter are set' do
-    it_behaves_like 'returns field_set' do
+    it_behaves_like 'returns fieldsets' do
       let(:params) { { 'fields' => { 'posts' => 'awesome' } } }
       let(:expected) { { posts: [:awesome] } }
     end
   end
 
   context 'fieldset settings and multiple parameters are set' do
-    it_behaves_like 'returns field_set' do
+    it_behaves_like 'returns fieldsets' do
       let(:params)  { { 'fields' => { 'posts' => 'awesome,samples' } } }
       let(:expected) { { posts: [:awesome, :samples] } }
     end
   end
 
   context 'fieldset settings and a required and an optional parameter are set' do
-    it_behaves_like 'returns field_set' do
+    it_behaves_like 'returns fieldsets' do
       let(:params) { { 'fields' => { 'posts' => 'awesome', 'photos' => 'foo' } } }
       let(:expected) { { posts: [:awesome], photos: [:foo] } }
     end
@@ -64,7 +64,7 @@ describe RequestHandler::FieldSetHandler do
     before do
       opts.required = [:posts, :photos]
     end
-    it_behaves_like 'returns field_set' do
+    it_behaves_like 'returns fieldsets' do
       let(:params) { { 'fields' => { 'posts' => 'awesome', 'photos' => 'foo' } } }
       let(:expected) { { posts: [:awesome], photos: [:foo] } }
     end
@@ -103,13 +103,13 @@ describe RequestHandler::FieldSetHandler do
 
     context 'invalid settings' do
       it 'fails if an allowed type is not a Enum' do
-        opts.field_set.allowed.posts = 'foo'
-        expect { described_class.new(params: {}, allowed: opts.field_set.allowed, required: [:posts]) }
+        opts.fieldsets.allowed.posts = 'foo'
+        expect { described_class.new(params: {}, allowed: opts.fieldsets.allowed, required: [:posts]) }
           .to raise_error(RequestHandler::InternalArgumentError)
       end
 
       it 'fails if required is not an Array' do
-        expect { described_class.new(params: {}, allowed: opts.field_set.allowed, required: 'foo') }
+        expect { described_class.new(params: {}, allowed: opts.fieldsets.allowed, required: 'foo') }
           .to raise_error(RequestHandler::InternalArgumentError)
       end
     end

@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 require 'spec_helper'
-require 'request_handler/header_handler'
-describe RequestHandler::HeaderHandler do
+require 'request_handler/header_parser'
+describe RequestHandler::HeaderParser do
   shared_examples 'fetch proper headers' do
     it 'returns auth information' do
-      handler = RequestHandler::HeaderHandler.new(env: headers)
+      handler = RequestHandler::HeaderParser.new(env: headers)
       expect(handler.run).to eq(expected_headers)
     end
   end

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'request_handler/error'
 module RequestHandler
-  class PageHandler
+  class PageParser
     def initialize(params:, page_config:)
       missing_arguments = []
       missing_arguments << { params: 'is missing' } if params.nil?
