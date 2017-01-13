@@ -126,7 +126,7 @@ module RequestHandler
     def params
       raise MissingArgumentError, params: 'is missing' if request.params.nil?
       raise ExternalArgumentError, params: 'must be a Hash' unless request.params.is_a?(Hash)
-      @params ||= Helper.deep_transform_keys_in_object(request.params) { |k| k.gsub('.', '__') }
+      @params ||= Helper.deep_transform_keys_in_object(request.params) { |k| k.gsub('.', ::RequestHandler.separator) }
     end
 
     def config

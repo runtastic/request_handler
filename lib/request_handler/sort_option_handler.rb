@@ -20,7 +20,7 @@ module RequestHandler
       options.map do |option|
         name, order = parse_option(option)
         allowed_option(name)
-        name.gsub!('.', '__')
+        name.gsub!('.', ::RequestHandler.separator)
         SortOption.new(name, order)
       end
     end
