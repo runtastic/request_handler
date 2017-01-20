@@ -40,7 +40,7 @@ class IntegrationTestRequestHandler < RequestHandler::Base
     end
 
     include_options do
-      allowed Dry::Types['strict.string'].enum('user', 'user.avatar', 'groups')
+      allowed Dry::Types['strict.string'].enum('user', 'user__avatar', 'groups')
     end
 
     sort_options do
@@ -116,6 +116,12 @@ describe RequestHandler do
     expect(described_class::VERSION).not_to be_nil
   end
 
+  before do
+    RequestHandler.configure do
+      separator '__'
+    end
+  end
+
   let(:headers) do
     {
       'HTTP_APP_KEY'          => 'some.app.key',
@@ -153,7 +159,7 @@ describe RequestHandler do
           }
         }
       }
-    JSON
+      JSON
 
       params = {
         'user_id' => 'awesome_user_id',
@@ -181,6 +187,7 @@ describe RequestHandler do
       expect(dto.headers).to eq(expected_headers)
     end
   end
+
   context 'w/o body' do
     it 'works' do
       params = {
