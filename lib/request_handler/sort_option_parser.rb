@@ -19,8 +19,8 @@ module RequestHandler
     def parse_options(options)
       options.map do |option|
         name, order = parse_option(option)
-        allowed_option(name)
         name.gsub!('.', ::RequestHandler.separator)
+        allowed_option(name)
         SortOption.new(name, order)
       end
     end

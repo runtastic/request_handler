@@ -207,7 +207,7 @@ describe RequestHandler do
           'users.number'              => '1',
           'posts.samples.photos.size' => '4'
         },
-        'include' => 'user,groups',
+        'include' => 'user,groups,user.avatar',
         'sort'    => 'name,-age',
         'fields'  => {
           'posts' => 'samples,awesome'
@@ -236,7 +236,7 @@ describe RequestHandler do
                              assets__size:                 10,
                              assets__number:               1)
 
-      expect(dto.include).to eq(%i(user groups))
+      expect(dto.include).to eq(%i(user groups user__avatar))
 
       expect(dto.sort).to eq([RequestHandler::SortOption.new('name', :asc),
                               RequestHandler::SortOption.new('age', :desc)])

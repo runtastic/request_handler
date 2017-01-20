@@ -3,7 +3,7 @@ require 'spec_helper'
 require 'request_handler/sort_option_parser'
 describe RequestHandler::SortOptionParser do
   let(:handler) do
-    options_type = Dry::Types['strict.string'].enum('id', 'date', 'posts.created_at')
+    options_type = Dry::Types['strict.string'].enum('id', 'date', 'posts__created_at')
     described_class.new(params: params,
                         allowed_options_type: options_type)
   end

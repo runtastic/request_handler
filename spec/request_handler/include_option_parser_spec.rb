@@ -3,7 +3,7 @@ require 'spec_helper'
 require 'request_handler/include_option_parser'
 describe RequestHandler::IncludeOptionParser do
   let(:handler) do
-    options_type = Dry::Types['strict.string'].enum('user', 'email', 'user.posts')
+    options_type = Dry::Types['strict.string'].enum('user', 'email', 'user__posts')
     described_class.new(params:               params,
                         allowed_options_type: options_type)
   end
