@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'spec_helper'
-require 'request_handler/filter_handler'
-describe RequestHandler::FilterHandler do
+require 'request_handler/filter_parser'
+describe RequestHandler::FilterParser do
   shared_examples 'proccesses the filters correctly' do
     it 'outputs the filters in a flat way' do
       handler = described_class.new(schema: schema, params: params, additional_url_filter: additional_url_filter)

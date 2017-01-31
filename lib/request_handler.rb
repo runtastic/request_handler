@@ -15,7 +15,12 @@ module RequestHandler
     def configuration
       @configuration ||= ::Confstruct::Configuration.new do
         logger Logger.new(STDOUT)
+        separator '__'
       end
+    end
+
+    def separator
+      configuration.separator
     end
   end
 end

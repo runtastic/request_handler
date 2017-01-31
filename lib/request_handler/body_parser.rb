@@ -1,8 +1,8 @@
 # frozen_string_literal: true
-require 'request_handler/schema_handler'
+require 'request_handler/schema_parser'
 require 'request_handler/error'
 module RequestHandler
-  class BodyHandler < SchemaHandler
+  class BodyParser < SchemaParser
     def initialize(request:, schema:, schema_options: {})
       raise MissingArgumentError, "request.body": 'is missing' if request.body.nil?
       super(schema: schema, schema_options: schema_options)

@@ -1,8 +1,8 @@
 # frozen_string_literal: true
-require 'request_handler/option_handler'
+require 'request_handler/option_parser'
 require 'request_handler/error'
 module RequestHandler
-  class IncludeOptionHandler < OptionHandler
+  class IncludeOptionParser < OptionParser
     def run
       return [] unless params.key?('include')
       options = fetch_options
@@ -12,12 +12,12 @@ module RequestHandler
 
     def allowed_options(options)
       options.map do |option|
+        option.gsub!('.', ::RequestHandler.separator)
         begin
-          allowed_options_type&.call(option)
+          allowed_options_type&.call(option).to_sym
         rescue Dry::Types::ConstraintError
           raise OptionNotAllowedError, option.to_sym => 'is not an allowed include option'
         end
-        option.to_sym
       end
     end
 

@@ -12,7 +12,7 @@ class IntegrationTestRequestHandler < RequestHandler::Base
         max_size 50
       end
 
-      posts_samples_photos do
+      posts__samples__photos do
         default_size 3
       end
 
@@ -31,23 +31,23 @@ class IntegrationTestRequestHandler < RequestHandler::Base
       schema(Dry::Validation.Form do
                required(:user_id).filled(:int?)
                required(:name).filled(:str?)
-               optional(:age_gt).filled(:int?)
-               optional(:age_gte).filled(:int?)
-               optional(:posts_awesome).filled(:bool?)
-               optional(:posts_samples_photos_has_thumbnail).filled(:bool?)
+               optional(:age__gt).filled(:int?)
+               optional(:age__gte).filled(:int?)
+               optional(:posts__awesome).filled(:bool?)
+               optional(:posts__samples__photos__has_thumbnail).filled(:bool?)
              end)
       additional_url_filter %i(user_id)
     end
 
     include_options do
-      allowed Dry::Types['strict.string'].enum('user', 'user.avatar', 'groups')
+      allowed Dry::Types['strict.string'].enum('user', 'user__avatar', 'groups')
     end
 
     sort_options do
       allowed Dry::Types['strict.string'].enum('name', 'age')
     end
 
-    field_set do
+    fieldsets do
       allowed do
         posts Dry::Types['strict.string'].enum('awesome', 'samples')
       end
@@ -61,7 +61,7 @@ class IntegrationTestRequestHandler < RequestHandler::Base
       page:      page_params,
       include:   include_params,
       sort:      sort_params,
-      field_set: field_set_params,
+      fieldsets: fieldsets_params,
       headers:   headers
     )
   end
@@ -86,7 +86,7 @@ class IntegrationTestRequestHandlerWithBody < RequestHandler::Base
                end
              end)
 
-      options(->(_handler, request) { { query_id: request.params['id'] } })
+      options(->(_parser, request) { { query_id: request.params['id'] } })
     end
 
     filter do
@@ -114,6 +114,12 @@ end
 describe RequestHandler do
   it 'has a version' do
     expect(described_class::VERSION).not_to be_nil
+  end
+
+  before do
+    RequestHandler.configure do
+      separator '__'
+    end
   end
 
   let(:headers) do
@@ -153,7 +159,7 @@ describe RequestHandler do
           }
         }
       }
-    JSON
+      JSON
 
       params = {
         'user_id' => 'awesome_user_id',
@@ -181,6 +187,7 @@ describe RequestHandler do
       expect(dto.headers).to eq(expected_headers)
     end
   end
+
   context 'w/o body' do
     it 'works' do
       params = {
@@ -200,7 +207,7 @@ describe RequestHandler do
           'users.number'              => '1',
           'posts.samples.photos.size' => '4'
         },
-        'include' => 'user,groups',
+        'include' => 'user,groups,user.avatar',
         'sort'    => 'name,-age',
         'fields'  => {
           'posts' => 'samples,awesome'
@@ -214,28 +221,28 @@ describe RequestHandler do
 
       expect(dto.filter).to eq(user_id:                            234,
                                name:                               'foo',
-                               posts_awesome:                      true,
-                               age_gt:                             5,
-                               posts_samples_photos_has_thumbnail: false)
+                               posts__awesome:                      true,
+                               age__gt:                             5,
+                               posts__samples__photos__has_thumbnail: false)
 
-      expect(dto.page).to eq(posts_size:                  34,
-                             posts_number:                2,
+      expect(dto.page).to eq(posts__size:                  34,
+                             posts__number:                2,
                              number:                      3,
                              size:                        15,
-                             users_size:                  40,
-                             users_number:                1,
-                             posts_samples_photos_size:   4,
-                             posts_samples_photos_number: 1,
-                             assets_size:                 10,
-                             assets_number:               1)
+                             users__size:                  40,
+                             users__number:                1,
+                             posts__samples__photos__size:   4,
+                             posts__samples__photos__number: 1,
+                             assets__size:                 10,
+                             assets__number:               1)
 
-      expect(dto.include).to eq(%i(user groups))
+      expect(dto.include).to eq(%i(user groups user__avatar))
 
       expect(dto.sort).to eq([RequestHandler::SortOption.new('name', :asc),
                               RequestHandler::SortOption.new('age', :desc)])
 
       expect(dto.headers).to eq(expected_headers)
-      expect(dto.field_set).to eq(posts: [:samples, :awesome])
+      expect(dto.fieldsets).to eq(posts: [:samples, :awesome])
     end
   end
 end

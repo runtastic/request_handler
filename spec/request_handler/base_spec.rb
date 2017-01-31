@@ -5,7 +5,7 @@ require 'request_handler/base'
 describe RequestHandler::Base do
   shared_examples 'correct_arguments_passed' do
     it 'passes the right arguments to the handler' do
-      expect(tested_handler).to receive(:new).with(expected_args).and_return(runstub)
+      expect(tested_parser).to receive(:new).with(expected_args).and_return(runstub)
       expect(testclass.new(request: request).send(tested_method)).to eq(runstub.run)
     end
   end
@@ -14,13 +14,13 @@ describe RequestHandler::Base do
     let(:n) { 2 }
     it 'persists for the same instance' do
       instance = testclass.new(request: request)
-      expect(tested_handler).to receive(:new).once.and_return(runstub)
+      expect(tested_parser).to receive(:new).once.and_return(runstub)
       n.times { instance.send(tested_method) }
     end
     it 'does not persist for different instances' do
       instances = []
       n.times { instances << testclass.new(request: request) }
-      expect(tested_handler).to receive(:new).exactly(n).times.and_return(runstub)
+      expect(tested_parser).to receive(:new).exactly(n).times.and_return(runstub)
       instances.each { |instance| instance.send(tested_method) }
     end
   end
@@ -28,7 +28,7 @@ describe RequestHandler::Base do
   shared_examples 'default_handling' do
     it 'uses the default values if no value is given' do
       instance = testclass.new(request: request)
-      expect(tested_handler).to receive(:new).and_return(runstub)
+      expect(tested_parser).to receive(:new).and_return(runstub)
       expect(instance.send(tested_method)).to eq(tested_defaults[:output])
     end
   end
@@ -101,7 +101,7 @@ describe RequestHandler::Base do
                     env:    { 'FOO' => 'bar' },
                     body:   StringIO.new('body'))
   end
-  let(:runstub) { double('Handler', run: { foo: 'bar' }) }
+  let(:runstub) { double('Parser', run: { foo: 'bar' }) }
 
   context '#filter_params' do
     let(:testclass) do
@@ -126,12 +126,12 @@ describe RequestHandler::Base do
         schema_options:        tested_options[:output]
       }
     end
-    let(:tested_method)  { :filter_params }
-    let(:tested_handler) { RequestHandler::FilterHandler }
+    let(:tested_method) { :filter_params }
+    let(:tested_parser) { RequestHandler::FilterParser }
     let(:tested_defaults) { { input: nil, output: runstub.run } }
     context 'with a proc as options' do
       let(:tested_options) do
-        { input:  ->(_handler, _request) { { body_user_id: 1 } },
+        { input:  ->(_parser, _request) { { body_user_id: 1 } },
           output: { body_user_id: 1 } }
       end
       it_behaves_like 'correct_persistence'
@@ -140,7 +140,7 @@ describe RequestHandler::Base do
     end
     context 'with a proc using the request as options' do
       let(:tested_options) do
-        { input:  ->(_handler, request) { { foo: request.env['FOO'] } },
+        { input:  ->(_parser, request) { { foo: request.env['FOO'] } },
           output: { foo: 'bar' } }
       end
       it_behaves_like 'correct_persistence'
@@ -177,14 +177,14 @@ describe RequestHandler::Base do
         page_config: { default_size: 'default_size' }
       }
     end
-    let(:tested_method)  { :page_params }
-    let(:tested_handler) { RequestHandler::PageHandler }
+    let(:tested_method) { :page_params }
+    let(:tested_parser) { RequestHandler::PageParser }
     it_behaves_like 'correct_persistence'
     it_behaves_like 'correct_arguments_passed'
   end
 
   context '#include_params' do
-    let(:runstub) { double('Handler', run: [{ foo: 'bar' }]) }
+    let(:runstub) { double('Parser', run: [{ foo: 'bar' }]) }
     let(:testclass) do
       defs = tested_defaults[:input]
       Class.new(RequestHandler::Base) do
@@ -202,8 +202,8 @@ describe RequestHandler::Base do
         allowed_options_type: 'allowed_options'
       }
     end
-    let(:tested_method)  { :include_params }
-    let(:tested_handler) { RequestHandler::IncludeOptionHandler }
+    let(:tested_method) { :include_params }
+    let(:tested_parser) { RequestHandler::IncludeOptionParser }
     let(:tested_defaults) { { input: nil, output: runstub.run } }
     it_behaves_like 'correct_persistence'
     it_behaves_like 'correct_arguments_passed'
@@ -211,7 +211,7 @@ describe RequestHandler::Base do
   end
 
   context '#sort_params' do
-    let(:runstub) { double('Handler', run: [{ foo: 'bar' }]) }
+    let(:runstub) { double('Parser', run: [{ foo: 'bar' }]) }
     let(:testclass) do
       defs = tested_defaults[:input]
       Class.new(RequestHandler::Base) do
@@ -229,8 +229,8 @@ describe RequestHandler::Base do
         allowed_options_type: 'allowed_options'
       }
     end
-    let(:tested_method)  { :sort_params }
-    let(:tested_handler) { RequestHandler::SortOptionHandler }
+    let(:tested_method) { :sort_params }
+    let(:tested_parser) { RequestHandler::SortOptionParser }
     let(:tested_defaults) { { input: nil, output: runstub.run } }
     it_behaves_like 'correct_persistence'
     it_behaves_like 'correct_arguments_passed'
@@ -247,8 +247,8 @@ describe RequestHandler::Base do
         env: request.env
       }
     end
-    let(:tested_method)  { :headers }
-    let(:tested_handler) { RequestHandler::HeaderHandler }
+    let(:tested_method) { :headers }
+    let(:tested_parser) { RequestHandler::HeaderParser }
     it_behaves_like 'correct_persistence'
     it_behaves_like 'correct_arguments_passed'
   end
@@ -274,12 +274,12 @@ describe RequestHandler::Base do
         schema_options: tested_options[:output]
       }
     end
-    let(:tested_method)  { :body_params }
-    let(:tested_handler) { RequestHandler::BodyHandler }
+    let(:tested_method) { :body_params }
+    let(:tested_parser) { RequestHandler::BodyParser }
     let(:tested_defaults) { { input: nil, output: runstub.run } }
     context 'with a proc as options' do
       let(:tested_options) do
-        { input:  ->(_handler, _request) { { body_user_id: 1 } },
+        { input:  ->(_parser, _request) { { body_user_id: 1 } },
           output: { body_user_id: 1 } }
       end
       it_behaves_like 'correct_persistence'
@@ -288,7 +288,7 @@ describe RequestHandler::Base do
     end
     context 'with a proc using the request as options' do
       let(:tested_options) do
-        { input:  ->(_handler, request) { { foo: request.env['FOO'] } },
+        { input:  ->(_parser, request) { { foo: request.env['FOO'] } },
           output: { foo: 'bar' } }
       end
       it_behaves_like 'correct_persistence'
@@ -317,14 +317,18 @@ describe RequestHandler::Base do
                                         {
                                           'foo.bar'      => 'test',
                                           'nested'       => { 'nested.foo.bar' => 'test2' },
-                                          'nested.twice' => { 'nested.twice.foo.bar' => { 'nested.again' => 'test3' } }
+                                          'nested.twice' => {
+                                            'nested.twice.foo.bar_underscored' => {
+                                              'nested.again' => 'test3'
+                                            }
+                                          }
                                         },
                                 env:    {},
                                 body:   StringIO.new('body'))
       expect(testclass.new(request: request).send(:params))
-        .to eq('foo_bar'      => 'test',
-               'nested'       => { 'nested_foo_bar' => 'test2' },
-               'nested_twice' => { 'nested_twice_foo_bar' => { 'nested_again' => 'test3' } })
+        .to eq('foo__bar' => 'test',
+               'nested' => { 'nested__foo__bar' => 'test2' },
+               'nested__twice' => { 'nested__twice__foo__bar_underscored' => { 'nested__again' => 'test3' } })
     end
   end
 

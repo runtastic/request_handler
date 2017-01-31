@@ -108,8 +108,46 @@ end
 # Given a Rack::Request you can create a well defined dto through the request handler:
 DemoHandler.new(request: request).to_dto
 ```
+### Nested Attributes
 
-### Caviats
+For nested attributes all options or parameter will be flattened and nesting
+will be represented by joining the nesting levels with the defined separator
+string. By default this will be double underscore `__`.
+
+This means in the request handler options one must use the attributes as flat
+structure with the configured separator.
+
+#### Example
+
+Input query parameters like the following:
+
+```http
+GET /users?filter[name]=John&filter[posts.tag]=health
+```
+
+will be parsed as
+
+```ruby
+{
+  name: "John",
+  posts__tag: "health"
+}
+```
+
+Same is applied for sort and include options.
+
+```http
+GET /users?sort=posts.published_on&include=posts.comments
+```
+
+becomes
+
+```ruby
+include_options = [:posts__comments]
+sort_options = SortOption.new(:posts__published_on, :asc)
+```
+
+### Caveats
 
 It is currently expected that _url_ parameter are already parsed and included in
 the request params. With Sinatra requests the following is needed to accomplish

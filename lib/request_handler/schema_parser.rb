@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'request_handler/error'
 module RequestHandler
-  class SchemaHandler
+  class SchemaParser
     def initialize(schema:, schema_options: {})
       missing_arguments = []
       missing_arguments << { schema: 'is missing' } if schema.nil?

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'request_handler/error'
 module RequestHandler
-  class OptionHandler
+  class OptionParser
     def initialize(params:, allowed_options_type:)
       @params = params
       @allowed_options_type = allowed_options_type

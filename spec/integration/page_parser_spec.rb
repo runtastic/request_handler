@@ -2,7 +2,7 @@
 require 'spec_helper'
 
 describe RequestHandler do
-  context 'PageHandler' do
+  context 'PageParser' do
     context 'invalid settings' do
       let(:testclass) do
         Class.new(RequestHandler::Base) do

@@ -1,9 +1,9 @@
 # frozen_string_literal: true
-require 'request_handler/option_handler'
+require 'request_handler/option_parser'
 require 'request_handler/error'
 require 'request_handler/sort_option'
 module RequestHandler
-  class SortOptionHandler < OptionHandler
+  class SortOptionParser < OptionParser
     def run
       return [] unless params.key?('sort')
       sort_options = parse_options(fetch_options)
@@ -19,6 +19,7 @@ module RequestHandler
     def parse_options(options)
       options.map do |option|
         name, order = parse_option(option)
+        name.gsub!('.', ::RequestHandler.separator)
         allowed_option(name)
         SortOption.new(name, order)
       end

@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 require 'spec_helper'
 describe RequestHandler do
-  context 'SchemaHandler' do
-    context 'BodyHandler' do
+  context 'SchemaParser' do
+    context 'BodyParser' do
       let(:valid_body) do
         <<~JSON
       {
@@ -83,7 +83,7 @@ describe RequestHandler do
       end
     end
 
-    context 'FilterHandler' do
+    context 'FilterParser' do
       let(:valid_params) do
         {
           'filter' => {

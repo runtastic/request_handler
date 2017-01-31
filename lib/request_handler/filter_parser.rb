@@ -1,8 +1,8 @@
 # frozen_string_literal: true
-require 'request_handler/schema_handler'
+require 'request_handler/schema_parser'
 require 'request_handler/error'
 module RequestHandler
-  class FilterHandler < SchemaHandler
+  class FilterParser < SchemaParser
     def initialize(params:, schema:, additional_url_filter:, schema_options: {})
       super(schema: schema, schema_options: schema_options)
       @filter = params.fetch('filter') { {} }
