@@ -3,6 +3,10 @@ Changelog
 
 ## master
 
+## 0.9.1
+
+- fix configure method
+
 ## 0.9.0
 
 - change nesting separator from `_` to `__` and use it consistently (also in sorting fields)

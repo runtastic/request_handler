@@ -9,7 +9,7 @@ require 'logger'
 module RequestHandler
   class << self
     def configure(&block)
-      @configuration.configure(&block)
+      configuration.configure(&block)
     end
 
     def configuration
