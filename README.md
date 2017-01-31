@@ -147,6 +147,18 @@ include_options = [:posts__comments]
 sort_options = SortOption.new(:posts__published_on, :asc)
 ```
 
+### Configuration
+
+The default logger and separator can be changed globally by using
+`RequestHandler.configure {}`.
+
+```ruby
+RequestHandler.configure do
+  logger Logger.new(STDERR)
+  separator '____'
+end
+```
+
 ### Caveats
 
 It is currently expected that _url_ parameter are already parsed and included in
