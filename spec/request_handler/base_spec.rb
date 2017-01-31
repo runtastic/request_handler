@@ -348,6 +348,40 @@ describe RequestHandler::Base do
       expect { testedhandler.send(:params) }.to raise_error(RequestHandler::ExternalArgumentError)
     end
   end
+  context 'missing options' do
+    let(:testclass) do
+      Class.new(RequestHandler::Base) do
+        options do
+          foo 'bar'
+        end
+      end
+    end
+    let(:request) { instance_double('Rack::Request', params: {}, env: {}, body: '') }
+    let(:handler) { testclass.new(request: request) }
+    it 'fails for a missing filter schema' do
+      expect { handler.send(:filter_params) }.to raise_error(RequestHandler::NoConfigAvailableError)
+    end
+    it 'fails for a missing page options' do
+      expect { handler.send(:page_params) }.to raise_error(RequestHandler::NoConfigAvailableError)
+    end
+    it 'fails for a missing allowed include options' do
+      expect { handler.send(:include_params) }.to raise_error(RequestHandler::NoConfigAvailableError)
+    end
+    it 'fails for a missing allowed sort options' do
+      expect { handler.send(:sort_params) }.to raise_error(RequestHandler::NoConfigAvailableError)
+    end
+    it 'fails for a missing body schema' do
+      expect { handler.send(:body_params) }.to raise_error(RequestHandler::NoConfigAvailableError)
+    end
+    it 'fails for a missing required fieldset params' do
+      handler.send(:config).push!(fieldset: { allowed: Dry::Types['strict.string'].enum('foo', 'bar') })
+      expect { handler.send(:fieldsets_params) }.to raise_error(RequestHandler::NoConfigAvailableError)
+    end
+    it 'fails for a missing alowed fieldset params' do
+      handler.send(:config).push!(fieldset: { required: ['Foo'] })
+      expect { handler.send(:fieldsets_params) }.to raise_error(RequestHandler::NoConfigAvailableError)
+    end
+  end
 
   context 'config inheritence' do
     class Parent < RequestHandler::Base
