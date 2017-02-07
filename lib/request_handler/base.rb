@@ -9,7 +9,7 @@ require 'request_handler/fieldsets_parser'
 require 'request_handler/helper'
 require 'confstruct'
 module RequestHandler
-  class Base # rubocop:disable Metrics/ClassLength
+  class Base
     class << self
       def options(&block)
         @config ||= ::Confstruct::Configuration.new
