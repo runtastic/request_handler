@@ -35,7 +35,7 @@ module RequestHandler
     def page_params
       @page_params ||= PageParser.new(
         params:      params,
-        page_config: config.lookup!('page')
+        page_config: lookup!('page')
       ).run
     end
 
@@ -71,9 +71,9 @@ module RequestHandler
       defaults = fetch_defaults('filter.defaults', {})
       defaults.merge(FilterParser.new(
         params:                params,
-        schema:                config.lookup!('filter.schema'),
-        additional_url_filter: config.lookup!('filter.additional_url_filter'),
-        schema_options:        execute_options(config.lookup!('filter.options'))
+        schema:                lookup!('filter.schema'),
+        additional_url_filter: lookup('filter.additional_url_filter'),
+        schema_options:        execute_options(lookup('filter.options'))
       ).run)
     end
 
@@ -89,7 +89,7 @@ module RequestHandler
       defaults = fetch_defaults("#{type}.defaults", [])
       result = parser.new(
         params:               params,
-        allowed_options_type: config.lookup!("#{type}.allowed")
+        allowed_options_type: lookup!("#{type}.allowed")
       ).run
       result.empty? ? defaults : result
     end
@@ -98,19 +98,19 @@ module RequestHandler
       defaults = fetch_defaults('body.defaults', {})
       defaults.merge(BodyParser.new(
         request:        request,
-        schema:         config.lookup!('body.schema'),
-        schema_options: execute_options(config.lookup!('body.options'))
+        schema:         lookup!('body.schema'),
+        schema_options: execute_options(lookup('body.options'))
       ).run)
     end
 
     def parse_fieldsets_params
       FieldsetsParser.new(params:   params,
-                          allowed:  config.lookup!('fieldsets.allowed'),
-                          required: config.lookup!('fieldsets.required')).run
+                          allowed:  lookup!('fieldsets.allowed'),
+                          required: lookup!('fieldsets.required')).run
     end
 
     def fetch_defaults(key, default)
-      value = config.lookup!(key)
+      value = lookup(key)
       return default if value.nil?
       return value unless value.respond_to?(:call)
       value.call(request)
@@ -120,6 +120,16 @@ module RequestHandler
       return {} if options.nil?
       return options unless options.respond_to?(:call)
       options.call(self, request)
+    end
+
+    def lookup!(key)
+      config.lookup!(key).tap do |data|
+        raise NoConfigAvailableError, key.to_sym => 'is not configured' if data.nil?
+      end
+    end
+
+    def lookup(key)
+      config.lookup!(key)
     end
 
     def params

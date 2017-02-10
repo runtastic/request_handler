@@ -3,6 +3,8 @@ Changelog
 
 ## master
 
+- raise an error if mandatory options are missing in the handler configuration
+
 ## 0.9.1
 
 - fix configure method

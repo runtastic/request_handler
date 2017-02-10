@@ -6,6 +6,9 @@ Metrics/LineLength:
 Metrics/MethodLength:
   Exclude:
     - test/**/*
+Metrics/ClassLength:
+  Exclude:
+    - lib/request_handler/base.rb
 Style/ClassAndModuleChildren:
   Exclude:
     - test/**/*
