@@ -139,7 +139,7 @@ describe RequestHandler do
 
   context 'w/ body' do
     it 'works' do
-      raw_body = <<~JSON
+      raw_body = <<-JSON
       {
         "data": {
           "type": "post",
