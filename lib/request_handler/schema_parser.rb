@@ -6,7 +6,7 @@ module RequestHandler
       missing_arguments = []
       missing_arguments << { schema: 'is missing' } if schema.nil?
       missing_arguments << { schema_options: 'is missing' } if schema_options.nil?
-      raise MissingArgumentError, missing_arguments if missing_arguments.length > 0
+      raise MissingArgumentError, missing_arguments unless missing_arguments.empty?
       raise InternalArgumentError, schema: 'must be a Schema' unless schema.is_a?(Dry::Validation::Schema)
       @schema = schema
       @schema_options = schema_options
