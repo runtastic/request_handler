@@ -4,6 +4,7 @@ Changelog
 ## master
 
 - raise an error if mandatory options are missing in the handler configuration
+- Transform param keys to string before substitution
 
 ## 0.9.1
 

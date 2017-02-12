@@ -330,6 +330,23 @@ describe RequestHandler::Base do
                'nested' => { 'nested__foo__bar' => 'test2' },
                'nested__twice' => { 'nested__twice__foo__bar_underscored' => { 'nested__again' => 'test3' } })
     end
+
+    it 'works with both strings and symbols as param keys' do
+      testclass = Class.new(described_class)
+      request = instance_double('Rack::Request',
+                                params:
+                                       {
+                                         'a.string'                 => 'test',
+                                         :a_symbol                  => 'test2',
+                                         :'a_symbol_with.separator' => 'omgwtf'
+                                       },
+                                env:   {},
+                                body:  StringIO.new('body'))
+      expect(testclass.new(request: request).send(:params))
+        .to eq('a__string'                => 'test',
+               'a_symbol'                 => 'test2',
+               'a_symbol_with__separator' => 'omgwtf')
+    end
   end
 
   context 'errorhandling' do
