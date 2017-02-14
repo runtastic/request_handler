@@ -1,10 +1,36 @@
-sudo: false
 language: ruby
 cache: bundler
-jdk:
-  - oraclejdk8
 rvm:
+  - 2.1.10
+  - 2.2.6
   - 2.3.3
   - 2.4.0
-  - jruby-9.1.6.0
-before_install: gem install bundler -v 1.13.6
+  - jruby-9.1.7.0
+jdk:
+  - oraclejdk8
+env:
+  - "JRUBY_OPTS='--dev --debug'"
+  - "JRUBY_OPTS='-Xcompile.invokedynamic=true --debug'"
+matrix:
+  exclude:
+    - rvm: 2.1.10
+      jdk: oraclejdk8
+      env: "JRUBY_OPTS='-Xcompile.invokedynamic=true --debug'"
+    - rvm: 2.2.6
+      jdk: oraclejdk8
+      env: "JRUBY_OPTS='-Xcompile.invokedynamic=true --debug'"
+    - rvm: 2.3.3
+      jdk: oraclejdk8
+      env: "JRUBY_OPTS='-Xcompile.invokedynamic=true --debug'"
+    - rvm: 2.4.0
+      jdk: oraclejdk8
+      env: "JRUBY_OPTS='-Xcompile.invokedynamic=true --debug'"
+  allow_failures:
+    - rvm: jruby-9.1.7.0
+      jdk: oraclejdk8
+      env: "JRUBY_OPTS='-Xcompile.invokedynamic=true --debug'"
+before_install:
+  - gem update --system
+  - gem install bundler -v 1.13.6
+after_success:
+  - bundle exec danger

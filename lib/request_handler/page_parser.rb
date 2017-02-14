@@ -51,7 +51,7 @@ module RequestHandler
     def fetch_and_check_default_size(prefix)
       default_size = lookup_nested_config_key('default_size', prefix)
       raise_no_default_size(prefix) if default_size.nil?
-      raise_not_positive(prefix, 'size') unless default_size.is_a?(Integer) && default_size.positive?
+      raise_not_positive(prefix, 'size') unless default_size.is_a?(Integer) && default_size > 0
       default_size
     end
 
@@ -64,7 +64,7 @@ module RequestHandler
 
     def check_int(string:, error_msg:)
       output = Integer(string)
-      raise ExternalArgumentError, error_msg unless output.positive?
+      raise ExternalArgumentError, error_msg unless output > 0
       output
     rescue ArgumentError
       raise ExternalArgumentError, error_msg

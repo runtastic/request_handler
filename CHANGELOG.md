@@ -5,6 +5,8 @@ Changelog
 
 - raise an error if mandatory options are missing in the handler configuration
 - Transform param keys to string before substitution
+- make gem compatible with ruby 2.1
+- add danger
 
 ## 0.9.1
 

@@ -310,8 +310,8 @@ describe RequestHandler::Base do
   end
 
   context '#params' do
+    let(:testclass) {Class.new(described_class)}
     it 'tranforms the params dots to undescores before using them' do
-      testclass = Class.new(described_class)
       request = instance_double('Rack::Request',
                                 params:
                                         {
@@ -332,7 +332,6 @@ describe RequestHandler::Base do
     end
 
     it 'works with both strings and symbols as param keys' do
-      testclass = Class.new(described_class)
       request = instance_double('Rack::Request',
                                 params:
                                        {
@@ -346,6 +345,18 @@ describe RequestHandler::Base do
         .to eq('a__string'                => 'test',
                'a_symbol'                 => 'test2',
                'a_symbol_with__separator' => 'omgwtf')
+    end
+
+    it "transforms nested arrays" do
+      request = instance_double('Rack::Request',
+                                params:
+                                        {
+                                          'nested'       => [{ 'hash.key.in.array' => 'test2' }, "normal.array.element"]
+                                        },
+                                env:    {},
+                                body:   StringIO.new('body'))
+      expect(testclass.new(request: request).send(:params))
+        .to eq('nested' => [{ 'hash__key__in__array' => 'test2' }, "normal.array.element"])
     end
   end
 

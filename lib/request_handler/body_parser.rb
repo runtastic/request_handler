@@ -4,7 +4,7 @@ require 'request_handler/error'
 module RequestHandler
   class BodyParser < SchemaParser
     def initialize(request:, schema:, schema_options: {})
-      raise MissingArgumentError, "request.body": 'is missing' if request.body.nil?
+      raise MissingArgumentError, :"request.body" => 'is missing' if request.body.nil?
       super(schema: schema, schema_options: schema_options)
       @request = request
     end

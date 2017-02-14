@@ -1,6 +1,6 @@
 # minitest specifics
 AllCops:
-  TargetRubyVersion: 2.3
+  TargetRubyVersion: 2.1
 Metrics/LineLength:
   Max: 119
 Metrics/MethodLength:
