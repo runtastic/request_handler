@@ -1,18 +1,9 @@
 # frozen_string_literal: true
 ENV['RACK_ENV'] = ENV['ENVIRONMENT'] ||= 'test'
 require 'simplecov'
-require 'simplecov-json'
 if ENV['TRAVIS']
   require 'codecov'
-  SimpleCov.formatters = [
-    SimpleCov::Formatter::JSONFormatter,
-    SimpleCov::Formatter::Codecov
-  ]
-else
-  SimpleCov.formatters = [
-    SimpleCov::Formatter::HTMLFormatter,
-    SimpleCov::Formatter::JSONFormatter
-  ]
+  SimpleCov.formatter SimpleCov::Formatter::Codecov
 end
 SimpleCov.start do
   add_filter '/spec/'

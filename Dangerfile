@@ -22,8 +22,5 @@ warn("Big PR") if git.lines_of_code > 500
 
 commit_lint.check warn: :all, disable: [:subject_cap]
 
-# Coverage
-simplecov.report('coverage/coverage.json')
-
 # rubocop
 rubocop.lint "*"
