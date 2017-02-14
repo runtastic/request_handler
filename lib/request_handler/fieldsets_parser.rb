@@ -45,12 +45,12 @@ module RequestHandler
     end
 
     def raise_invalid_field_option(type)
-      return if allowed&.key?(type)
+      return if allowed.key?(type)
       raise OptionNotAllowedError, fieldsets: "fieldsets for type: #{type} not allowed"
     end
 
     def raise_missing_fields_param
-      return if required.nil? || required.empty?
+      return if required.empty?
       raise ExternalArgumentError, fieldsets: 'missing required fields options'
     end
 

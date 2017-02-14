@@ -16,7 +16,7 @@ describe RequestHandler::BodyParser do
 
   context 'one relationships' do
     let(:raw_body) do
-      <<~JSON
+      <<-JSON
       {
         "data": {
           "id": "fer342ref",
@@ -36,7 +36,7 @@ describe RequestHandler::BodyParser do
           }
         }
       }
-    JSON
+      JSON
     end
     let(:wanted_result) do
       {
@@ -56,7 +56,7 @@ describe RequestHandler::BodyParser do
 
   context 'multiple relationships' do
     let(:raw_body) do
-      <<~JSON
+      <<-JSON
       {
         "data": {
           "type": "post",
@@ -82,7 +82,7 @@ describe RequestHandler::BodyParser do
           }
         }
       }
-    JSON
+      JSON
     end
     let(:wanted_result) do
       {
@@ -106,7 +106,7 @@ describe RequestHandler::BodyParser do
 
   context 'array in a relationship' do
     let(:raw_body) do
-      <<~JSON
+      <<-JSON
       {
         "data": {
           "id": "fer342ref",
@@ -132,7 +132,7 @@ describe RequestHandler::BodyParser do
           }
         }
       }
-    JSON
+      JSON
     end
     let(:wanted_result) do
       {
@@ -158,7 +158,7 @@ describe RequestHandler::BodyParser do
 
   context 'without relationships' do
     let(:raw_body) do
-      <<~JSON
+      <<-JSON
       {
         "data": {
           "type": "post",
@@ -170,7 +170,7 @@ describe RequestHandler::BodyParser do
           }
         }
       }
-    JSON
+      JSON
     end
     let(:wanted_result) do
       {
@@ -186,7 +186,7 @@ describe RequestHandler::BodyParser do
 
   context 'different types of Inputs' do
     let(:raw_body) do
-      <<~JSON
+      <<-JSON
       {
         "data": {
           "type": "post",
@@ -198,7 +198,7 @@ describe RequestHandler::BodyParser do
           }
         }
       }
-    JSON
+      JSON
     end
     let(:wanted_result) do
       {
@@ -214,7 +214,7 @@ describe RequestHandler::BodyParser do
 
   context 'without attributes' do
     let(:raw_body) do
-      <<~JSON
+      <<-JSON
       {
         "data": {
           "type": "post",
@@ -229,7 +229,7 @@ describe RequestHandler::BodyParser do
           }
         }
       }
-    JSON
+      JSON
     end
     let(:wanted_result) do
       {

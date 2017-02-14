@@ -4,26 +4,26 @@ describe RequestHandler do
   context 'SchemaParser' do
     context 'BodyParser' do
       let(:valid_body) do
-        <<~JSON
-      {
-        "data": {
-          "attributes": {
-            "name": "About naming stuff and cache invalidation"
+        <<-JSON
+        {
+          "data": {
+            "attributes": {
+              "name": "About naming stuff and cache invalidation"
+            }
           }
         }
-      }
-      JSON
+        JSON
       end
       let(:invalid_body) do
-        <<~JSON
-      {
-        "data": {
-          "attributes": {
-            "foo": "About naming stuff and cache invalidation"
+        <<-JSON
+        {
+          "data": {
+            "attributes": {
+              "foo": "About naming stuff and cache invalidation"
+            }
           }
         }
-      }
-      JSON
+        JSON
       end
       context 'valid schema' do
         let(:testclass) do
