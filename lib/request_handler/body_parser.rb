@@ -17,6 +17,7 @@ module RequestHandler
 
     def flattened_request_body
       body = request_body['data']
+      raise ExternalArgumentError, body: 'must contain data' unless body
       body.merge!(body.delete('attributes') { {} })
       relationships = flatten_relationship_resource_linkages(body.delete('relationships') { {} })
       body.merge!(relationships)
