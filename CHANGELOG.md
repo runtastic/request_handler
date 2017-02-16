@@ -3,6 +3,8 @@ Changelog
 
 ## master
 
+## 0.10.0
+
 - raise an error if mandatory options are missing in the handler configuration
 - Transform param keys to string before substitution
 - make gem compatible with ruby 2.1
