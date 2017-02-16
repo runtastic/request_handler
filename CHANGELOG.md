@@ -7,6 +7,7 @@ Changelog
 - Transform param keys to string before substitution
 - make gem compatible with ruby 2.1
 - add danger
+- raise an ExternalArgumentError if the body does not contain data
 
 ## 0.9.1
 

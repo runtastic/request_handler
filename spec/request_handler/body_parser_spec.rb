@@ -252,4 +252,18 @@ describe RequestHandler::BodyParser do
     end
       .to raise_error(RequestHandler::MissingArgumentError)
   end
+
+  it 'fails if the request body does not contain a data hash' do
+    schema = Dry::Validation.JSON {}
+    expect do
+      described_class.new(
+        schema:  schema,
+        request: instance_double('Rack::Request',
+                                 params: {},
+                                 env: {},
+                                 body: StringIO.new('{"include": [{"type": "foo", "id": "bar"}]}'))
+      ).run
+    end
+      .to raise_error(RequestHandler::ExternalArgumentError)
+  end
 end
