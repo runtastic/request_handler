@@ -90,17 +90,17 @@ class DemoHandler < RequestHandler::Base
       options(->(_handler, _request) { { foo: "bar" } })
       # options({foo: "bar"}) # also works for hash options instead of procs
     end
+  end
 
-    def to_dto
-      OpenStruct.new(
-        body:    body_params,
-        page:    page_params,
-        include: include_params,
-        filter:  filter_params,
-        sort:    sort_params,
-        headers: headers
-      )
-    end
+  def to_dto
+    OpenStruct.new(
+      body:    body_params,
+      page:    page_params,
+      include: include_params,
+      filter:  filter_params,
+      sort:    sort_params,
+      headers: headers
+    )
   end
 end
 
