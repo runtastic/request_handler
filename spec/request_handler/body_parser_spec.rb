@@ -381,7 +381,9 @@ describe RequestHandler::BodyParser do
     end
     it 'flattens the body as expected' do
       expect(handler).to receive(:validate_schema).with(wanted_result.shift)
-      wanted_result.each { |result| expect(handler).to receive(:validate_schema).with(result, with: anything) }
+      wanted_result.each do |result|
+        expect(handler).to receive(:validate_schema).with(result, with: anything)
+      end
       handler.run
     end
   end

@@ -10,6 +10,17 @@ describe RequestHandler do
             "attributes": {
               "name": "About naming stuff and cache invalidation"
             }
+          }
+        }
+        JSON
+      end
+      let(:valid_body_with_included) do
+        <<-JSON
+        {
+          "data": {
+            "attributes": {
+              "name": "About naming stuff and cache invalidation"
+            }
           },
           "included": [
             {
@@ -64,6 +75,12 @@ describe RequestHandler do
 
         it 'works for valid data' do
           request = build_mock_request(params: {}, headers: {}, body: valid_body)
+          testhandler = testclass.new(request: request)
+          expect(testhandler.to_dto).to eq(OpenStruct.new(body: { name: 'About naming stuff and cache invalidation' }))
+        end
+
+        it 'works for valid data with includes' do
+          request = build_mock_request(params: {}, headers: {}, body: valid_body_with_included)
           testhandler = testclass.new(request: request)
           expect(testhandler.to_dto).to eq(OpenStruct.new(body: { name: 'About naming stuff and cache invalidation' }))
         end
@@ -122,11 +139,18 @@ describe RequestHandler do
           expect { testhandler.to_dto }.to raise_error(RequestHandler::MissingArgumentError)
         end
 
-        it 'works for valid data' do
-          request = build_mock_request(params: {}, headers: {}, body: valid_body)
+        it 'works for valid data with includes' do
+          request = build_mock_request(params: {}, headers: {}, body: valid_body_with_included)
           testhandler = testclass.new(request: request)
           expect(testhandler.to_dto)
             .to eq(OpenStruct.new(body: [{ name: 'About naming stuff and cache invalidation' }, { view_count: 1337 }]))
+        end
+
+        it 'works for valid data without includes' do
+          request = build_mock_request(params: {}, headers: {}, body: valid_body)
+          testhandler = testclass.new(request: request)
+          expect(testhandler.to_dto)
+            .to eq(OpenStruct.new(body: [{ name: 'About naming stuff and cache invalidation' }]))
         end
       end
       context 'invalid schema' do
