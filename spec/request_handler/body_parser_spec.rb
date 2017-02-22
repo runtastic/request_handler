@@ -11,12 +11,7 @@ describe RequestHandler::BodyParser do
   end
   shared_examples 'flattens the body as expected' do
     it 'returns the flattened body' do
-      if wanted_result.is_a? Array
-        expect(handler).to receive(:validate_schema).with(wanted_result.shift)
-        wanted_result.each { |result| expect(handler).to receive(:validate_schema).with(result, with: anything) }
-      else
-        expect(handler).to receive(:validate_schema).with(wanted_result)
-      end
+      expect(handler).to receive(:validate_schema).with(wanted_result)
       handler.run
     end
   end
@@ -384,7 +379,11 @@ describe RequestHandler::BodyParser do
         }
       ]
     end
-    it_behaves_like 'flattens the body as expected'
+    it 'flattens the body as expected' do
+      expect(handler).to receive(:validate_schema).with(wanted_result.shift)
+      wanted_result.each { |result| expect(handler).to receive(:validate_schema).with(result, with: anything) }
+      handler.run
+    end
   end
 
   it 'fails if the request body is nil' do
