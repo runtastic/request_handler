@@ -3,16 +3,27 @@ require 'spec_helper'
 require 'request_handler/body_parser'
 describe RequestHandler::BodyParser do
   let(:handler) do
-    described_class.new(schema: schema, request: build_mock_request(params: {}, headers: {}, body: raw_body))
+    described_class.new(
+      schema:           schema,
+      request:          build_mock_request(params: {}, headers: {}, body: raw_body),
+      included_schemas: included_schemas
+    )
   end
   shared_examples 'flattens the body as expected' do
-    it 'returns the flattend body' do
-      expect(handler).to receive(:validate_schema).with(wanted_result)
+    it 'returns the flattened body' do
+      if wanted_result.is_a? Array
+        expect(handler).to receive(:validate_schema).with(wanted_result.shift)
+        wanted_result.each { |result| expect(handler).to receive(:validate_schema).with(result, with: anything) }
+      else
+        expect(handler).to receive(:validate_schema).with(wanted_result)
+      end
       handler.run
     end
   end
 
   let(:schema) { Dry::Validation.JSON {} }
+
+  let(:included_schemas) { nil }
 
   context 'one relationships' do
     let(:raw_body) do
@@ -240,6 +251,138 @@ describe RequestHandler::BodyParser do
           'type' => 'category'
         }
       }
+    end
+    it_behaves_like 'flattens the body as expected'
+  end
+
+  context 'with included_schemas defined' do
+    let(:included_schemas) do
+      {
+        people:   schema,
+        comments: schema
+      }
+    end
+    let(:raw_body) do
+      <<-JSON
+      {
+        "data": {
+          "type": "articles",
+          "id": "1",
+          "attributes": {
+            "title": "JSON API paints my bikeshed!"
+          },
+          "relationships": {
+            "author": {
+              "data": {
+                "type": "people",
+                "id": "9"
+              }
+            },
+            "comments": {
+              "data": [
+                {
+                  "type": "comments",
+                  "id": "5"
+                },
+                {
+                  "type": "comments",
+                  "id": "12"
+                }
+              ]
+            }
+          }
+        },
+        "included": [
+          {
+            "type": "people",
+            "id": "9",
+            "attributes": {
+              "first_name": "Dan",
+              "last_name": "Gebhardt",
+              "twitter": "dgeb"
+            }
+          },
+          {
+            "type": "comments",
+            "id": "5",
+            "attributes": {
+              "body": "First!"
+            },
+            "relationships": {
+              "author": {
+                "data": {
+                  "type": "people",
+                   "id": "2"
+                }
+              }
+            }
+          },
+         {
+            "type": "comments",
+            "id": "12",
+            "attributes": {
+              "body": "I like XML better"
+            },
+            "relationships": {
+              "author": {
+                "data": {
+                  "type": "people",
+                  "id": "9"
+                }
+              }
+            }
+          }
+        ]
+      }
+      JSON
+    end
+    let(:wanted_result) do
+      [
+        {
+          'type' => 'articles',
+          'id' => '1',
+          'title' => 'JSON API paints my bikeshed!',
+          'author' => {
+            'type' => 'people',
+            'id' => '9'
+          },
+          'comments' => [
+            {
+              'type' => 'comments',
+              'id' => '5'
+            },
+            {
+              'type' => 'comments',
+              'id' => '12'
+            }
+          ]
+        },
+        {
+          'type' => 'people',
+          'id' => '9',
+          'first_name' => 'Dan',
+          'last_name' => 'Gebhardt',
+          'twitter' => 'dgeb'
+        },
+        {
+          'type' => 'comments',
+          'id' => '5',
+          'body' => 'First!',
+          'author' => {
+            'type' => 'people',
+            'id' => '2'
+          }
+        },
+        {
+          'type' => 'comments',
+          'id' => '12',
+          'body' => 'I like XML better',
+          'author' => {
+            'type' => 'people',
+            'id' => '9'
+          }
+        }
+      ]
     end
     it_behaves_like 'flattens the body as expected'
   end

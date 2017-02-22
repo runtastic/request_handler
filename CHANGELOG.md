@@ -3,6 +3,8 @@ Changelog
 
 ## master
 
+- Parse `included` array from request body
+
 ## 0.10.0
 
 - raise an error if mandatory options are missing in the handler configuration

@@ -3,14 +3,24 @@ require 'request_handler/schema_parser'
 require 'request_handler/error'
 module RequestHandler
   class BodyParser < SchemaParser
-    def initialize(request:, schema:, schema_options: {})
+    def initialize(request:, schema:, schema_options: {}, included_schemas: {})
       raise MissingArgumentError, :"request.body" => 'is missing' if request.body.nil?
       super(schema: schema, schema_options: schema_options)
       @request = request
+      @included_schemas = included_schemas
     end
 
     def run
-      validate_schema(flattened_request_body)
+      body, *included = flattened_request_body
+      return validate_schema(body) unless included_schemas?
+
+      schemas = [validate_schema(body)]
+      included_schemas.each do |type, schema|
+        included.select { |inc| inc['type'] == type.to_s }.each do |inc|
+          schemas << validate_schema(inc, with: schema)
+        end
+      end
+      schemas
     end
 
     private
@@ -19,10 +29,13 @@ module RequestHandler
       body = request_body.fetch('data') do
         raise ExternalArgumentError, body: 'must contain data'
       end
-      body.merge!(body.delete('attributes') { {} })
-      relationships = flatten_relationship_resource_linkages(body.delete('relationships') { {} })
-      body.merge!(relationships)
-      body
+      [flatten_resource!(body), *parse_included]
+    end
+
+    def flatten_resource!(resource)
+      resource.merge!(resource.delete('attributes') { {} })
+      relationships = flatten_relationship_resource_linkages(resource.delete('relationships') { {} })
+      resource.merge!(relationships)
     end
 
     def flatten_relationship_resource_linkages(relationships)
@@ -33,6 +46,14 @@ module RequestHandler
       end
     end
 
+    def parse_included
+      return [] unless included_schemas?
+      included = request_body.fetch('included') { [] }
+      included.each do |hsh|
+        flatten_resource!(hsh)
+      end
+    end
+
     def request_body
       b = request.body
       b.rewind
@@ -40,6 +61,10 @@ module RequestHandler
       b.empty? ? {} : MultiJson.load(b)
     end
 
-    attr_reader :request
+    def included_schemas?
+      !(included_schemas.nil? || included_schemas.empty?)
+    end
+
+    attr_reader :request, :included_schemas
   end
 end

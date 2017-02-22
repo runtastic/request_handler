@@ -269,9 +269,10 @@ describe RequestHandler::Base do
     end
     let(:expected_args) do
       {
-        request:        request,
-        schema:         'schema',
-        schema_options: tested_options[:output]
+        request:          request,
+        schema:           'schema',
+        schema_options:   tested_options[:output],
+        included_schemas: nil
       }
     end
     let(:tested_method) { :body_params }
