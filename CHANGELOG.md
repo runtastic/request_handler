@@ -4,6 +4,7 @@ Changelog
 ## master
 
 - Parse `included` array from request body
+- Body no longer accepts a default
 
 ## 0.10.0
 

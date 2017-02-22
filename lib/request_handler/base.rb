@@ -95,15 +95,12 @@ module RequestHandler
     end
 
     def parse_body_params
-      defaults = fetch_defaults('body.defaults', {})
-      parsed_body = BodyParser.new(
+      BodyParser.new(
         request:          request,
         schema:           lookup!('body.schema'),
         schema_options:   execute_options(lookup('body.options')),
         included_schemas: lookup('body.included')
       ).run
-      return defaults.merge(parsed_body) unless parsed_body.is_a? Array
-      parsed_body.unshift(defaults.merge(parsed_body.shift))
     end
 
     def parse_fieldsets_params
