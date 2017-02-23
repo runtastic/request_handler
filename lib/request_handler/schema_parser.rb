@@ -16,16 +16,16 @@ module RequestHandler
 
     def validate_schema(data, with: schema)
       raise MissingArgumentError, data: 'is missing' if data.nil?
-      validator = validate(data, with: with)
+      validator = validate(data, schema: with)
       validation_failure?(validator)
       validator.output
     end
 
-    def validate(data, with:)
+    def validate(data, schema:)
       if schema_options.empty?
-        with.call(data)
+        schema.call(data)
       else
-        with.with(schema_options).call(data)
+        schema.with(schema_options).call(data)
       end
     end
 
