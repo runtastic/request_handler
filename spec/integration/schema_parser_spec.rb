@@ -79,10 +79,10 @@ describe RequestHandler do
           expect(testhandler.to_dto).to eq(OpenStruct.new(body: { name: 'About naming stuff and cache invalidation' }))
         end
 
-        it 'works for valid data with includes' do
+        it 'raises a SchemaValidationError with valid data and includes' do
           request = build_mock_request(params: {}, headers: {}, body: valid_body_with_included)
           testhandler = testclass.new(request: request)
-          expect(testhandler.to_dto).to eq(OpenStruct.new(body: { name: 'About naming stuff and cache invalidation' }))
+          expect { testhandler.to_dto }.to raise_error(RequestHandler::SchemaValidationError)
         end
       end
       context 'valid schema with included objects' do

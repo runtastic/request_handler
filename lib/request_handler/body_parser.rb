@@ -12,15 +12,12 @@ module RequestHandler
 
     def run
       body, *included = flattened_request_body
-      return validate_schema(body) unless included_schemas?
-
-      schemas = [validate_schema(body)]
-      included_schemas.each do |type, schema|
-        included.select { |inc| inc['type'] == type.to_s }.each do |inc|
-          schemas << validate_schema(inc, with: schema)
-        end
+      unless included_schemas?
+        raise SchemaValidationError, included: 'must be empty' unless included.empty?
+        return validate_schema(body)
       end
-      schemas
+
+      validate_schemas(body, included)
     end
 
     private
@@ -47,7 +44,6 @@ module RequestHandler
     end
 
     def parse_included
-      return [] unless included_schemas?
       included = request_body.fetch('included') { [] }
       included.each do |hsh|
         flatten_resource!(hsh)
@@ -63,6 +59,16 @@ module RequestHandler
 
     def included_schemas?
       !(included_schemas.nil? || included_schemas.empty?)
+    end
+
+    def validate_schemas(body, included)
+      schemas = [validate_schema(body)]
+      included_schemas.each do |type, schema|
+        included.select { |inc| inc['type'] == type.to_s }.each do |inc|
+          schemas << validate_schema(inc, with: schema)
+        end
+      end
+      schemas
     end
 
     attr_reader :request, :included_schemas
