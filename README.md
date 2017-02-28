@@ -90,17 +90,17 @@ class DemoHandler < RequestHandler::Base
       options(->(_handler, _request) { { foo: "bar" } })
       # options({foo: "bar"}) # also works for hash options instead of procs
     end
+  end
 
-    def to_dto
-      OpenStruct.new(
-        body:    body_params,
-        page:    page_params,
-        include: include_params,
-        filter:  filter_params,
-        sort:    sort_params,
-        headers: headers
-      )
-    end
+  def to_dto
+    OpenStruct.new(
+      body:    body_params,
+      page:    page_params,
+      include: include_params,
+      filter:  filter_params,
+      sort:    sort_params,
+      headers: headers
+    )
   end
 end
 
@@ -144,6 +144,132 @@ becomes
 ```ruby
 include_options = [:posts__comments]
 sort_options = SortOption.new(:posts__published_on, :asc)
+```
+
+### Included relations
+
+Sometimes you want to create a single resource with its relations in a single
+request, ensuring that everything or nothing at all is created.  However, the
+current JSON API specification does not mention anything about how to achieve
+this at all, it is expected that all associated resources already exist.  
+`request_handler` attempts to solve this problem by allowing the request body
+to contain an `included` array with all the resources that have to be created.
+
+#### Example
+
+With this request handler:
+
+```ruby
+class CreateQuestionHandler < RequestHandler::Base
+  options do
+    body do
+      schema(
+        Dry::Validation.JSON do
+          required(:id).filled(:str?)
+          required(:type).filled(:str?)
+          required(:content).filled(:str?)
+
+          optional(:media).schema do
+            required(:id).filled(:str?)
+            required(:type).filled(:str?)
+          end
+        end
+      )
+
+      included do
+        media(
+          Dry::Validation.JSON do
+            required(:id).filled(:str?)
+            required(:type).filled(:str?)
+            required(:url).filled(:str?)
+
+            optional(:categories).schema do
+              required(:id).filled(:str?)
+              required(:type).filled(:str?)
+            end
+          end
+        )
+      end
+    end
+  end
+
+  def to_dto
+    # see the resulting body_params below
+    { body: body_params }
+  end
+end
+```
+
+The following JSON object including its included items is validated with the
+defined schema:
+
+``` json
+{
+  "data": {
+    "id": "1",
+    "type": "questions",
+    "attributes": {
+      "content": "How much is the fish?"
+    },
+    "relationships": {
+      "media": {
+          "data": {
+            "id": "image-123456",
+            "type": "media"
+          }
+        }
+      }
+    }
+  },
+  "included": [
+    {
+      "id": "image-123456",
+      "type": "media",
+      "attributes": {
+        "url": "https://example.com/fish.jpg"
+      },
+      "relationships": {
+        "categories": {
+          "data": {
+            "id": "123",
+            "type": "categories"
+          }
+        }
+      }
+    }
+  ]
+}
+```
+
+The resulting `body_params` will be this:
+
+``` ruby
+[
+  # The first object is the main resource object, i.e. the one that is about to
+  # be created
+  {
+    id:      '1',
+    type:    'questions',
+    content: 'How much is the fish?'
+    media:   [
+      {
+        id:   'image-123456',
+        type: 'media'
+      }
+    ]
+  },
+  # The remaining objects are every included object, validated with the schema
+  # defined above
+  {
+    id:         'image-123456',
+    type:       'media',
+    url:        'https://example.com/fish.jpg',
+    categories: {
+      id:   '123',
+      type: 'categories'
+    }
+  }
+]
 ```
 
 ### Configuration

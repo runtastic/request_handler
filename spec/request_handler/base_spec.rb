@@ -256,27 +256,25 @@ describe RequestHandler::Base do
   context '#body_params' do
     let(:testclass) do
       opts = tested_options[:input]
-      defs = tested_defaults[:input]
       Class.new(RequestHandler::Base) do
         options do
           body do
             schema 'schema'
             options(opts)
-            defaults(defs)
           end
         end
       end
     end
     let(:expected_args) do
       {
-        request:        request,
-        schema:         'schema',
-        schema_options: tested_options[:output]
+        request:          request,
+        schema:           'schema',
+        schema_options:   tested_options[:output],
+        included_schemas: nil
       }
     end
     let(:tested_method) { :body_params }
     let(:tested_parser) { RequestHandler::BodyParser }
-    let(:tested_defaults) { { input: nil, output: runstub.run } }
     context 'with a proc as options' do
       let(:tested_options) do
         { input:  ->(_parser, _request) { { body_user_id: 1 } },
@@ -284,7 +282,6 @@ describe RequestHandler::Base do
       end
       it_behaves_like 'correct_persistence'
       it_behaves_like 'correct_arguments_passed'
-      it_behaves_like 'correct_default_handling_hash'
     end
     context 'with a proc using the request as options' do
       let(:tested_options) do
@@ -293,19 +290,16 @@ describe RequestHandler::Base do
       end
       it_behaves_like 'correct_persistence'
       it_behaves_like 'correct_arguments_passed'
-      it_behaves_like 'correct_default_handling_hash'
     end
     context 'with a hash as options' do
       let(:tested_options) { { input: { body_user_id: 1 }, output: { body_user_id: 1 } } }
       it_behaves_like 'correct_persistence'
       it_behaves_like 'correct_arguments_passed'
-      it_behaves_like 'correct_default_handling_hash'
     end
     context 'with nil as options' do
       let(:tested_options) { { input: nil, output: {} } }
       it_behaves_like 'correct_persistence'
       it_behaves_like 'correct_arguments_passed'
-      it_behaves_like 'correct_default_handling_hash'
     end
   end
 
