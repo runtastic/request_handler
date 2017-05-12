@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'request_handler/schema_parser'
 require 'request_handler/error'
-require 'request_handler/json_api_parser'
+require 'request_handler/json_api_data_parser'
 module RequestHandler
   class BodyParser
     def initialize(request:, schema:, schema_options: {}, included_schemas: {})
@@ -13,7 +13,7 @@ module RequestHandler
     end
 
     def run
-      JsonApiParser.new(
+      JsonApiDataParser.new(
         data: request_body,
         schema: schema,
         schema_options: schema_options,

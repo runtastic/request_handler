@@ -5,6 +5,7 @@ require 'request_handler/include_option_parser'
 require 'request_handler/sort_option_parser'
 require 'request_handler/header_parser'
 require 'request_handler/body_parser'
+require 'request_handler/multiparts_parser'
 require 'request_handler/fieldsets_parser'
 require 'request_handler/helper'
 require 'confstruct'
@@ -55,6 +56,10 @@ module RequestHandler
       @body_params ||= parse_body_params
     end
 
+    def multiparts_params
+      @multiparts_params ||= parse_multiparts_params
+    end
+
     def fieldsets_params
       @fieldsets_params ||= parse_fieldsets_params
     end
@@ -100,6 +105,13 @@ module RequestHandler
         schema:           lookup!('body.schema'),
         schema_options:   execute_options(lookup('body.options')),
         included_schemas: lookup('body.included')
+      ).run
+    end
+
+    def parse_multiparts_params
+      MultipartsParser.new(
+        request:           request,
+        multiparts_config: lookup!('multiparts')
       ).run
     end
 

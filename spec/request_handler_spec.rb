@@ -136,24 +136,11 @@ class IntegrationTestRequestHandlerWithMultiparts < RequestHandler::Base
       file do
       end
     end
-
-    filter do
-      schema(Dry::Validation.Form do
-        configure do
-          option :body_user_id
-        end
-        required(:user_id).value(eql?: body_user_id)
-        required(:id).filled(:str?)
-      end)
-      additional_url_filter %i(user_id id)
-      options(->(handler, _request) { { body_user_id: handler.body_params[:user_id] } })
-    end
   end
 
   def to_dto
     OpenStruct.new(
-      multiparts: multipart_params,
-      filter:     filter_params,
+      multiparts: multiparts_params,
       headers:    headers
     )
   end
@@ -290,6 +277,59 @@ describe RequestHandler do
 
       expect(dto.headers).to eq(expected_headers)
       expect(dto.fieldsets).to eq(posts: [:samples, :awesome])
+    end
+  end
+
+  context 'w/ multiparts' do
+    it 'works' do
+      raw_meta = <<-JSON
+      {
+        "data": {
+          "type": "post",
+          "id": "fer342ref",
+          "attributes": {
+            "user_id": "awesome_user_id",
+            "name": "About naming stuff and cache invalidation",
+            "publish_on": "2016-09-26T12:23:55Z"
+          },
+          "relationships":{
+            "category": {
+              "data": {
+                "id": "54",
+                "type": "category"
+              }
+            }
+          }
+        }
+      }
+      JSON
+
+      params = {
+        'user_id' => 'awesome_user_id',
+        'id'      => 'fer342ref',
+        'meta'    => raw_meta,
+        'file'    => { 'filename' => 'rt.jpg' }
+      }
+
+      # api call looks for example like:
+      # PUT some-host.com/:user_id/posts/:id
+      request = build_mock_request(params: params, headers: headers)
+
+      handler = IntegrationTestRequestHandlerWithMultiparts.new(request: request)
+      dto = handler.to_dto
+
+      expect(dto.multiparts[:meta]).to eq(id:         'fer342ref',
+                                          type:       'post',
+                                          user_id:    'awesome_user_id',
+                                          name:       'About naming stuff and cache invalidation',
+                                          publish_on: Time.iso8601('2016-09-26T12:23:55Z'),
+                                          category:   {
+                                            id:   '54',
+                                            type: 'category'
+                                          })
+      expect(dto.multiparts[:file]).to eq('filename' => 'rt.jpg')
+
+      expect(dto.headers).to eq(expected_headers)
     end
   end
 end
