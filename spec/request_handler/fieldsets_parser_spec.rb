@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'spec_helper'
 describe RequestHandler::FieldsetsParser do
   let(:opts) do
@@ -49,7 +50,7 @@ describe RequestHandler::FieldsetsParser do
   context 'fieldset settings and multiple parameters are set' do
     it_behaves_like 'returns fieldsets' do
       let(:params)  { { 'fields' => { 'posts' => 'awesome,samples' } } }
-      let(:expected) { { posts: [:awesome, :samples] } }
+      let(:expected) { { posts: %i[awesome samples] } }
     end
   end
 
@@ -62,7 +63,7 @@ describe RequestHandler::FieldsetsParser do
 
   context 'fieldset settings and the required parameters are set' do
     before do
-      opts.required = [:posts, :photos]
+      opts.required = %i[posts photos]
     end
     it_behaves_like 'returns fieldsets' do
       let(:params) { { 'fields' => { 'posts' => 'awesome', 'photos' => 'foo' } } }
@@ -78,7 +79,7 @@ describe RequestHandler::FieldsetsParser do
     end
     context 'one required type is not set in the request' do
       before do
-        opts.required = [:posts, :photos]
+        opts.required = %i[posts photos]
       end
       it_behaves_like 'fails' do
         let(:params) { { 'fields' => { 'photos' => 'bar' } } }

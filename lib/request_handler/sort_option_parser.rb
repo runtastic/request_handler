@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'request_handler/option_parser'
 require 'request_handler/error'
 require 'request_handler/sort_option'

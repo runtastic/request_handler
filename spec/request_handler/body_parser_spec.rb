@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'spec_helper'
 require 'request_handler/body_parser'
 describe RequestHandler::BodyParser do

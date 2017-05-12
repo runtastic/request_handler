@@ -1,6 +1,8 @@
 # minitest specifics
 AllCops:
   TargetRubyVersion: 2.1
+  Exclude:
+    - Dangerfile
 Metrics/LineLength:
   Max: 119
 Metrics/MethodLength:
@@ -13,5 +15,7 @@ Style/ClassAndModuleChildren:
   Exclude:
     - test/**/*
 
+Metrics/BlockLength:
+  Enabled: false
 Style/Documentation:
   Enabled: false

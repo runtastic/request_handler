@@ -3,6 +3,8 @@ Changelog
 
 ## master
 
+- update rubocop and fix danger check
+
 ## 0.11.0
 
 - Parse `included` array from request body

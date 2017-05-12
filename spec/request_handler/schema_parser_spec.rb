@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'spec_helper'
 require 'request_handler/schema_parser'
 describe RequestHandler::SchemaParser do

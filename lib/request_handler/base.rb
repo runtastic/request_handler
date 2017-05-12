@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'request_handler/filter_parser'
 require 'request_handler/page_parser'
 require 'request_handler/include_option_parser'
