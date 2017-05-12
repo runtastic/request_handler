@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 require 'spec_helper'
-require 'request_handler/body_parser'
-describe RequestHandler::BodyParser do
+require 'request_handler/json_api_parser'
+describe RequestHandler::JsonApiParser do
   let(:handler) do
     described_class.new(
       schema:           schema,
-      request:          build_mock_request(params: {}, headers: {}, body: raw_body),
+      data:             raw_body.empty? ? {} : MultiJson.load(raw_body),
       included_schemas: included_schemas
     )
   end
@@ -388,11 +388,11 @@ describe RequestHandler::BodyParser do
     end
   end
 
-  it 'fails if the request body is nil' do
+  it 'fails if data is nil' do
     schema = Dry::Validation.JSON {}
     expect do
       described_class.new(schema:  schema,
-                          request: instance_double('Rack::Request', params: {}, env: {}, body: nil))
+                          data:    nil)
     end
       .to raise_error(RequestHandler::MissingArgumentError)
   end
@@ -402,10 +402,7 @@ describe RequestHandler::BodyParser do
     expect do
       described_class.new(
         schema:  schema,
-        request: instance_double('Rack::Request',
-                                 params: {},
-                                 env: {},
-                                 body: StringIO.new('{"include": [{"type": "foo", "id": "bar"}]}'))
+        data:   JSON.parse('{"include": [{"type": "foo", "id": "bar"}]}')
       ).run
     end
       .to raise_error(RequestHandler::ExternalArgumentError)

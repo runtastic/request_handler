@@ -56,7 +56,7 @@ describe RequestHandler do
             end
             def to_dto
               OpenStruct.new(
-                body:  body_params
+                body: body_params
               )
             end
           end

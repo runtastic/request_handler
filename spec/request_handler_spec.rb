@@ -111,6 +111,54 @@ class IntegrationTestRequestHandlerWithBody < RequestHandler::Base
   end
 end
 
+class IntegrationTestRequestHandlerWithMultiparts < RequestHandler::Base
+  options do
+    multiparts do
+      meta do
+        schema(Dry::Validation.JSON do
+          configure do
+            option :query_id
+          end
+          required(:id).value(eql?: query_id)
+          required(:type).value(eql?: 'post')
+          required(:user_id).filled(:str?)
+          required(:name).filled(:str?)
+          optional(:publish_on).filled(:time?)
+
+          required(:category).schema do
+            required(:id).filled(:str?)
+            required(:type).value(eql?: 'category')
+          end
+        end)
+        options(->(_parser, request) { { query_id: request.params['id'] } })
+      end
+
+      file do
+      end
+    end
+
+    filter do
+      schema(Dry::Validation.Form do
+        configure do
+          option :body_user_id
+        end
+        required(:user_id).value(eql?: body_user_id)
+        required(:id).filled(:str?)
+      end)
+      additional_url_filter %i(user_id id)
+      options(->(handler, _request) { { body_user_id: handler.body_params[:user_id] } })
+    end
+  end
+
+  def to_dto
+    OpenStruct.new(
+      multiparts: multipart_params,
+      filter:     filter_params,
+      headers:    headers
+    )
+  end
+end
+
 describe RequestHandler do
   it 'has a version' do
     expect(described_class::VERSION).not_to be_nil
@@ -160,7 +208,6 @@ describe RequestHandler do
         }
       }
       JSON
-
       params = {
         'user_id' => 'awesome_user_id',
         'id'      => 'fer342ref'
