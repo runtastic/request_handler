@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'request_handler/error'
 module RequestHandler
   class PageParser
@@ -25,7 +26,7 @@ module RequestHandler
 
     private
 
-    TOP_LEVEL_PAGE_KEYS = Set.new([:default_size, :max_size])
+    TOP_LEVEL_PAGE_KEYS = Set.new(%i[default_size max_size])
     attr_reader :page_options, :config
 
     def check_for_missing_options(config)

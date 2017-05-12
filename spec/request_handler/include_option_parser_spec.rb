@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'spec_helper'
 require 'request_handler/include_option_parser'
 describe RequestHandler::IncludeOptionParser do
@@ -20,13 +21,13 @@ describe RequestHandler::IncludeOptionParser do
 
   context 'option is allowed' do
     let(:params) { { 'include' => 'user,email' } }
-    let(:output) { [:user, :email] }
+    let(:output) { %i[user email] }
     it_behaves_like 'proccesses valid options correctly'
   end
 
   context 'nested attributes are correctly transformed' do
     let(:params) { { 'include' => 'user,user.posts' } }
-    let(:output) { [:user, :user__posts] }
+    let(:output) { %i[user user__posts] }
     it_behaves_like 'proccesses valid options correctly'
   end
 

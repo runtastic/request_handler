@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'request_handler/version'
 require 'request_handler/base'
 require 'confstruct'

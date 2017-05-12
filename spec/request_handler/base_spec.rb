@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'spec_helper'
 require 'request_handler/base'
 
@@ -64,8 +65,8 @@ describe RequestHandler::Base do
     context 'with hash defaults' do
       let(:tested_defaults) do
         {
-          input:  [:test1, :test2],
-          output: (runstub.run.empty? ? [:test1, :test2] : runstub.run)
+          input:  %i[test1 test2],
+          output: (runstub.run.empty? ? %i[test1 test2] : runstub.run)
         }
       end
       it_behaves_like 'default_handling'
@@ -73,8 +74,8 @@ describe RequestHandler::Base do
     context 'with proc defaults' do
       let(:tested_defaults) do
         {
-          input:  ->(_request) { [:test1, :test2] },
-          output: (runstub.run.empty? ? [:test1, :test2] : runstub.run)
+          input:  ->(_request) { %i[test1 test2] },
+          output: (runstub.run.empty? ? %i[test1 test2] : runstub.run)
         }
       end
       it_behaves_like 'default_handling'
@@ -304,7 +305,7 @@ describe RequestHandler::Base do
   end
 
   context '#params' do
-    let(:testclass) {Class.new(described_class)}
+    let(:testclass) { Class.new(described_class) }
     it 'tranforms the params dots to undescores before using them' do
       request = instance_double('Rack::Request',
                                 params:
@@ -341,16 +342,16 @@ describe RequestHandler::Base do
                'a_symbol_with__separator' => 'omgwtf')
     end
 
-    it "transforms nested arrays" do
+    it 'transforms nested arrays' do
       request = instance_double('Rack::Request',
                                 params:
                                         {
-                                          'nested'       => [{ 'hash.key.in.array' => 'test2' }, "normal.array.element"]
+                                          'nested' => [{ 'hash.key.in.array' => 'test2' }, 'normal.array.element']
                                         },
                                 env:    {},
                                 body:   StringIO.new('body'))
       expect(testclass.new(request: request).send(:params))
-        .to eq('nested' => [{ 'hash__key__in__array' => 'test2' }, "normal.array.element"])
+        .to eq('nested' => [{ 'hash__key__in__array' => 'test2' }, 'normal.array.element'])
     end
   end
 

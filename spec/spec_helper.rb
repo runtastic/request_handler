@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 ENV['RACK_ENV'] = ENV['ENVIRONMENT'] ||= 'test'
 require 'simplecov'
 if ENV['TRAVIS']
