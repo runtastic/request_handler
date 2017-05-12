@@ -172,7 +172,6 @@ describe RequestHandler do
 
       handler = IntegrationTestRequestHandlerWithBody.new(request: request)
       dto = handler.to_dto
-
       expect(dto.body).to eq(id:         'fer342ref',
                              type:       'post',
                              user_id:    'awesome_user_id',

@@ -6,7 +6,8 @@ module RequestHandler
     def initialize(params:, allowed: {}, required: [])
       @params = params
       allowed.each_value do |option|
-        raise InternalArgumentError, allowed: 'must be a Enum' unless option.is_a?(Dry::Types::Enum)
+        raise InternalArgumentError, allowed: 'must be a Enum or a Boolean' unless
+              option.is_a?(Dry::Types::Enum) || option.is_a?(TrueClass) || option.is_a?(FalseClass)
       end
       @allowed = allowed
       raise InternalArgumentError, allowed: 'must be an Array' unless required.is_a?(Array)
@@ -16,7 +17,6 @@ module RequestHandler
     def run
       fields = params['fields']
       raise_missing_fields_param unless fields
-
       fieldsets = fields.to_h.each_with_object({}) do |(type, values), memo|
         type = type.to_sym
         raise_invalid_field_option(type)
@@ -27,14 +27,20 @@ module RequestHandler
 
     private
 
+
     def parse_options(type, values)
+      return [] if allowed[type] === false
       values.split(',').map! do |option|
         parse_option(type, option)
       end
     end
 
     def parse_option(type, option)
-      allowed[type].call(option).to_sym
+      if allowed[type] === true
+        option.to_sym
+      else
+        allowed[type].call(option).to_sym
+      end
     rescue Dry::Types::ConstraintError
       raise ExternalArgumentError, fieldsets: "invalid field: <#{option}> for type: #{type}"
     end
