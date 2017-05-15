@@ -114,7 +114,7 @@ end
 
 class IntegrationTestRequestHandlerWithMultiparts < RequestHandler::Base
   options do
-    multiparts do
+    multipart do
       meta do
         schema(Dry::Validation.JSON do
           configure do
@@ -141,7 +141,7 @@ class IntegrationTestRequestHandlerWithMultiparts < RequestHandler::Base
 
   def to_dto
     OpenStruct.new(
-      multiparts: multiparts_params,
+      multipart: multipart_params,
       headers:    headers
     )
   end
@@ -281,7 +281,7 @@ describe RequestHandler do
     end
   end
 
-  context 'w/ multiparts' do
+  context 'w/ multipart' do
     it 'works' do
       raw_meta = <<-JSON
       {
@@ -317,7 +317,7 @@ describe RequestHandler do
       handler = IntegrationTestRequestHandlerWithMultiparts.new(request: request)
       dto = handler.to_dto
 
-      expect(dto.multiparts[:meta]).to eq(id:         'fer342ref',
+      expect(dto.multipart[:meta]).to eq(id:         'fer342ref',
                                           type:       'post',
                                           user_id:    'awesome_user_id',
                                           name:       'About naming stuff and cache invalidation',
@@ -326,7 +326,7 @@ describe RequestHandler do
                                             id:   '54',
                                             type: 'category'
                                           })
-      expect(dto.multiparts[:file]).to eq('filename' => 'rt.jpg')
+      expect(dto.multipart[:file]).to eq('filename' => 'rt.jpg')
 
       expect(dto.headers).to eq(expected_headers)
     end

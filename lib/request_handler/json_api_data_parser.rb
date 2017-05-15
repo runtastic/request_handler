@@ -5,14 +5,14 @@ require 'request_handler/error'
 module RequestHandler
   class JsonApiDataParser < SchemaParser
     def initialize(data:, schema:, schema_options: {}, included_schemas: {})
-      raise MissingArgumentError, "request.body": 'is missing' if data.nil?
+      raise MissingArgumentError, "data": 'is missing' if data.nil?
       super(schema: schema, schema_options: schema_options)
       @data = data
       @included_schemas = included_schemas
     end
 
     def run
-      body, *included = flattened_request_body
+      body, *included = flattened_data
       unless included_schemas?
         raise SchemaValidationError, included: 'must be empty' unless included.empty?
         return validate_schema(body)
@@ -23,7 +23,7 @@ module RequestHandler
 
     private
 
-    def flattened_request_body
+    def flattened_data
       body = data.fetch('data') do
         raise ExternalArgumentError, body: 'must contain data'
       end

@@ -2,12 +2,9 @@ Changelog
 ===
 
 ## master
-
+- support for multipart-requests
 - update rubocop and fix danger check
 - drop support for ruby 2.1 (dry-types does not support it anymore either which makes supporting it here pointless)
-
-## 0.12.0
-- support for multipart-requests
 
 ## 0.11.0
 

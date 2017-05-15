@@ -254,12 +254,12 @@ describe RequestHandler::Base do
     it_behaves_like 'correct_arguments_passed'
   end
 
-  context '#multiparts_params' do
+  context '#multipart_params' do
     let(:testclass) do
       opts = tested_options[:input]
       Class.new(RequestHandler::Base) do
         options do
-          multiparts do
+          multipart do
             meta do
               schema 'schema'
               options(opts)
@@ -273,10 +273,10 @@ describe RequestHandler::Base do
     let(:expected_args) do
       {
         request:           request,
-        multiparts_config: { meta: { schema: 'schema', options: anything }, file: {} }
+        multipart_config: { meta: { schema: 'schema', options: anything }, file: {} }
       }
     end
-    let(:tested_method) { :multiparts_params }
+    let(:tested_method) { :multipart_params }
     let(:tested_parser) { RequestHandler::MultipartsParser }
     let(:tested_options) do
       { input:  ->(_parser, _request) { { body_user_id: 1 } },

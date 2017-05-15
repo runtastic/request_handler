@@ -1,17 +1,17 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'request_handler/multiparts_parser'
+require 'request_handler/multipart_parser'
 describe RequestHandler::MultipartsParser do
   let(:handler) do
     described_class.new(
       request:           build_mock_request(params: params, headers: {}),
-      multiparts_config: config.multiparts
+      multipart_config: config.multipart
     )
   end
   let(:config) do
     Confstruct::Configuration.new do
-      multiparts do
+      multipart do
         meta do
           schema(Dry::Validation.JSON do
             configure do
@@ -61,14 +61,6 @@ describe RequestHandler::MultipartsParser do
     JSON
   end
 
-  let(:headers) do
-    {
-      'HTTP_APP_KEY'          => 'some.app.key',
-      'HTTP_USER_ID'          => '345',
-      'HTTP_SOME_OTHER_STUFF' => "doesn't matter"
-    }
-  end
-
   let(:params) do
     {
       'user_id' => 'awesome_user_id',
@@ -95,7 +87,7 @@ describe RequestHandler::MultipartsParser do
   it 'fails if params missing' do
     expect do
       described_class.new(request: instance_double('Rack::Request', params: nil, env: {}, body: nil),
-                          multiparts_config: config)
+                          multipart_config: config)
     end
       .to raise_error(RequestHandler::MissingArgumentError)
   end
@@ -103,7 +95,7 @@ describe RequestHandler::MultipartsParser do
   it 'fails if config missing' do
     expect do
       described_class.new(request: instance_double('Rack::Request', params: params, env: {}, body: nil),
-                          multiparts_config: nil)
+                          multipart_config: nil)
     end
       .to raise_error(RequestHandler::MissingArgumentError)
   end
@@ -111,7 +103,7 @@ describe RequestHandler::MultipartsParser do
   it 'fails if configured param missing' do
     expect do
       described_class.new(request: instance_double('Rack::Request', params: params.delete('meta'), env: {}, body: nil),
-                          multiparts_config: config).run
+                          multipart_config: config).run
     end
       .to raise_error(RequestHandler::ExternalArgumentError)
   end
