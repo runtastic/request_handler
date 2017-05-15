@@ -9,7 +9,7 @@ module RequestHandler
       allowed.reject! { |k, v| v == false }
       allowed.each_value do |option|
         raise InternalArgumentError, allowed: 'must be a Enum or a Boolean' unless
-              option.is_a?(Dry::Types::Enum) || option.is_a?(TrueClass) || option.is_a?(FalseClass)
+              option.is_a?(Dry::Types::Enum) || option.is_a?(TrueClass)
       end
       @allowed = allowed
       raise InternalArgumentError, required: 'must be an Array' unless required.is_a?(Array)
@@ -30,7 +30,6 @@ module RequestHandler
     private
 
     def parse_options(type, values)
-      raise ExternalArgumentError, fieldsets: "invalid type: <#{type}>" if allowed[type] == false
       values.split(',').map! do |option|
         parse_option(type, option)
       end
