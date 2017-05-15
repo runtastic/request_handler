@@ -6,7 +6,7 @@ module RequestHandler
   class FieldsetsParser
     def initialize(params:, allowed: {}, required: [])
       @params = params
-      allowed = allowed.reject { |k, v| v.is_a?(FalseClass) }
+      allowed.reject! { |k, v| v == false }
       allowed.each_value do |option|
         raise InternalArgumentError, allowed: 'must be a Enum or a Boolean' unless
               option.is_a?(Dry::Types::Enum) || option.is_a?(TrueClass) || option.is_a?(FalseClass)
