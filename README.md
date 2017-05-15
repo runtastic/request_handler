@@ -272,6 +272,75 @@ The resulting `body_params` will be this:
 ]
 ```
 
+### Multipart requests
+It is also possible to process and validate multipart requests, consisting of an arbitrary number of parts.
+
+The following request handler accepts a question (which will be uploaded as a json-file) and an additional 
+file related to the question
+
+```ruby
+class CreateQuestionHandler < RequestHandler::Base
+  options do
+    multipart do
+      question do
+        schema(
+          Dry::Validation.JSON do
+            required(:id).filled(:str?)
+            required(:type).filled(:str?)
+            required(:content).filled(:str?) 
+          end
+        )
+      end
+      
+      file do
+        # no validation necessary
+      end
+    end
+  end
+
+  def to_dto
+    # see the resulting multipart_params below
+    { multipart: multipart_params }
+  end
+end
+```
+
+Assuming that the request consists of a json file `question.json` containing  
+``` json
+{
+  "data": {
+    "id": "1",
+    "type": "questions",
+    "attributes": {
+      "content": "How much is the fish?"
+    }
+  }
+}
+``` 
+
+and an additional file `image.png`, the resulting `multipart_params` will be the following:
+
+``` ruby
+{
+  question: 
+    {
+      id:      '1',
+      type:    'questions',
+      content: 'How much is the fish?'
+    },
+  file: 
+    {
+      filename: 'image.png',
+      type:     'application/octet-stream'
+      name:     'file',
+      tempfile: #<Tempfile:/...>,
+      head:     'Content-Disposition: form-data;...'
+    }
+}
+```
+
+Please note that each part's content has to be uploaded as a separate file currently. 
+
 ### Configuration
 
 The default logger and separator can be changed globally by using

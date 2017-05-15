@@ -17,10 +17,9 @@ module RequestHandler
     end
 
     def run
-      multipart_config.keys.reduce({}) do |memo, name|
+      multipart_config.keys.each_with_object({}) do |name, memo|
         raise ExternalArgumentError, multipart: 'missing' if params[name.to_s].nil?
         memo[name] = parse_part(name)
-        memo
       end
     end
 
@@ -28,15 +27,24 @@ module RequestHandler
 
     def parse_part(name)
       if lookup("#{name}.schema")
-        JsonApiDataParser.new(
-          data:             MultiJson.load(params[name.to_s]),
-          schema:           lookup("#{name}.schema"),
-          schema_options:   execute_options(lookup("#{name}.options")),
-          included_schemas: lookup("#{name}.included")
-        ).run
+        raise ExternalArgumentError, multipart_file: 'missing' if multipart_file(name).nil?
+        parse_data(name)
       else
         params[name.to_s]
       end
+    end
+
+    def parse_data(name)
+      JsonApiDataParser.new(
+        data:             MultiJson.load(multipart_file(name).read),
+        schema:           lookup("#{name}.schema"),
+        schema_options:   execute_options(lookup("#{name}.options")),
+        included_schemas: lookup("#{name}.included")
+      ).run
+    end
+
+    def multipart_file(name)
+      params[name.to_s][:tempfile]
     end
 
     def lookup(key)

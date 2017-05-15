@@ -65,8 +65,8 @@ describe RequestHandler::MultipartsParser do
     {
       'user_id' => 'awesome_user_id',
       'id'      => 'fer342ref',
-      'meta'    => raw_meta,
-      'file'    => { 'filename' => 'rt.jpg' }
+      'meta'    => { filename: 'meta.json', tempfile: instance_double('Tempfile', read: raw_meta) },
+      'file'    => { filename: 'rt.jpg' }
     }
   end
 
@@ -81,7 +81,7 @@ describe RequestHandler::MultipartsParser do
                                   id:   '54',
                                   type: 'category'
                                 })
-    expect(result[:file]).to eq('filename' => 'rt.jpg')
+    expect(result[:file]).to eq(filename: 'rt.jpg')
   end
 
   it 'fails if params missing' do
@@ -103,6 +103,15 @@ describe RequestHandler::MultipartsParser do
   it 'fails if configured param missing' do
     expect do
       described_class.new(request: instance_double('Rack::Request', params: params.delete('meta'), env: {}, body: nil),
+                          multipart_config: config).run
+    end
+      .to raise_error(RequestHandler::ExternalArgumentError)
+  end
+
+  it 'fails if file for validated multipart is missing' do
+    params['meta'][:tempfile] = nil
+    expect do
+      described_class.new(request: instance_double('Rack::Request', params: params, env: {}, body: nil),
                           multipart_config: config).run
     end
       .to raise_error(RequestHandler::ExternalArgumentError)

@@ -308,8 +308,8 @@ describe RequestHandler do
       params = {
         'user_id' => 'awesome_user_id',
         'id'      => 'fer342ref',
-        'meta'    => raw_meta,
-        'file'    => { 'filename' => 'rt.jpg' }
+        'meta'    => { filename: 'meta.json', tempfile: instance_double('Tempfile', read: raw_meta) },
+        'file'    => { filename: 'rt.jpg' }
       }
 
       request = build_mock_request(params: params, headers: headers)
@@ -318,15 +318,15 @@ describe RequestHandler do
       dto = handler.to_dto
 
       expect(dto.multipart[:meta]).to eq(id:         'fer342ref',
-                                          type:       'post',
-                                          user_id:    'awesome_user_id',
-                                          name:       'About naming stuff and cache invalidation',
-                                          publish_on: Time.iso8601('2016-09-26T12:23:55Z'),
-                                          category:   {
-                                            id:   '54',
-                                            type: 'category'
-                                          })
-      expect(dto.multipart[:file]).to eq('filename' => 'rt.jpg')
+                                         type:       'post',
+                                         user_id:    'awesome_user_id',
+                                         name:       'About naming stuff and cache invalidation',
+                                         publish_on: Time.iso8601('2016-09-26T12:23:55Z'),
+                                         category:   {
+                                           id:   '54',
+                                           type: 'category'
+                                         })
+      expect(dto.multipart[:file]).to eq(filename: 'rt.jpg')
 
       expect(dto.headers).to eq(expected_headers)
     end
