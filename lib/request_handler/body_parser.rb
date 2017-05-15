@@ -1,10 +1,11 @@
 # frozen_string_literal: true
+
 require 'request_handler/schema_parser'
 require 'request_handler/error'
 module RequestHandler
   class BodyParser < SchemaParser
     def initialize(request:, schema:, schema_options: {}, included_schemas: {})
-      raise MissingArgumentError, :"request.body" => 'is missing' if request.body.nil?
+      raise MissingArgumentError, "request.body": 'is missing' if request.body.nil?
       super(schema: schema, schema_options: schema_options)
       @request = request
       @included_schemas = included_schemas

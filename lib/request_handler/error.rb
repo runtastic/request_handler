@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module RequestHandler
   class BaseError < StandardError
     attr_reader :errors

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'spec_helper'
 require 'request_handler/sort_option_parser'
 describe RequestHandler::SortOptionParser do

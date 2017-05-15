@@ -3,6 +3,9 @@ Changelog
 
 ## master
 
+- update rubocop and fix danger check
+- drop support for ruby 2.1 (dry-types does not support it anymore either which makes supporting it here pointless)
+
 ## 0.11.0
 
 - Parse `included` array from request body

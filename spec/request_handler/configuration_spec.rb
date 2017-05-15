@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 describe RequestHandler do
   around do |example|
     default_config = RequestHandler.configuration.dup
