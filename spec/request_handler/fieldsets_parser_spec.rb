@@ -8,8 +8,8 @@ describe RequestHandler::FieldsetsParser do
         allowed do
           posts Dry::Types['strict.string'].enum('awesome', 'samples')
           photos Dry::Types['strict.string'].enum('foo', 'bar')
-          sample true
-          run_session false
+          videos true
+          musicfiles false
         end
         required [:posts]
       end
@@ -74,30 +74,34 @@ describe RequestHandler::FieldsetsParser do
         let(:expected) { { posts: [:awesome], photos: [:foo] } }
       end
     end
-  end
-
-  context 'fieldset types tests' do
-    context 'valid fieldset wich return all parameters because fieldset is set to true in RequestHandler config' do
-      it_behaves_like 'returns fieldsets' do
-        let(:params) { { 'fields' => { 'posts' => 'awesome', 'sample' => 'hello,moin,gutentach' } } }
-        let(:expected) { { posts: [:awesome], sample: %i[hello moin gutentach] } }
-      end
-    end
 
     context 'invalid fieldset wich fails because of unrecognized field in posts' do
       it_behaves_like 'fails' do
         let(:params) { { 'fields' => { 'posts' => 'awesome,good' } } }
       end
     end
+  end
 
-    context 'invalid fieldset which fails because fieldset "run_session" is set to false in RequestHandler config' do
+  context 'fieldset types tests' do
+    context 'valid fieldset wich return all parameters because fieldset is set to true in RequestHandler config' do
+      it_behaves_like 'returns fieldsets' do
+        let(:params) { { 'fields' => { 'posts' => 'awesome', 'videos' => 'nr1,nr2,nr3' } } }
+        let(:expected) { { posts: [:awesome], videos: %i[nr1 nr2 nr3] } }
+      end
+    end
+
+    context 'invalid fieldset wich fails because of unrecognized field in posts' do
+      it_behaves_like 'fails' do
+        let(:params) { { 'fields' => { 'posts' => 'post1,post2', 'videos' => 'nr1,nr2' } } }
+      end
+    end
+
+    context 'invalid fieldset which fails because fieldset "musicfiles" is set to false in RequestHandler config' do
       it_behaves_like 'fails' do
         let(:params) do
-          { 'fields' => { 'posts' => 'awesome',
-                          'run_session' => 'hello,moin,gutentach',
-                          'sample'      => 'hello,moin,gutentach' } }
+          { 'fields' => { 'videos' => 'video1,video2,video3',
+                          'musicfiles' => 'nr1,nr2' } }
         end
-        let(:expected) { { posts: [:awesome], sample: %i[hello moin gutentach], run_session: [] } }
       end
     end
   end
