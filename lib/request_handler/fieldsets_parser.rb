@@ -28,16 +28,15 @@ module RequestHandler
 
     private
 
-
     def parse_options(type, values)
-      return [] if allowed[type] === false
+      return [] if allowed[type] == false
       values.split(',').map! do |option|
         parse_option(type, option)
       end
     end
 
     def parse_option(type, option)
-      if allowed[type] === true
+      if allowed[type] == true
         option.to_sym
       else
         allowed[type].call(option).to_sym

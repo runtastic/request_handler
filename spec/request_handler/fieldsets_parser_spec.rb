@@ -54,7 +54,7 @@ describe RequestHandler::FieldsetsParser do
     context 'fieldset settings and multiple parameters are set' do
       it_behaves_like 'returns fieldsets' do
         let(:params)  { { 'fields' => { 'posts' => 'awesome,samples' } } }
-        let(:expected) { { posts: [:awesome, :samples] } }
+        let(:expected) { { posts: %i[awesome samples] } }
       end
     end
 
@@ -67,7 +67,7 @@ describe RequestHandler::FieldsetsParser do
 
     context 'fieldset settings and the required parameters are set' do
       before do
-        opts.required = [:posts, :photos]
+        opts.required = %i[posts photos]
       end
       it_behaves_like 'returns fieldsets' do
         let(:params) { { 'fields' => { 'posts' => 'awesome', 'photos' => 'foo' } } }
@@ -80,7 +80,7 @@ describe RequestHandler::FieldsetsParser do
     context 'valid fieldset wich return all parameters because fieldset is set to true in RequestHandler config' do
       it_behaves_like 'returns fieldsets' do
         let(:params) { { 'fields' => { 'posts' => 'awesome', 'sample' => 'hello,moin,gutentach' } } }
-        let(:expected) { { posts: [:awesome], sample: [:hello, :moin, :gutentach] } }
+        let(:expected) { { posts: [:awesome], sample: %i[hello moin gutentach] } }
       end
     end
 
@@ -92,10 +92,12 @@ describe RequestHandler::FieldsetsParser do
 
     context 'valid fieldset wich return no parameters because fieldset is set to false in RequestHandler config' do
       it_behaves_like 'returns fieldsets' do
-        let(:params) { { 'fields' => { 'posts'       => 'awesome',
-                                       'run_session' => 'hello,moin,gutentach',
-                                       'sample'      => 'hello,moin,gutentach' } } }
-        let(:expected) { { posts: [:awesome], sample: [:hello, :moin, :gutentach] , run_session: [] } }
+        let(:params) do
+          { 'fields' => { 'posts' => 'awesome',
+                          'run_session' => 'hello,moin,gutentach',
+                          'sample'      => 'hello,moin,gutentach' } }
+        end
+        let(:expected) { { posts: [:awesome], sample: %i[hello moin gutentach], run_session: [] } }
       end
     end
   end
