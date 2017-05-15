@@ -11,7 +11,7 @@ module RequestHandler
               option.is_a?(Dry::Types::Enum) || option.is_a?(TrueClass) || option.is_a?(FalseClass)
       end
       @allowed = allowed
-      raise InternalArgumentError, allowed: 'must be an Array' unless required.is_a?(Array)
+      raise InternalArgumentError, required: 'must be an Array' unless required.is_a?(Array)
       @required = required
     end
 
@@ -29,7 +29,7 @@ module RequestHandler
     private
 
     def parse_options(type, values)
-      return [] if allowed[type] == false
+      raise ExternalArgumentError, fieldsets: "invalid type: <#{type}>" if allowed[type] == false
       values.split(',').map! do |option|
         parse_option(type, option)
       end

@@ -86,12 +86,12 @@ describe RequestHandler::FieldsetsParser do
 
     context 'invalid fieldset wich fails because of unrecognized field in posts' do
       it_behaves_like 'fails' do
-        let(:params) { { 'fields' => { 'posts' => 'awesome,good', 'sample' => 'hello,moin' } } }
+        let(:params) { { 'fields' => { 'posts' => 'awesome,good' } } }
       end
     end
 
-    context 'valid fieldset wich return no parameters because fieldset is set to false in RequestHandler config' do
-      it_behaves_like 'returns fieldsets' do
+    context 'invalid fieldset which fails because fieldset "run_session" is set to false in RequestHandler config' do
+      it_behaves_like 'fails' do
         let(:params) do
           { 'fields' => { 'posts' => 'awesome',
                           'run_session' => 'hello,moin,gutentach',
