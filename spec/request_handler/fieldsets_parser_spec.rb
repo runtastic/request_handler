@@ -25,6 +25,7 @@ describe RequestHandler::FieldsetsParser do
         .to eq(expected)
     end
   end
+
   shared_examples 'fails' do
     let(:error) { RequestHandler::ExternalArgumentError }
     it 'raises an error' do
@@ -36,6 +37,7 @@ describe RequestHandler::FieldsetsParser do
         .to raise_error(error)
     end
   end
+
   context 'fieldset tests' do
     context 'no fieldset settings in the config or request' do
       it_behaves_like 'returns fieldsets' do
@@ -44,6 +46,7 @@ describe RequestHandler::FieldsetsParser do
         let(:params) { {} }
       end
     end
+
     context 'fieldset settings and the parameter are set' do
       it_behaves_like 'returns fieldsets' do
         let(:params) { { 'fields' => { 'posts' => 'awesome' } } }
@@ -102,6 +105,16 @@ describe RequestHandler::FieldsetsParser do
           { 'fields' => { 'videos' => 'video1,video2,video3',
                           'musicfiles' => 'nr1,nr2' } }
         end
+        let(:error) { RequestHandler::OptionNotAllowedError }
+      end
+    end
+    context 'invalid fieldset which fails because fieldset "games" is not set in RequestHandler config' do
+      it_behaves_like 'fails' do
+        let(:params) do
+          { 'fields' => { 'videos' => 'video1,video2,video3',
+                          'games' => 'nr1,nr2' } }
+        end
+        let(:error) { RequestHandler::OptionNotAllowedError }
       end
     end
   end
