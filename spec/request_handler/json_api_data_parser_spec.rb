@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'spec_helper'
 require 'request_handler/json_api_data_parser'
 describe RequestHandler::JsonApiDataParser do

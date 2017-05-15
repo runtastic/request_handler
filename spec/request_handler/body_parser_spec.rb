@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'spec_helper'
 require 'request_handler/body_parser'
 require 'request_handler/json_api_data_parser'
@@ -42,7 +43,7 @@ describe RequestHandler::BodyParser do
     JSON
   end
 
-  it 'constructs and runs jsonApiParser correctly' do
+  it 'constructs and runs jsonApiDataParser correctly' do
     parser_double = instance_double(RequestHandler::JsonApiDataParser)
     expect(RequestHandler::JsonApiDataParser)
       .to receive(:new)

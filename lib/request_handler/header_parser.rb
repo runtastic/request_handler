@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'request_handler/error'
 module RequestHandler
   class HeaderParser

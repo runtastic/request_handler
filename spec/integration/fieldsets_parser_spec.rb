@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'spec_helper'
 describe RequestHandler do
   let(:testclass) do
@@ -21,7 +22,7 @@ describe RequestHandler do
   it 'works for a valid request' do
     request = build_mock_request(params: { 'fields' => { 'posts' => 'foo,bar' } }, headers: nil, body: '')
     testhandler = testclass.new(request: request)
-    expect(testhandler.to_dto).to eq(OpenStruct.new(fieldsets: { posts: [:foo, :bar] }))
+    expect(testhandler.to_dto).to eq(OpenStruct.new(fieldsets: { posts: %i[foo bar] }))
   end
 
   it 'raises an OptionNotAllowedError if the client sends a type not allowed on the server' do
@@ -36,7 +37,7 @@ describe RequestHandler do
     expect { testhandler.to_dto }.to raise_error(RequestHandler::ExternalArgumentError)
   end
   it 'raises an OptionNotAllowedError if the client sends a value that is not allowed for a type' do
-    testclass.config.fieldsets.allowed.posts = %w(foo bar)
+    testclass.config.fieldsets.allowed.posts = %w[foo bar]
     request = build_mock_request(params: { 'fields' => { 'posts' => 'foo' } }, headers: nil, body: '')
     testhandler = testclass.new(request: request)
     expect { testhandler.to_dto }.to raise_error(RequestHandler::InternalArgumentError)

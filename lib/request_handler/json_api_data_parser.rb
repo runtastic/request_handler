@@ -1,10 +1,11 @@
 # frozen_string_literal: true
+
 require 'request_handler/schema_parser'
 require 'request_handler/error'
 module RequestHandler
   class JsonApiDataParser < SchemaParser
     def initialize(data:, schema:, schema_options: {}, included_schemas: {})
-      raise MissingArgumentError, :"request.body" => 'is missing' if data.nil?
+      raise MissingArgumentError, "request.body": 'is missing' if data.nil?
       super(schema: schema, schema_options: schema_options)
       @data = data
       @included_schemas = included_schemas

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'spec_helper'
 require 'ostruct'
 class IntegrationTestRequestHandler < RequestHandler::Base
@@ -36,7 +37,7 @@ class IntegrationTestRequestHandler < RequestHandler::Base
                optional(:posts__awesome).filled(:bool?)
                optional(:posts__samples__photos__has_thumbnail).filled(:bool?)
              end)
-      additional_url_filter %i(user_id)
+      additional_url_filter %i[user_id]
     end
 
     include_options do
@@ -97,7 +98,7 @@ class IntegrationTestRequestHandlerWithBody < RequestHandler::Base
                required(:user_id).value(eql?: body_user_id)
                required(:id).filled(:str?)
              end)
-      additional_url_filter %i(user_id id)
+      additional_url_filter %i[user_id id]
       options(->(handler, _request) { { body_user_id: handler.body_params[:user_id] } })
     end
   end
@@ -270,13 +271,13 @@ describe RequestHandler do
                              assets__size:                 10,
                              assets__number:               1)
 
-      expect(dto.include).to eq(%i(user groups user__avatar))
+      expect(dto.include).to eq(%i[user groups user__avatar])
 
       expect(dto.sort).to eq([RequestHandler::SortOption.new('name', :asc),
                               RequestHandler::SortOption.new('age', :desc)])
 
       expect(dto.headers).to eq(expected_headers)
-      expect(dto.fieldsets).to eq(posts: [:samples, :awesome])
+      expect(dto.fieldsets).to eq(posts: %i[samples awesome])
     end
   end
 
@@ -311,8 +312,6 @@ describe RequestHandler do
         'file'    => { 'filename' => 'rt.jpg' }
       }
 
-      # api call looks for example like:
-      # PUT some-host.com/:user_id/posts/:id
       request = build_mock_request(params: params, headers: headers)
 
       handler = IntegrationTestRequestHandlerWithMultiparts.new(request: request)

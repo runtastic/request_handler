@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module RequestHandler
   module Helper
     # extracted out of active_support

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'spec_helper'
 describe RequestHandler do
   context 'Option Parser' do
@@ -8,7 +9,7 @@ describe RequestHandler do
           options do
             include_options do
               allowed Dry::Types['strict.string'].enum('user', 'groups')
-              defaults [:foo, :bar]
+              defaults %i[foo bar]
             end
           end
           def to_dto

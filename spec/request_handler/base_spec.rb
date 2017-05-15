@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'spec_helper'
 require 'request_handler/base'
 
@@ -64,8 +65,8 @@ describe RequestHandler::Base do
     context 'with hash defaults' do
       let(:tested_defaults) do
         {
-          input:  [:test1, :test2],
-          output: (runstub.run.empty? ? [:test1, :test2] : runstub.run)
+          input:  %i[test1 test2],
+          output: (runstub.run.empty? ? %i[test1 test2] : runstub.run)
         }
       end
       it_behaves_like 'default_handling'
@@ -73,8 +74,8 @@ describe RequestHandler::Base do
     context 'with proc defaults' do
       let(:tested_defaults) do
         {
-          input:  ->(_request) { [:test1, :test2] },
-          output: (runstub.run.empty? ? [:test1, :test2] : runstub.run)
+          input:  ->(_request) { %i[test1 test2] },
+          output: (runstub.run.empty? ? %i[test1 test2] : runstub.run)
         }
       end
       it_behaves_like 'default_handling'
