@@ -88,7 +88,7 @@ describe RequestHandler::MultipartsParser do
   it 'fails if params missing' do
     expect do
       described_class.new(request: instance_double('Rack::Request', params: nil, env: {}, body: nil),
-                          multipart_config: config)
+                          multipart_config: config.multipart)
     end
       .to raise_error(RequestHandler::MissingArgumentError)
   end
@@ -104,7 +104,7 @@ describe RequestHandler::MultipartsParser do
   it 'fails if configured param missing' do
     expect do
       described_class.new(request: instance_double('Rack::Request', params: params.delete('meta'), env: {}, body: nil),
-                          multipart_config: config).run
+                          multipart_config: config.multipart).run
     end
       .to raise_error(RequestHandler::ExternalArgumentError)
   end
@@ -113,8 +113,36 @@ describe RequestHandler::MultipartsParser do
     params['meta'][:tempfile] = nil
     expect do
       described_class.new(request: instance_double('Rack::Request', params: params, env: {}, body: nil),
-                          multipart_config: config).run
+                          multipart_config: config.multipart).run
     end
       .to raise_error(RequestHandler::ExternalArgumentError)
+  end
+
+  context 'invalid json payload' do
+    let(:raw_meta) do
+      <<-JSON
+        "data": {{
+      JSON
+    end
+
+    it 'fails' do
+      expect do
+        described_class.new(request: instance_double('Rack::Request', params: params, env: {}, body: nil),
+                            multipart_config: config.multipart).run
+      end
+          .to raise_error(RequestHandler::ExternalArgumentError)
+    end
+  end
+
+  context 'empty json payload' do
+    let(:raw_meta) { '' }
+
+    it 'fails' do
+      expect do
+        described_class.new(request: instance_double('Rack::Request', params: params, env: {}, body: nil),
+                            multipart_config: config.multipart).run
+      end
+          .to raise_error(RequestHandler::ExternalArgumentError)
+    end
   end
 end

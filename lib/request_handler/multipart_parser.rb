@@ -36,11 +36,19 @@ module RequestHandler
 
     def parse_data(name)
       JsonApiDataParser.new(
-        data:             MultiJson.load(multipart_file(name).read),
+        data:             load_json(name),
         schema:           lookup("#{name}.schema"),
         schema_options:   execute_options(lookup("#{name}.options")),
         included_schemas: lookup("#{name}.included")
       ).run
+    end
+
+    def load_json(name)
+      begin
+        MultiJson.load(multipart_file(name).read)
+      rescue MultiJson::ParseError
+        raise ExternalArgumentError, multipart_file: 'invalid'
+      end
     end
 
     def multipart_file(name)
