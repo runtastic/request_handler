@@ -130,7 +130,7 @@ describe RequestHandler::MultipartsParser do
         described_class.new(request: instance_double('Rack::Request', params: params, env: {}, body: nil),
                             multipart_config: config.multipart).run
       end
-          .to raise_error(RequestHandler::ExternalArgumentError)
+        .to raise_error(RequestHandler::ExternalArgumentError)
     end
   end
 
@@ -142,7 +142,7 @@ describe RequestHandler::MultipartsParser do
         described_class.new(request: instance_double('Rack::Request', params: params, env: {}, body: nil),
                             multipart_config: config.multipart).run
       end
-          .to raise_error(RequestHandler::ExternalArgumentError)
+        .to raise_error(RequestHandler::ExternalArgumentError)
     end
   end
 end

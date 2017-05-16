@@ -44,11 +44,9 @@ module RequestHandler
     end
 
     def load_json(name)
-      begin
-        MultiJson.load(multipart_file(name).read)
-      rescue MultiJson::ParseError
-        raise ExternalArgumentError, multipart_file: 'invalid'
-      end
+      MultiJson.load(multipart_file(name).read)
+    rescue MultiJson::ParseError
+      raise ExternalArgumentError, multipart_file: 'invalid'
     end
 
     def multipart_file(name)
