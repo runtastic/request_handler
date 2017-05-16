@@ -8,11 +8,14 @@ describe RequestHandler::FieldsetsParser do
         allowed do
           posts Dry::Types['strict.string'].enum('awesome', 'samples')
           photos Dry::Types['strict.string'].enum('foo', 'bar')
+          videos true
+          musicfiles false
         end
         required [:posts]
       end
     end
   end
+
   shared_examples 'returns fieldsets' do
     let(:allowed) { opts.lookup!('fieldsets.allowed') }
     let(:required) { opts.lookup!('fieldsets.required') }
@@ -22,6 +25,7 @@ describe RequestHandler::FieldsetsParser do
         .to eq(expected)
     end
   end
+
   shared_examples 'fails' do
     let(:error) { RequestHandler::ExternalArgumentError }
     it 'raises an error' do
@@ -33,41 +37,85 @@ describe RequestHandler::FieldsetsParser do
         .to raise_error(error)
     end
   end
-  context 'no fieldset settings in the config or request' do
-    it_behaves_like 'returns fieldsets' do
-      let(:allowed) { {} }
-      let(:required) { [] }
-      let(:params) { {} }
+
+  context 'fieldset tests' do
+    context 'no fieldset settings in the config or request' do
+      it_behaves_like 'returns fieldsets' do
+        let(:allowed) { {} }
+        let(:required) { [] }
+        let(:params) { {} }
+      end
     end
-  end
-  context 'fieldset settings and the parameter are set' do
-    it_behaves_like 'returns fieldsets' do
-      let(:params) { { 'fields' => { 'posts' => 'awesome' } } }
-      let(:expected) { { posts: [:awesome] } }
+
+    context 'fieldset settings and the parameter are set' do
+      it_behaves_like 'returns fieldsets' do
+        let(:params) { { 'fields' => { 'posts' => 'awesome' } } }
+        let(:expected) { { posts: [:awesome] } }
+      end
+    end
+
+    context 'fieldset settings and multiple parameters are set' do
+      it_behaves_like 'returns fieldsets' do
+        let(:params)  { { 'fields' => { 'posts' => 'awesome,samples' } } }
+        let(:expected) { { posts: %i[awesome samples] } }
+      end
+    end
+
+    context 'fieldset settings and a required and an optional parameter are set' do
+      it_behaves_like 'returns fieldsets' do
+        let(:params) { { 'fields' => { 'posts' => 'awesome', 'photos' => 'foo' } } }
+        let(:expected) { { posts: [:awesome], photos: [:foo] } }
+      end
+    end
+
+    context 'fieldset settings and the required parameters are set' do
+      before do
+        opts.required = %i[posts photos]
+      end
+      it_behaves_like 'returns fieldsets' do
+        let(:params) { { 'fields' => { 'posts' => 'awesome', 'photos' => 'foo' } } }
+        let(:expected) { { posts: [:awesome], photos: [:foo] } }
+      end
+    end
+
+    context 'invalid fieldset wich fails because of unrecognized field in posts' do
+      it_behaves_like 'fails' do
+        let(:params) { { 'fields' => { 'posts' => 'awesome,good' } } }
+      end
     end
   end
 
-  context 'fieldset settings and multiple parameters are set' do
-    it_behaves_like 'returns fieldsets' do
-      let(:params)  { { 'fields' => { 'posts' => 'awesome,samples' } } }
-      let(:expected) { { posts: %i[awesome samples] } }
+  context 'fieldset types tests' do
+    context 'valid fieldset wich return all parameters because fieldset is set to true in RequestHandler config' do
+      it_behaves_like 'returns fieldsets' do
+        let(:params) { { 'fields' => { 'posts' => 'awesome', 'videos' => 'nr1,nr2,nr3' } } }
+        let(:expected) { { posts: [:awesome], videos: %i[nr1 nr2 nr3] } }
+      end
     end
-  end
 
-  context 'fieldset settings and a required and an optional parameter are set' do
-    it_behaves_like 'returns fieldsets' do
-      let(:params) { { 'fields' => { 'posts' => 'awesome', 'photos' => 'foo' } } }
-      let(:expected) { { posts: [:awesome], photos: [:foo] } }
+    context 'invalid fieldset wich fails because of unrecognized field in posts' do
+      it_behaves_like 'fails' do
+        let(:params) { { 'fields' => { 'posts' => 'post1,post2', 'videos' => 'nr1,nr2' } } }
+      end
     end
-  end
 
-  context 'fieldset settings and the required parameters are set' do
-    before do
-      opts.required = %i[posts photos]
+    context 'invalid fieldset which fails because fieldset "musicfiles" is set to false in RequestHandler config' do
+      it_behaves_like 'fails' do
+        let(:params) do
+          { 'fields' => { 'videos' => 'video1,video2,video3',
+                          'musicfiles' => 'nr1,nr2' } }
+        end
+        let(:error) { RequestHandler::OptionNotAllowedError }
+      end
     end
-    it_behaves_like 'returns fieldsets' do
-      let(:params) { { 'fields' => { 'posts' => 'awesome', 'photos' => 'foo' } } }
-      let(:expected) { { posts: [:awesome], photos: [:foo] } }
+    context 'invalid fieldset which fails because fieldset "games" is not set in RequestHandler config' do
+      it_behaves_like 'fails' do
+        let(:params) do
+          { 'fields' => { 'videos' => 'video1,video2,video3',
+                          'games' => 'nr1,nr2' } }
+        end
+        let(:error) { RequestHandler::OptionNotAllowedError }
+      end
     end
   end
 
