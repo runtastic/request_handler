@@ -10,7 +10,8 @@ if has_app_changes && !has_test_changes && !is_version_bump
 end
 
 if !git.modified_files.include?('CHANGELOG.md') && has_app_changes
-  raise("Please include a CHANGELOG entry. \nYou can find it at [CHANGELOG.md](https://github.com/request_handler/request_handler/blob/master/CHANGELOG.md).")
+  fail("Please include a CHANGELOG entry. \nYou can find it at [CHANGELOG.md](https://github.com/request_handler/request_handler/blob/master/CHANGELOG.md).")
+  message "Note, we hard-wrap at 80 chars and use 2 spaces after the last line."
 end
 
 # Make it more obvious that a PR is a work in progress and shouldn't be merged yet
