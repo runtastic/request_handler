@@ -305,11 +305,13 @@ describe RequestHandler do
       }
       JSON
 
+      file_tempfile = instance_double('Tempfile')
+
       params = {
         'user_id' => 'awesome_user_id',
         'id'      => 'fer342ref',
         'meta'    => { filename: 'meta.json', tempfile: instance_double('Tempfile', read: raw_meta) },
-        'file'    => { filename: 'rt.jpg' }
+        'file'    => { filename: 'rt.jpg', tempfile: file_tempfile }
       }
 
       request = build_mock_request(params: params, headers: headers)
@@ -326,7 +328,7 @@ describe RequestHandler do
                                            id:   '54',
                                            type: 'category'
                                          })
-      expect(dto.multipart[:file]).to eq(filename: 'rt.jpg')
+      expect(dto.multipart[:file]).to eq(filename: 'rt.jpg', tempfile: file_tempfile)
 
       expect(dto.headers).to eq(expected_headers)
     end

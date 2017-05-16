@@ -66,9 +66,10 @@ describe RequestHandler::MultipartsParser do
       'user_id' => 'awesome_user_id',
       'id'      => 'fer342ref',
       'meta'    => { filename: 'meta.json', tempfile: instance_double('Tempfile', read: raw_meta) },
-      'file'    => { filename: 'rt.jpg' }
+      'file'    => { filename: 'rt.jpg', tempfile: file_tempfile }
     }
   end
+  let(:file_tempfile) { instance_double('Tempfile') }
 
   it 'returns expected result' do
     result = handler.run
@@ -81,7 +82,7 @@ describe RequestHandler::MultipartsParser do
                                   id:   '54',
                                   type: 'category'
                                 })
-    expect(result[:file]).to eq(filename: 'rt.jpg')
+    expect(result[:file]).to eq(filename: 'rt.jpg', tempfile: file_tempfile)
   end
 
   it 'fails if params missing' do
