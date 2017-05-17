@@ -34,7 +34,7 @@ describe RequestHandler do
   it 'raises an OptionNotAllowedError if the client sends a value that is not allowed for a type' do
     request = build_mock_request(params: { 'fields' => { 'posts' => 'no' } }, headers: nil, body: '')
     testhandler = testclass.new(request: request)
-    expect { testhandler.to_dto }.to raise_error(RequestHandler::ExternalArgumentError)
+    expect { testhandler.to_dto }.to raise_error(RequestHandler::FieldsetsParamsError)
   end
   it 'raises an OptionNotAllowedError if the client sends a value that is not allowed for a type' do
     testclass.config.fieldsets.allowed.posts = %w[foo bar]

@@ -42,12 +42,12 @@ module RequestHandler
         allowed[type].call(option).to_sym
       end
     rescue Dry::Types::ConstraintError
-      raise ExternalArgumentError, fieldsets: "invalid field: <#{option}> for type: #{type}"
+      raise FieldsetsParamsError, fieldsets: "invalid field: <#{option}> for type: #{type}"
     end
 
     def check_required_fieldsets_types(fieldsets)
       return fieldsets if (required - fieldsets.keys).empty?
-      raise ExternalArgumentError, fieldsets: 'missing required fieldsets parameter'
+      raise FieldsetsParamsError, fieldsets: 'missing required fieldsets parameter'
     end
 
     def raise_invalid_field_option(type)
@@ -57,7 +57,7 @@ module RequestHandler
 
     def raise_missing_fields_param
       return if required.empty?
-      raise ExternalArgumentError, fieldsets: 'missing required fields options'
+      raise FieldsetsParamsError, fieldsets: 'missing required fields options'
     end
 
     attr_reader :params, :allowed, :required

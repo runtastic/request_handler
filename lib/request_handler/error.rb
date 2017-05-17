@@ -30,4 +30,17 @@ module RequestHandler
   end
   class NoConfigAvailableError < InternalBaseError
   end
+
+  class BodyParamsError < ExternalArgumentError
+  end
+  class FieldsetsParamsError < ExternalArgumentError
+  end
+  class FilterParamsError < ExternalArgumentError
+  end
+  class IncludeParamsError < ExternalArgumentError
+  end
+  class PageParamsError < ExternalArgumentError
+  end
+  class SortParamsError < ExternalArgumentError
+  end
 end
