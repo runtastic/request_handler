@@ -7,6 +7,11 @@ Changelog
 - drop support for ruby 2.1 (dry-types does not support it anymore either which makes supporting it here pointless)
 - adapt fieldset validation to allow all fields in addition to a specific enum
 
+## 0.12.0
+
+- Throw different errors for each parser
+- all new errors inherit from ExternalArgumentError
+
 ## 0.11.0
 
 - Parse `included` array from request body
