@@ -78,7 +78,7 @@ describe RequestHandler do
     end
 
     it 'works when fields is not passed' do
-      request = build_mock_request(params: { "filter" => {}}, headers: nil, body: '')
+      request = build_mock_request(params: { 'filter' => {} }, headers: nil, body: '')
       testhandler = testclass.new(request: request)
       expect(testhandler.to_dto).to eq(OpenStruct.new(fieldsets: {}))
     end
