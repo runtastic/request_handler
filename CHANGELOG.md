@@ -7,6 +7,10 @@ Changelog
 - drop support for ruby 2.1 (dry-types does not support it anymore either which makes supporting it here pointless)
 - adapt fieldset validation to allow all fields in addition to a specific enum
 
+## 0.11.1
+
+- no need for required field in fieldsets anymore, ifi allowed is set to true or false
+
 ## 0.11.0
 
 - Parse `included` array from request body
