@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 require 'request_handler/body_parser'
-require 'request_handler/json_api_data_parser'
+require 'request_handler/json_api_document_parser'
 describe RequestHandler::BodyParser do
   let(:handler) do
     described_class.new(
@@ -43,11 +43,11 @@ describe RequestHandler::BodyParser do
     JSON
   end
 
-  it 'constructs and runs jsonApiDataParser correctly' do
-    parser_double = instance_double(RequestHandler::JsonApiDataParser)
-    expect(RequestHandler::JsonApiDataParser)
+  it 'constructs and runs jsonApiDocumentParser correctly' do
+    parser_double = instance_double(RequestHandler::JsonApiDocumentParser)
+    expect(RequestHandler::JsonApiDocumentParser)
       .to receive(:new)
-      .with(data: MultiJson.load(raw_body), schema: schema, schema_options: {}, included_schemas: included_schemas)
+      .with(document: MultiJson.load(raw_body), schema: schema, schema_options: {}, included_schemas: included_schemas)
       .and_return(parser_double)
 
     result_double = instance_double(Hash)

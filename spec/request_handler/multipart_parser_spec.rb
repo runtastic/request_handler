@@ -85,14 +85,6 @@ describe RequestHandler::MultipartsParser do
     expect(result[:file]).to eq(filename: 'rt.jpg', tempfile: file_tempfile)
   end
 
-  it 'fails if params missing' do
-    expect do
-      described_class.new(request: instance_double('Rack::Request', params: nil, env: {}, body: nil),
-                          multipart_config: config.multipart)
-    end
-      .to raise_error(RequestHandler::MissingArgumentError)
-  end
-
   it 'fails if config missing' do
     expect do
       described_class.new(request: instance_double('Rack::Request', params: params, env: {}, body: nil),

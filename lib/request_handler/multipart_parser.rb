@@ -3,7 +3,7 @@
 require 'request_handler/error'
 require 'request_handler/schema_parser'
 require 'request_handler/error'
-require 'request_handler/json_api_data_parser'
+require 'request_handler/json_api_document_parser'
 module RequestHandler
   class MultipartsParser
     def initialize(request:, multipart_config:)
@@ -11,14 +11,13 @@ module RequestHandler
       @params = request.params
       @multipart_config = multipart_config
       missing_arguments = []
-      missing_arguments << { params: 'is missing' } if params.nil?
       missing_arguments << { multipart_config: 'is missing' } if multipart_config.nil?
       raise MissingArgumentError, missing_arguments unless missing_arguments.empty?
     end
 
     def run
       multipart_config.keys.each_with_object({}) do |name, memo|
-        raise ExternalArgumentError, multipart: 'missing' if params[name.to_s].nil?
+        params.fetch(name.to_s) { raise ExternalArgumentError, multipart: 'missing' }
         memo[name] = parse_part(name)
       end
     end
@@ -35,8 +34,8 @@ module RequestHandler
     end
 
     def parse_data(name)
-      JsonApiDataParser.new(
-        data:             load_json(name),
+      JsonApiDocumentParser.new(
+        document:         load_json(name),
         schema:           lookup("#{name}.schema"),
         schema_options:   execute_options(lookup("#{name}.options")),
         included_schemas: lookup("#{name}.included")

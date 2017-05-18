@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'request_handler/json_api_data_parser'
-describe RequestHandler::JsonApiDataParser do
+require 'request_handler/json_api_document_parser'
+describe RequestHandler::JsonApiDocumentParser do
   let(:handler) do
     described_class.new(
       schema:           schema,
-      data:             raw_body.empty? ? {} : MultiJson.load(raw_body),
+      document:             raw_body.empty? ? {} : MultiJson.load(raw_body),
       included_schemas: included_schemas
     )
   end
@@ -393,7 +393,7 @@ describe RequestHandler::JsonApiDataParser do
     schema = Dry::Validation.JSON {}
     expect do
       described_class.new(schema:  schema,
-                          data:    nil)
+                          document:    nil)
     end
       .to raise_error(RequestHandler::MissingArgumentError)
   end
@@ -403,7 +403,7 @@ describe RequestHandler::JsonApiDataParser do
     expect do
       described_class.new(
         schema:  schema,
-        data:   JSON.parse('{"include": [{"type": "foo", "id": "bar"}]}')
+        document:   JSON.parse('{"include": [{"type": "foo", "id": "bar"}]}')
       ).run
     end
       .to raise_error(RequestHandler::ExternalArgumentError)

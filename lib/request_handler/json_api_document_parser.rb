@@ -3,31 +3,31 @@
 require 'request_handler/schema_parser'
 require 'request_handler/error'
 module RequestHandler
-  class JsonApiDataParser < SchemaParser
-    def initialize(data:, schema:, schema_options: {}, included_schemas: {})
-      raise MissingArgumentError, "data": 'is missing' if data.nil?
+  class JsonApiDocumentParser < SchemaParser
+    def initialize(document:, schema:, schema_options: {}, included_schemas: {})
+      raise MissingArgumentError, "data": 'is missing' if document.nil?
       super(schema: schema, schema_options: schema_options)
-      @data = data
+      @document = document
       @included_schemas = included_schemas
     end
 
     def run
-      body, *included = flattened_data
+      resource, *included = flattened_document
       unless included_schemas?
         raise SchemaValidationError, included: 'must be empty' unless included.empty?
-        return validate_schema(body)
+        return validate_schema(resource)
       end
 
-      validate_schemas(body, included)
+      validate_schemas(resource, included)
     end
 
     private
 
-    def flattened_data
-      body = data.fetch('data') do
-        raise ExternalArgumentError, body: 'must contain data'
+    def flattened_document
+      resource = document.fetch('data') do
+        raise ExternalArgumentError, resource: 'must contain data'
       end
-      [flatten_resource!(body), *parse_included]
+      [flatten_resource!(resource), *parse_included]
     end
 
     def flatten_resource!(resource)
@@ -45,7 +45,7 @@ module RequestHandler
     end
 
     def parse_included
-      included = data.fetch('included') { [] }
+      included = document.fetch('included') { [] }
       included.each do |hsh|
         flatten_resource!(hsh)
       end
@@ -55,8 +55,8 @@ module RequestHandler
       !(included_schemas.nil? || included_schemas.empty?)
     end
 
-    def validate_schemas(body, included)
-      schemas = [validate_schema(body)]
+    def validate_schemas(resource, included)
+      schemas = [validate_schema(resource)]
       included_schemas.each do |type, schema|
         included.select { |inc| inc['type'] == type.to_s }.each do |inc|
           schemas << validate_schema(inc, with: schema)
@@ -65,6 +65,6 @@ module RequestHandler
       schemas
     end
 
-    attr_reader :data, :included_schemas
+    attr_reader :document, :included_schemas
   end
 end
