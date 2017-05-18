@@ -65,16 +65,22 @@ describe RequestHandler do
       end
     end
 
-    it 'works for a valid request' do
+    it 'works fields is an empty hash' do
       request = build_mock_request(params: { 'fields' => {} }, headers: nil, body: '')
       testhandler = testclass.new(request: request)
       expect(testhandler.to_dto).to eq(OpenStruct.new(fieldsets: {}))
     end
 
-    it 'works for a valid request' do
+    it 'works when fields is filled with allowed params' do
       request = build_mock_request(params: { 'fields' => { 'posts' => 'foo,bar' } }, headers: nil, body: '')
       testhandler = testclass.new(request: request)
       expect(testhandler.to_dto).to eq(OpenStruct.new(fieldsets: { posts: %i[foo bar] }))
+    end
+
+    it 'works when fields is not passed' do
+      request = build_mock_request(params: { "filter" => {}}, headers: nil, body: '')
+      testhandler = testclass.new(request: request)
+      expect(testhandler.to_dto).to eq(OpenStruct.new(fieldsets: {}))
     end
 
     it 'raises an OptionNotAllowedError if the client sends a type not allowed on the server' do
