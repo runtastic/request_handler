@@ -83,13 +83,13 @@ describe RequestHandler::MultipartsParser do
     expect(file[:head]).not_to be_nil
   end
 
-  shared_examples_for 'an invalid request' do
+  shared_examples_for 'an invalid multipart request' do
     it do
       expect do
         described_class.new(request: request,
                             multipart_config: config.multipart).run
       end
-        .to raise_error(RequestHandler::ExternalArgumentError)
+        .to raise_error(RequestHandler::MultipartParamsError)
     end
   end
 
@@ -101,17 +101,17 @@ describe RequestHandler::MultipartsParser do
         'file' => other_file
       }
     end
-    it_behaves_like 'an invalid request'
+    it_behaves_like 'an invalid multipart request'
   end
 
   context 'invalid json payload' do
     let(:meta_filename) { 'invalid_meta.json' }
-    it_behaves_like 'an invalid request'
+    it_behaves_like 'an invalid multipart request'
   end
 
   context 'empty json payload' do
     let(:meta_filename) { 'empty_meta.json' }
-    it_behaves_like 'an invalid request'
+    it_behaves_like 'an invalid multipart request'
   end
 
   context 'config missing' do

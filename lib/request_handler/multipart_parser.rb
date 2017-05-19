@@ -17,7 +17,7 @@ module RequestHandler
 
     def run
       multipart_config.keys.each_with_object({}) do |name, memo|
-        params.fetch(name.to_s) { raise ExternalArgumentError, multipart: 'missing' }
+        params.fetch(name.to_s) { raise MultipartParamsError, multipart: 'missing' }
         memo[name] = parse_part(name)
       end
     end
@@ -25,7 +25,7 @@ module RequestHandler
     private
 
     def parse_part(name)
-      params[name.to_s].fetch(:tempfile) { raise ExternalArgumentError, multipart_file: 'missing' }
+      params[name.to_s].fetch(:tempfile) { raise MultipartParamsError, multipart_file: 'missing' }
       if lookup("#{name}.schema")
         parse_data(name)
       else
@@ -45,7 +45,7 @@ module RequestHandler
     def load_json(name)
       MultiJson.load(multipart_file(name).read)
     rescue MultiJson::ParseError
-      raise ExternalArgumentError, multipart_file: 'invalid'
+      raise MultipartParamsError, multipart_file: 'invalid'
     end
 
     def multipart_file(name)
