@@ -40,13 +40,13 @@ describe RequestHandler::IncludeOptionParser do
   context 'no include options are specified' do
     let(:params) { { 'include' => '' } }
     let(:output) { [] }
-    let(:error) { RequestHandler::ExternalArgumentError }
+    let(:error) { RequestHandler::IncludeParamsError }
     it_behaves_like 'proccesses invalid options correctly'
   end
 
   context 'options contain a space' do
     let(:params) { { 'include' => 'user, email' } }
-    let(:error) { RequestHandler::ExternalArgumentError }
+    let(:error) { RequestHandler::IncludeParamsError }
     it_behaves_like 'proccesses invalid options correctly'
   end
 

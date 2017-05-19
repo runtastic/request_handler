@@ -9,7 +9,7 @@ module RequestHandler
       missing_arguments << { page_config: 'is missing' } if page_config.nil?
       raise MissingArgumentError, missing_arguments unless missing_arguments.empty?
       @page_options = params.fetch('page') { {} }
-      raise ExternalArgumentError, page: 'must be a Hash' unless @page_options.is_a?(Hash)
+      raise PageParamsError, page: 'must be a Hash' unless @page_options.is_a?(Hash)
       @config = page_config
     end
 
@@ -65,10 +65,10 @@ module RequestHandler
 
     def check_int(string:, error_msg:)
       output = Integer(string)
-      raise ExternalArgumentError, error_msg unless output > 0
+      raise PageParamsError, error_msg unless output > 0
       output
     rescue ArgumentError
-      raise ExternalArgumentError, error_msg
+      raise PageParamsError, error_msg
     end
 
     def apply_max_size_constraint(size, prefix)

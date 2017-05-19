@@ -75,6 +75,6 @@ describe RequestHandler::BodyParser do
                                  body: StringIO.new('{"include": [{"type": "foo", "id": "bar"}]}'))
       ).run
     end
-      .to raise_error(RequestHandler::ExternalArgumentError)
+      .to raise_error(RequestHandler::BodyParamsError)
   end
 end

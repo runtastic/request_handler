@@ -8,12 +8,12 @@ module RequestHandler
     def run
       return [] unless params.key?('sort')
       sort_options = parse_options(fetch_options)
-      raise ExternalArgumentError, sort_options: 'must be unique' if duplicates?(sort_options)
+      raise SortParamsError, sort_options: 'must be unique' if duplicates?(sort_options)
       sort_options
     end
 
     def fetch_options
-      raise ExternalArgumentError, sort_options: 'the query paramter must not be empty' if empty_param?('sort')
+      raise SortParamsError, sort_options: 'the query paramter must not be empty' if empty_param?('sort')
       params.fetch('sort') { '' }.split(',')
     end
 
@@ -27,7 +27,7 @@ module RequestHandler
     end
 
     def parse_option(option)
-      raise ExternalArgumentError, sort_options: 'must not contain a space' if option.include? ' '
+      raise SortParamsError, sort_options: 'must not contain a space' if option.include? ' '
       if option.start_with?('-')
         [option[1..-1], :desc]
       else

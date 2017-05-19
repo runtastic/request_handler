@@ -119,7 +119,7 @@ module RequestHandler
     def parse_fieldsets_params
       FieldsetsParser.new(params:   params,
                           allowed:  lookup!('fieldsets.allowed'),
-                          required: lookup!('fieldsets.required')).run
+                          required: lookup('fieldsets.required') || []).run
     end
 
     def fetch_defaults(key, default)

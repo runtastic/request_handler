@@ -25,7 +25,7 @@ module RequestHandler
 
     def flattened_document
       resource = document.fetch('data') do
-        raise ExternalArgumentError, resource: 'must contain data'
+        raise BodyParamsError, resource: 'must contain data'
       end
       [flatten_resource!(resource), *parse_included]
     end

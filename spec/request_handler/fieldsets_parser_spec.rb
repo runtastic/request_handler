@@ -27,7 +27,7 @@ describe RequestHandler::FieldsetsParser do
   end
 
   shared_examples 'fails' do
-    let(:error) { RequestHandler::ExternalArgumentError }
+    let(:error) { RequestHandler::FieldsetsParamsError }
     it 'raises an error' do
       expect do
         described_class.new(params:   params,
