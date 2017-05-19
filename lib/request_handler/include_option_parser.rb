@@ -7,7 +7,7 @@ module RequestHandler
     def run
       return [] unless params.key?('include')
       options = fetch_options
-      raise ExternalArgumentError, include: 'must not contain a space' if options.include? ' '
+      raise IncludeParamsError, include: 'must not contain a space' if options.include? ' '
       allowed_options(options.split(','))
     end
 
@@ -23,7 +23,7 @@ module RequestHandler
     end
 
     def fetch_options
-      raise ExternalArgumentError, include_options: 'query paramter must not be empty' if empty_param?('include')
+      raise IncludeParamsError, include_options: 'query paramter must not be empty' if empty_param?('include')
       params.fetch('include') { '' }
     end
   end

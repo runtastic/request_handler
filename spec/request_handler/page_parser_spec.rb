@@ -110,7 +110,7 @@ describe RequestHandler::PageParser do
     end
 
     context 'number is set to a non integer string' do
-      let(:error) { RequestHandler::ExternalArgumentError }
+      let(:error) { RequestHandler::PageParamsError }
       let(:params) do
         { 'page' => {
           'users__size'   => '40',
@@ -121,7 +121,7 @@ describe RequestHandler::PageParser do
     end
 
     context 'number is set to a negative string' do
-      let(:error) { RequestHandler::ExternalArgumentError }
+      let(:error) { RequestHandler::PageParamsError }
       let(:params) do
         { 'page' => {
           'users__size'   => '40',
@@ -132,7 +132,7 @@ describe RequestHandler::PageParser do
     end
 
     context 'size is set to a negative string' do
-      let(:error) { RequestHandler::ExternalArgumentError }
+      let(:error) { RequestHandler::PageParamsError }
       let(:params) do
         { 'page' => {
           'users__size'   => '-40',
@@ -143,7 +143,7 @@ describe RequestHandler::PageParser do
     end
 
     context 'size is set to a non integer string' do
-      let(:error) { RequestHandler::ExternalArgumentError }
+      let(:error) { RequestHandler::PageParamsError }
       let(:params) do
         { 'page' => {
           'users__size'   => 'asdf',

@@ -118,6 +118,6 @@ describe RequestHandler::FilterParser do
       required('name').filled
     end
     expect { described_class.new(schema: schema, params: params, additional_url_filter: additional_url_filter) }
-      .to raise_error(RequestHandler::ExternalArgumentError)
+      .to raise_error(RequestHandler::FilterParamsError)
   end
 end
