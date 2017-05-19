@@ -51,7 +51,7 @@ describe RequestHandler::SortOptionParser do
   context 'no sort options are specified' do
     let(:params) { { 'sort' => '' } }
     let(:output) { [] }
-    let(:error) { RequestHandler::ExternalArgumentError }
+    let(:error) { RequestHandler::SortParamsError }
     it_behaves_like 'processes invalid sort options correctly'
   end
 
@@ -63,19 +63,19 @@ describe RequestHandler::SortOptionParser do
 
   context 'sort key is not unique and the order is different in the duplicate' do
     let(:params) { { 'sort' => 'id,-id' } }
-    let(:error) { RequestHandler::ExternalArgumentError }
+    let(:error) { RequestHandler::SortParamsError }
     it_behaves_like 'processes invalid sort options correctly'
   end
 
   context 'sort key is not unique and the order is identical in the duplicate' do
     let(:params) { { 'sort' => 'id,id' } }
-    let(:error) { RequestHandler::ExternalArgumentError }
+    let(:error) { RequestHandler::SortParamsError }
     it_behaves_like 'processes invalid sort options correctly'
   end
 
   context 'one of the sort keys contains spaces' do
     let(:params) { { 'sort' => 'id, foo' } }
-    let(:error) { RequestHandler::ExternalArgumentError }
+    let(:error) { RequestHandler::SortParamsError }
     it_behaves_like 'processes invalid sort options correctly'
   end
 

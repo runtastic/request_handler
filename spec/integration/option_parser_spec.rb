@@ -27,7 +27,7 @@ describe RequestHandler do
       it 'raises an ExternalArgumentError if the query parameter contains as space' do
         request = build_mock_request(params: { 'include' => 'user, groups' }, headers: {}, body: '')
         testhandler = testclass.new(request: request)
-        expect { testhandler.to_dto }.to raise_error(RequestHandler::ExternalArgumentError)
+        expect { testhandler.to_dto }.to raise_error(RequestHandler::IncludeParamsError)
       end
       it 'raises a InternalArgumentError if params is set to nil' do
         request = build_mock_request(params: nil, headers: {}, body: '')
@@ -68,7 +68,7 @@ describe RequestHandler do
       it 'raises an ExternalArgumentError if the query parameter contains as space' do
         request = build_mock_request(params: { 'sort' => 'name, age' }, headers: {}, body: '')
         testhandler = testclass.new(request: request)
-        expect { testhandler.to_dto }.to raise_error(RequestHandler::ExternalArgumentError)
+        expect { testhandler.to_dto }.to raise_error(RequestHandler::SortParamsError)
       end
       it 'raises an MissingArgumentError if params is set to nil' do
         request = build_mock_request(params: nil, headers: {}, body: '')
