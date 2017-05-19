@@ -112,6 +112,41 @@ class IntegrationTestRequestHandlerWithBody < RequestHandler::Base
   end
 end
 
+class IntegrationTestRequestHandlerWithMultiparts < RequestHandler::Base
+  options do
+    multipart do
+      meta do
+        schema(Dry::Validation.JSON do
+          configure do
+            option :query_id
+          end
+          required(:id).value(eql?: query_id)
+          required(:type).value(eql?: 'post')
+          required(:user_id).filled(:str?)
+          required(:name).filled(:str?)
+          optional(:publish_on).filled(:time?)
+
+          required(:category).schema do
+            required(:id).filled(:str?)
+            required(:type).value(eql?: 'category')
+          end
+        end)
+        options(->(_parser, request) { { query_id: request.params['id'] } })
+      end
+
+      file do
+      end
+    end
+  end
+
+  def to_dto
+    OpenStruct.new(
+      multipart: multipart_params,
+      headers:    headers
+    )
+  end
+end
+
 describe RequestHandler do
   it 'has a version' do
     expect(described_class::VERSION).not_to be_nil
@@ -161,7 +196,6 @@ describe RequestHandler do
         }
       }
       JSON
-
       params = {
         'user_id' => 'awesome_user_id',
         'id'      => 'fer342ref'
@@ -243,6 +277,56 @@ describe RequestHandler do
 
       expect(dto.headers).to eq(expected_headers)
       expect(dto.fieldsets).to eq(posts: %i[samples awesome])
+    end
+  end
+
+  context 'w/ multipart' do
+    let(:request) do
+      Rack::Request.new(env.merge(headers))
+    end
+    let(:env) do
+      Rack::MockRequest.env_for(path, method: method, params: params, env: headers)
+    end
+    let(:path) { '/' }
+    let(:method) { 'POST' }
+    let(:params) do
+      {
+        'user_id' => 'awesome_user_id',
+        'id' =>      'fer342ref',
+        'meta' => meta_file,
+        'file' => other_file
+      }
+    end
+    let(:meta_file) do
+      Rack::Multipart::UploadedFile.new("spec/fixtures/#{meta_filename}", 'application/json')
+    end
+    let(:meta_filename) { 'meta.json' }
+
+    let(:other_file) do
+      Rack::Multipart::UploadedFile.new('spec/fixtures/rt.png', 'image/png')
+    end
+
+    it 'works' do
+      handler = IntegrationTestRequestHandlerWithMultiparts.new(request: request)
+      dto = handler.to_dto
+
+      expect(dto.multipart[:meta]).to eq(id:         'fer342ref',
+                                         type:       'post',
+                                         user_id:    'awesome_user_id',
+                                         name:       'About naming stuff and cache invalidation',
+                                         publish_on: Time.iso8601('2016-09-26T12:23:55Z'),
+                                         category:   {
+                                           id:   '54',
+                                           type: 'category'
+                                         })
+      file = dto.multipart[:file]
+      expect(file[:filename]).to eq('rt.png')
+      expect(file[:type]).to eq('image/png')
+      expect(file[:name]).to eq('file')
+      expect(file[:tempfile]).not_to be_nil
+      expect(file[:head]).not_to be_nil
+
+      expect(dto.headers).to eq(expected_headers)
     end
   end
 end

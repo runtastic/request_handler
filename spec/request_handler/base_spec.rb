@@ -254,6 +254,38 @@ describe RequestHandler::Base do
     it_behaves_like 'correct_arguments_passed'
   end
 
+  context '#multipart_params' do
+    let(:testclass) do
+      opts = tested_options[:input]
+      Class.new(RequestHandler::Base) do
+        options do
+          multipart do
+            meta do
+              schema 'schema'
+              options(opts)
+            end
+            file do
+            end
+          end
+        end
+      end
+    end
+    let(:expected_args) do
+      {
+        request:           request,
+        multipart_config: { meta: { schema: 'schema', options: anything }, file: {} }
+      }
+    end
+    let(:tested_method) { :multipart_params }
+    let(:tested_parser) { RequestHandler::MultipartsParser }
+    let(:tested_options) do
+      { input:  ->(_parser, _request) { { body_user_id: 1 } },
+        output: { body_user_id: 1 } }
+    end
+    it_behaves_like 'correct_persistence'
+    it_behaves_like 'correct_arguments_passed'
+  end
+
   context '#body_params' do
     let(:testclass) do
       opts = tested_options[:input]

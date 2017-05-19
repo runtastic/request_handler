@@ -43,4 +43,6 @@ module RequestHandler
   end
   class SortParamsError < ExternalArgumentError
   end
+  class MultipartParamsError < ExternalArgumentError
+  end
 end
