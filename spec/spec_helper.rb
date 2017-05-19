@@ -15,6 +15,7 @@ require 'request_handler'
 require_relative 'support/helper'
 require 'pry'
 require 'ostruct'
+require 'rack'
 
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|

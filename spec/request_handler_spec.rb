@@ -281,40 +281,32 @@ describe RequestHandler do
   end
 
   context 'w/ multipart' do
-    it 'works' do
-      raw_meta = <<-JSON
+    let(:request) do
+      Rack::Request.new(env.merge(headers))
+    end
+    let(:env) do
+      Rack::MockRequest.env_for(path, method: method, params: params, env: headers)
+    end
+    let(:path) { '/' }
+    let(:method) { 'POST' }
+    let(:params) do
       {
-        "data": {
-          "type": "post",
-          "id": "fer342ref",
-          "attributes": {
-            "user_id": "awesome_user_id",
-            "name": "About naming stuff and cache invalidation",
-            "publish_on": "2016-09-26T12:23:55Z"
-          },
-          "relationships":{
-            "category": {
-              "data": {
-                "id": "54",
-                "type": "category"
-              }
-            }
-          }
-        }
-      }
-      JSON
-
-      file_tempfile = instance_double('Tempfile')
-
-      params = {
         'user_id' => 'awesome_user_id',
-        'id'      => 'fer342ref',
-        'meta'    => { filename: 'meta.json', tempfile: instance_double('Tempfile', read: raw_meta) },
-        'file'    => { filename: 'rt.jpg', tempfile: file_tempfile }
+        'id' =>      'fer342ref',
+        'meta' => meta_file,
+        'file' => other_file
       }
+    end
+    let(:meta_file) do
+      Rack::Multipart::UploadedFile.new("spec/fixtures/#{meta_filename}", 'application/json')
+    end
+    let(:meta_filename) { 'meta.json' }
 
-      request = build_mock_request(params: params, headers: headers)
+    let(:other_file) do
+      Rack::Multipart::UploadedFile.new('spec/fixtures/rt.png', 'image/png')
+    end
 
+    it 'works' do
       handler = IntegrationTestRequestHandlerWithMultiparts.new(request: request)
       dto = handler.to_dto
 
@@ -327,7 +319,12 @@ describe RequestHandler do
                                            id:   '54',
                                            type: 'category'
                                          })
-      expect(dto.multipart[:file]).to eq(filename: 'rt.jpg', tempfile: file_tempfile)
+      file = dto.multipart[:file]
+      expect(file[:filename]).to eq('rt.png')
+      expect(file[:type]).to eq('image/png')
+      expect(file[:name]).to eq('file')
+      expect(file[:tempfile]).not_to be_nil
+      expect(file[:head]).not_to be_nil
 
       expect(dto.headers).to eq(expected_headers)
     end

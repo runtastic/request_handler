@@ -5,10 +5,35 @@ require 'request_handler/multipart_parser'
 describe RequestHandler::MultipartsParser do
   let(:handler) do
     described_class.new(
-      request:           build_mock_request(params: params, headers: {}),
+      request:           request,
       multipart_config: config.multipart
     )
   end
+  let(:request) do
+    Rack::Request.new(env)
+  end
+  let(:env) do
+    Rack::MockRequest.env_for(path, method: method, params: params)
+  end
+  let(:path) { '/' }
+  let(:method) { 'POST' }
+  let(:params) do
+    {
+      'user_id' => 'awesome_user_id',
+      'id' =>      'fer342ref',
+      'meta' => meta_file,
+      'file' => other_file
+    }
+  end
+  let(:meta_file) do
+    Rack::Multipart::UploadedFile.new("spec/fixtures/#{meta_filename}", 'application/json')
+  end
+  let(:meta_filename) { 'meta.json' }
+
+  let(:other_file) do
+    Rack::Multipart::UploadedFile.new('spec/fixtures/rt.png', 'image/png')
+  end
+
   let(:config) do
     Confstruct::Configuration.new do
       multipart do
@@ -37,38 +62,6 @@ describe RequestHandler::MultipartsParser do
     end
   end
 
-  let(:raw_meta) do
-    <<-JSON
-      {
-        "data": {
-          "type": "post",
-          "id": "fer342ref",
-          "attributes": {
-            "user_id": "awesome_user_id",
-            "name": "About naming stuff and cache invalidation",
-            "publish_on": "2016-09-26T12:23:55Z"
-          },
-          "relationships":{
-            "category": {
-              "data": {
-                "id": "54",
-                "type": "category"
-              }
-            }
-          }
-        }
-      }
-    JSON
-  end
-
-  let(:params) do
-    {
-      'user_id' => 'awesome_user_id',
-      'id'      => 'fer342ref',
-      'meta'    => { filename: 'meta.json', tempfile: instance_double('Tempfile', read: raw_meta) },
-      'file'    => { filename: 'rt.jpg', tempfile: file_tempfile }
-    }
-  end
   let(:file_tempfile) { instance_double('Tempfile') }
 
   it 'returns expected result' do
@@ -82,59 +75,52 @@ describe RequestHandler::MultipartsParser do
                                   id:   '54',
                                   type: 'category'
                                 })
-    expect(result[:file]).to eq(filename: 'rt.jpg', tempfile: file_tempfile)
+    file = result[:file]
+    expect(file[:filename]).to eq('rt.png')
+    expect(file[:type]).to eq('image/png')
+    expect(file[:name]).to eq('file')
+    expect(file[:tempfile]).not_to be_nil
+    expect(file[:head]).not_to be_nil
   end
 
-  it 'fails if config missing' do
-    expect do
-      described_class.new(request: instance_double('Rack::Request', params: params, env: {}, body: nil),
-                          multipart_config: nil)
+  shared_examples_for 'an invalid request' do
+    it do
+      expect do
+        described_class.new(request: request,
+                            multipart_config: config.multipart).run
+      end
+        .to raise_error(RequestHandler::ExternalArgumentError)
     end
-      .to raise_error(RequestHandler::MissingArgumentError)
   end
 
-  it 'fails if configured param missing' do
-    expect do
-      described_class.new(request: instance_double('Rack::Request', params: params.delete('meta'), env: {}, body: nil),
-                          multipart_config: config.multipart).run
+  context 'configured param missing' do
+    let(:params) do
+      {
+        'user_id' => 'awesome_user_id',
+        'id' =>      'fer342ref',
+        'file' => other_file
+      }
     end
-      .to raise_error(RequestHandler::ExternalArgumentError)
-  end
-
-  it 'fails if file for validated multipart is missing' do
-    params['meta'][:tempfile] = nil
-    expect do
-      described_class.new(request: instance_double('Rack::Request', params: params, env: {}, body: nil),
-                          multipart_config: config.multipart).run
-    end
-      .to raise_error(RequestHandler::ExternalArgumentError)
+    it_behaves_like 'an invalid request'
   end
 
   context 'invalid json payload' do
-    let(:raw_meta) do
-      <<-JSON
-        "data": {{
-      JSON
-    end
-
-    it 'fails' do
-      expect do
-        described_class.new(request: instance_double('Rack::Request', params: params, env: {}, body: nil),
-                            multipart_config: config.multipart).run
-      end
-        .to raise_error(RequestHandler::ExternalArgumentError)
-    end
+    let(:meta_filename) { 'invalid_meta.json' }
+    it_behaves_like 'an invalid request'
   end
 
   context 'empty json payload' do
-    let(:raw_meta) { '' }
+    let(:meta_filename) { 'empty_meta.json' }
+    it_behaves_like 'an invalid request'
+  end
 
-    it 'fails' do
+  context 'config missing' do
+    it do
       expect do
-        described_class.new(request: instance_double('Rack::Request', params: params, env: {}, body: nil),
-                            multipart_config: config.multipart).run
+        described_class.new(request: request,
+                            multipart_config: nil).run
       end
-        .to raise_error(RequestHandler::ExternalArgumentError)
+        .to raise_error(RequestHandler::MissingArgumentError)
     end
   end
 end

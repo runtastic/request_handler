@@ -25,7 +25,7 @@ module RequestHandler
     private
 
     def parse_part(name)
-      raise ExternalArgumentError, multipart_file: 'missing' if multipart_file(name).nil?
+      params[name.to_s].fetch(:tempfile) { raise ExternalArgumentError, multipart_file: 'missing' }
       if lookup("#{name}.schema")
         parse_data(name)
       else
