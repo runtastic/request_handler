@@ -3,6 +3,8 @@ Changelog
 
 ## master
 
+- remove support for sidepushing via `included` array in request body.
+
 ## 0.12.0
 
 - support for multipart-requests

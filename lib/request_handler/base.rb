@@ -104,8 +104,7 @@ module RequestHandler
       BodyParser.new(
         request:          request,
         schema:           lookup!('body.schema'),
-        schema_options:   execute_options(lookup('body.options')),
-        included_schemas: lookup('body.included')
+        schema_options:   execute_options(lookup('body.options'))
       ).run
     end
 

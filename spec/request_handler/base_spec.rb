@@ -302,8 +302,7 @@ describe RequestHandler::Base do
       {
         request:          request,
         schema:           'schema',
-        schema_options:   tested_options[:output],
-        included_schemas: nil
+        schema_options:   tested_options[:output]
       }
     end
     let(:tested_method) { :body_params }
