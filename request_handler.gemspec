@@ -25,6 +25,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'dry-validation', '~> 0.11.0'
   spec.add_dependency 'dry-types', '~> 0.11.0'
+
   spec.add_dependency 'confstruct', '~> 1.0.2'
   spec.add_dependency 'multi_json', '~> 1.12'
 
