@@ -3,6 +3,8 @@ Changelog
 
 ## master
 
+- sidecar resources for multipart requests can be labeled with allowed or required
+
 ## 0.12.0
 
 - support for multipart-requests

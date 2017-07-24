@@ -15,8 +15,14 @@ module RequestHandler
       raise MissingArgumentError, missing_arguments unless missing_arguments.empty?
     end
 
-    def run
+    def run # rubocop:disable AbcSize
       multipart_config.keys.each_with_object({}) do |name, memo|
+        if multipart_config[name][:required]
+          params.fetch(name.to_s) { raise MultipartParamsError, multipart: "#{name} missing" }
+        elsif multipart_config[name][:allowed] != true
+          raise MultipartParamsError, multipart: "#{name} not allowed" unless params[name.to_s].nil?
+        end
+        next if params[name.to_s].nil?
         memo[name] = parse_part(name)
       end
     end
@@ -24,6 +30,7 @@ module RequestHandler
     private
 
     def parse_part(name)
+      params[name.to_s].fetch(:tempfile) { raise MultipartParamsError, multipart_file: 'missing' }
       if lookup("#{name}.schema")
         parse_data(name)
       else
@@ -46,7 +53,7 @@ module RequestHandler
       file = file.read
       MultiJson.load(file)
     rescue MultiJson::ParseError
-      raise MultipartParamsError, multipart_file: 'invalid'
+      raise MultipartParamsError, multipart_file: 'invalid JSON'
     end
 
     def multipart_file(name)

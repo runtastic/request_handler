@@ -5,7 +5,7 @@ require 'request_handler/multipart_parser'
 describe RequestHandler::MultipartsParser do
   let(:handler) do
     described_class.new(
-      request:           request,
+      request:          request,
       multipart_config: config.multipart
     )
   end
@@ -34,10 +34,15 @@ describe RequestHandler::MultipartsParser do
     Rack::Multipart::UploadedFile.new('spec/fixtures/rt.png', 'image/png')
   end
 
+  let(:video_file) do
+    Rack::Multipart::UploadedFile.new('spec/fixtures/mocked_video.mp4', 'video/mp4')
+  end
+
   let(:config) do
     Confstruct::Configuration.new do
       multipart do
         meta do
+          required true
           schema(Dry::Validation.JSON do
             configure do
               option :query_id
@@ -57,6 +62,11 @@ describe RequestHandler::MultipartsParser do
         end
 
         file do
+          allowed true
+        end
+
+        video do
+          allowed false
         end
       end
     end
@@ -93,17 +103,6 @@ describe RequestHandler::MultipartsParser do
     end
   end
 
-  context 'configured param missing' do
-    let(:params) do
-      {
-        'user_id' => 'awesome_user_id',
-        'id' =>      'fer342ref',
-        'file' => other_file
-      }
-    end
-    it_behaves_like 'an invalid multipart request'
-  end
-
   context 'invalid json payload' do
     let(:meta_filename) { 'invalid_meta.json' }
     it_behaves_like 'an invalid multipart request'
@@ -122,5 +121,31 @@ describe RequestHandler::MultipartsParser do
       end
         .to raise_error(RequestHandler::MissingArgumentError)
     end
+  end
+
+  context 'required sidecar resource not sent' do
+    let(:params) do
+      {
+        'user_id' => 'awesome_user_id',
+        'id' =>      'fer342ref',
+        'meta' =>    meta_file,
+        'file' =>    other_file,
+        'video' =>   video_file
+      }
+    end
+
+    it { expect { handler.run }.to raise_error(RequestHandler::MultipartParamsError) }
+  end
+
+  context 'sidecar resource not allowed' do
+    let(:params) do
+      {
+        'user_id' => 'awesome_user_id',
+        'id' =>      'fer342ref',
+        'file' =>    other_file
+      }
+    end
+
+    it { expect { handler.run }.to raise_error(RequestHandler::MultipartParamsError) }
   end
 end
