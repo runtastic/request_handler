@@ -148,8 +148,9 @@ sort_options = SortOption.new(:posts__published_on, :asc)
 
 ### Multipart requests
 It is also possible to process and validate multipart requests, consisting of an arbitrary number of parts.
+You can require specific resources, all the other listed resources are optional
 
-The following request handler accepts a question (which will be uploaded as a json-file) and an additional 
+The following request handler requires a question (which will be uploaded as a json-file) and accepts an additional 
 file related to the question
 
 ```ruby
@@ -157,6 +158,7 @@ class CreateQuestionHandler < RequestHandler::Base
   options do
     multipart do
       question do
+        required true
         schema(
           Dry::Validation.JSON do
             required(:id).filled(:str?)

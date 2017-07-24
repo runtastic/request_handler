@@ -16,14 +16,10 @@ module RequestHandler
     end
 
     def run # rubocop:disable AbcSize
-      multipart_config.keys.each_with_object({}) do |name, memo|
-        if multipart_config[name][:required]
-          params.fetch(name.to_s) { raise MultipartParamsError, multipart: "#{name} missing" }
-        elsif multipart_config[name][:allowed] != true
-          raise MultipartParamsError, multipart: "#{name} not allowed" unless params[name.to_s].nil?
-        end
+      multipart_config.each_with_object({}) do |(name, config), memo|
+        raise MultipartParamsError, multipart: "#{name} missing" if config[:required] && !params.key?(name.to_s)
         next if params[name.to_s].nil?
-        memo[name] = parse_part(name)
+        memo[name] = parse_part(name.to_s) 
       end
     end
 

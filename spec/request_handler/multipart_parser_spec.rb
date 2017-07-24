@@ -62,11 +62,6 @@ describe RequestHandler::MultipartsParser do
         end
 
         file do
-          allowed true
-        end
-
-        video do
-          allowed false
         end
       end
     end
@@ -123,7 +118,7 @@ describe RequestHandler::MultipartsParser do
     end
   end
 
-  context 'required sidecar resource not sent' do
+  context 'sidecar resource not configured' do
     let(:params) do
       {
         'user_id' => 'awesome_user_id',
@@ -134,10 +129,13 @@ describe RequestHandler::MultipartsParser do
       }
     end
 
-    it { expect { handler.run }.to raise_error(RequestHandler::MultipartParamsError) }
+    it do
+      result = handler.run
+      expect(result[:video]).to eq(nil)
+    end
   end
 
-  context 'sidecar resource not allowed' do
+  context 'required sidecar resource not sent' do
     let(:params) do
       {
         'user_id' => 'awesome_user_id',

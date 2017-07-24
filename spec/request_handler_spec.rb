@@ -116,7 +116,6 @@ class IntegrationTestRequestHandlerWithMultiparts < RequestHandler::Base
   options do
     multipart do
       meta do
-        required true
         schema(Dry::Validation.JSON do
           configure do
             option :query_id
@@ -136,7 +135,6 @@ class IntegrationTestRequestHandlerWithMultiparts < RequestHandler::Base
       end
 
       file do
-        allowed true
       end
     end
   end
