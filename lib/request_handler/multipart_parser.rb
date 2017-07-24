@@ -42,8 +42,7 @@ module RequestHandler
       JsonApiDocumentParser.new(
         document:         load_json(name),
         schema:           lookup("#{name}.schema"),
-        schema_options:   execute_options(lookup("#{name}.options")),
-        included_schemas: lookup("#{name}.included")
+        schema_options:   execute_options(lookup("#{name}.options"))
       ).run
     end
 

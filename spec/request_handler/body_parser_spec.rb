@@ -7,18 +7,11 @@ describe RequestHandler::BodyParser do
   let(:handler) do
     described_class.new(
       schema:           schema,
-      request:          build_mock_request(params: {}, headers: {}, body: raw_body),
-      included_schemas: included_schemas
+      request:          build_mock_request(params: {}, headers: {}, body: raw_body)
     )
   end
   let(:schema) { Dry::Validation.JSON {} }
 
-  let(:included_schemas) do
-    {
-      people:   schema,
-      comments: schema
-    }
-  end
   let(:raw_body) do
     <<-JSON
       {
@@ -47,7 +40,7 @@ describe RequestHandler::BodyParser do
     parser_double = instance_double(RequestHandler::JsonApiDocumentParser)
     expect(RequestHandler::JsonApiDocumentParser)
       .to receive(:new)
-      .with(document: MultiJson.load(raw_body), schema: schema, schema_options: {}, included_schemas: included_schemas)
+      .with(document: MultiJson.load(raw_body), schema: schema, schema_options: {})
       .and_return(parser_double)
 
     result_double = instance_double(Hash)
