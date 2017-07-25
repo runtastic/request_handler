@@ -26,11 +26,11 @@ module RequestHandler
     private
 
     def parse_part(name)
-      params[name.to_s].fetch(:tempfile) { raise MultipartParamsError, multipart_file: 'missing' }
+      params[name].fetch(:tempfile) { raise MultipartParamsError, multipart_file: 'missing' }
       if lookup("#{name}.schema")
         parse_data(name)
       else
-        params[name.to_s]
+        params[name]
       end
     end
 
@@ -52,7 +52,7 @@ module RequestHandler
     end
 
     def multipart_file(name)
-      params[name.to_s][:tempfile]
+      params[name][:tempfile]
     end
 
     def lookup(key)
