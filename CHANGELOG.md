@@ -3,8 +3,10 @@ Changelog
 
 ## master
 
+## 0.13.0
+
 - sidecar resources for multipart requests can be labeled with required
-- remove support for sidepushing via `included` array in request body.
+- **remove** support for sidepushing via `included` array in request body.
 
 ## 0.12.0
 
