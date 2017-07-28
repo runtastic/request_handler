@@ -15,11 +15,11 @@ module RequestHandler
       raise MissingArgumentError, missing_arguments unless missing_arguments.empty?
     end
 
-    def run # rubocop:disable AbcSize
+    def run
       multipart_config.each_with_object({}) do |(name, config), memo|
         raise MultipartParamsError, multipart: "#{name} missing" if config[:required] && !params.key?(name.to_s)
         next if params[name.to_s].nil?
-        memo[name] = parse_part(name.to_s) 
+        memo[name] = parse_part(name.to_s)
       end
     end
 
