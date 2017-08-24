@@ -187,7 +187,7 @@ describe RequestHandler do
             end
             def to_dto
               OpenStruct.new(
-                query:  query_params
+                query: query_params
               )
             end
           end
@@ -207,7 +207,7 @@ describe RequestHandler do
         it 'works for valid data' do
           request = build_mock_request(params: valid_params, headers: {}, body: '')
           testhandler = testclass.new(request: request)
-          expect(testhandler.to_dto).to eq(OpenStruct.new(query: { name: 'foo'}))
+          expect(testhandler.to_dto).to eq(OpenStruct.new(query: { name: 'foo' }))
         end
       end
       context 'invalid schema' do

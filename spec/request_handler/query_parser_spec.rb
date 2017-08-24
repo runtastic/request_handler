@@ -12,7 +12,7 @@ describe RequestHandler::QueryParser do
 
   context 'one query param' do
     let(:params) do
-      { 'name' => 'foo' } 
+      { 'name' => 'foo' }
     end
     let(:schema) do
       Dry::Validation.Schema do
@@ -28,12 +28,12 @@ describe RequestHandler::QueryParser do
   context 'one query param and multiple reserved params' do
     let(:params) do
       {
-        'name'   => 'foo',
+        'name' => 'foo',
         'page' => {
           'number' => '1',
           'size' => '5'
         },
-        'sort'  => 'id,-date',
+        'sort' => 'id,-date',
         'fields' => {
           'posts' => 'awesome'
         },
@@ -70,7 +70,7 @@ describe RequestHandler::QueryParser do
     end
     context 'param given' do
       let(:params) do
-        { 'name' => 'foo' } 
+        { 'name' => 'foo' }
       end
       let(:output) do
         {

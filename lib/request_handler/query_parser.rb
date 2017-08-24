@@ -4,7 +4,7 @@ require 'request_handler/schema_parser'
 require 'request_handler/error'
 module RequestHandler
   class QueryParser < SchemaParser
-    RESERVED_KEYS = %w(fields filter include page sort)
+    RESERVED_KEYS = %w[fields filter include page sort].freeze
 
     def initialize(params:, schema:, schema_options: {})
       super(schema: schema, schema_options: schema_options)
