@@ -3,6 +3,8 @@ Changelog
 
 ## master
 
+- support generic query params
+
 ## 0.13.0
 
 - sidecar resources for multipart requests can be labeled with required

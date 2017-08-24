@@ -40,6 +40,12 @@ class IntegrationTestRequestHandler < RequestHandler::Base
       additional_url_filter %i[user_id]
     end
 
+    query do
+      schema(Dry::Validation.Form do
+               required(:name).filled(:str?)
+             end)
+    end
+
     include_options do
       allowed Dry::Types['strict.string'].enum('user', 'user__avatar', 'groups')
     end
@@ -59,6 +65,7 @@ class IntegrationTestRequestHandler < RequestHandler::Base
   def to_dto
     OpenStruct.new(
       filter:    filter_params,
+      query:     query_params,
       page:      page_params,
       include:   include_params,
       sort:      sort_params,
@@ -226,6 +233,7 @@ describe RequestHandler do
     it 'works' do
       params = {
         'user_id' => '234',
+        'name'    => 'bar',
         'filter'  => {
           'name'                               => 'foo',
           'posts.awesome'                      => 'true',
@@ -277,6 +285,7 @@ describe RequestHandler do
 
       expect(dto.headers).to eq(expected_headers)
       expect(dto.fieldsets).to eq(posts: %i[samples awesome])
+      expect(dto.query).to eq(name: 'bar')
     end
   end
 

@@ -8,6 +8,7 @@ require 'request_handler/header_parser'
 require 'request_handler/body_parser'
 require 'request_handler/multipart_parser'
 require 'request_handler/fieldsets_parser'
+require 'request_handler/query_parser'
 require 'request_handler/helper'
 require 'confstruct'
 module RequestHandler
@@ -65,6 +66,10 @@ module RequestHandler
       @fieldsets_params ||= parse_fieldsets_params
     end
 
+    def query_params
+      @query_params ||= parse_query_params
+    end
+
     # @abstract Subclass is expected to implement #to_dto
     # !method to_dto
     #   take the parsed values and return as application specific data transfer object
@@ -119,6 +124,14 @@ module RequestHandler
       FieldsetsParser.new(params:   params,
                           allowed:  lookup!('fieldsets.allowed'),
                           required: lookup('fieldsets.required') || []).run
+    end
+
+    def parse_query_params
+      QueryParser.new(
+        params:         params,
+        schema:         lookup!('query.schema'),
+        schema_options: execute_options(lookup('query.options'))
+      ).run
     end
 
     def fetch_defaults(key, default)
