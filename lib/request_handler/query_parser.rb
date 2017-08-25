@@ -8,7 +8,7 @@ module RequestHandler
 
     def initialize(params:, schema:, schema_options: {})
       super(schema: schema, schema_options: schema_options)
-      @query = params.clone
+      @query = params.dup
       RESERVED_KEYS.each { |key| query.delete(key) }
     end
 
