@@ -42,6 +42,9 @@ Please note that pagination only considers options that are configured on the
 server (at least an empty configuration block int the page block), other options
 sent by the client are ignored and will cause a warning.
 
+Generic query params can be added by using the `query` block. This may be useful
+if parameters should be validated which cannot be assigned to other predefined option blocks.
+
 ```ruby
 require "dry-validation"
 require "request_handler"
@@ -76,6 +79,14 @@ class DemoHandler < RequestHandler::Base
       additional_url_filter %i(user_id id)
       options(->(_handler, _request) { { foo: "bar" } })
       # options({foo: "bar"}) # also works for hash options instead of procs
+    end
+
+    query do
+      schema(
+        Dry::Validation.Form do
+          optional(:name).filled(:str?)
+        end
+      )
     end
 
     body do
