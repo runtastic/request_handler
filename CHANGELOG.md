@@ -3,6 +3,8 @@ Changelog
 
 ## master
 
+## 0.14.0
+
 - support generic query params
 
 ## 0.13.0
