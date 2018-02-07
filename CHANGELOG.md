@@ -3,6 +3,10 @@ Changelog
 
 ## master
 
+## 0.15.0
+
+- Bump version for `dry-types` to `0.12.2`
+
 ## 0.14.0
 
 - support generic query params
