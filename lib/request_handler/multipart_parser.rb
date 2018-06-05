@@ -47,7 +47,7 @@ module RequestHandler
     end
 
     def jsonapi?(name)
-      request.params[name][:type] == "application/vnd.api+json"
+      request.params[name][:type] == 'application/vnd.api+json'
     end
 
     def load_json(name)

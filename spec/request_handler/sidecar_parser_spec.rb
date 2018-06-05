@@ -21,7 +21,7 @@ describe RequestHandler::SidecarParser do
       .to raise_error(RequestHandler::MissingArgumentError)
   end
 
-  describe "schema" do
+  describe 'schema' do
     let(:schema) do
       Dry::Validation.JSON do
         required(:required, :bool).filled(:bool?)
@@ -37,25 +37,25 @@ describe RequestHandler::SidecarParser do
       ).run
     end
 
-    context "required is missing" do
+    context 'required is missing' do
       let(:json) do
-        { optional: 1, maybe: "maybe" }.to_json
+        { optional: 1, maybe: 'maybe' }.to_json
       end
-      it_behaves_like "invalid hash"
+      it_behaves_like 'invalid hash'
     end
 
-    context "attr has wrong type" do
+    context 'attr has wrong type' do
       let(:json) do
-        { required: "true", optional: 1, maybe: "maybe" }.to_json
+        { required: 'true', optional: 1, maybe: 'maybe' }.to_json
       end
-      it_behaves_like "invalid hash"
+      it_behaves_like 'invalid hash'
     end
 
-    context "attr is null" do
+    context 'attr is null' do
       let(:json) do
-        { required: "true", optional: nil, maybe: "maybe" }.to_json
+        { required: 'true', optional: nil, maybe: 'maybe' }.to_json
       end
-      it_behaves_like "invalid hash"
+      it_behaves_like 'invalid hash'
     end
   end
 end
