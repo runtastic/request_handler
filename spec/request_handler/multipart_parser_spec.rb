@@ -26,7 +26,7 @@ describe RequestHandler::MultipartsParser do
     }
   end
   let(:meta_file) do
-    Rack::Multipart::UploadedFile.new("spec/fixtures/#{meta_filename}", 'application/json')
+    Rack::Multipart::UploadedFile.new("spec/fixtures/#{meta_filename}", 'application/vnd.api+json')
   end
   let(:meta_filename) { 'meta.json' }
 

@@ -149,7 +149,7 @@ class IntegrationTestRequestHandlerWithMultiparts < RequestHandler::Base
   def to_dto
     OpenStruct.new(
       multipart: multipart_params,
-      headers:    headers
+      headers:   headers
     )
   end
 end
@@ -307,7 +307,7 @@ describe RequestHandler do
       }
     end
     let(:meta_file) do
-      Rack::Multipart::UploadedFile.new("spec/fixtures/#{meta_filename}", 'application/json')
+      Rack::Multipart::UploadedFile.new("spec/fixtures/#{meta_filename}", 'application/vnd.api+json')
     end
     let(:meta_filename) { 'meta.json' }
 
