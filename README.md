@@ -43,7 +43,14 @@ server (at least an empty configuration block int the page block), other options
 sent by the client are ignored and will cause a warning.
 
 Generic query params can be added by using the `query` block. This may be useful
-if parameters should be validated which cannot be assigned to other predefined option blocks.
+if parameters should be validated which cannot be assigned to other predefined
+option blocks.
+
+A `type` param can be passed in the `body` block, or the `resource` block in
+multipart requests (like `question` in the example below).
+At the moment there are only "jsonapi" and "json" available for `type`. This
+defines if the JsonApiDocumentParser or JsonParser is used.
+If nothing is defined, JsonApiDocumentParser will be used by default.
 
 ```ruby
 require "dry-validation"
@@ -90,6 +97,7 @@ class DemoHandler < RequestHandler::Base
     end
 
     body do
+      type "jsonapi"
       schema(
         Dry::Validation.JSON do
           configure do
@@ -170,6 +178,7 @@ class CreateQuestionHandler < RequestHandler::Base
     multipart do
       question do
         required true
+        type "json"
         schema(
           Dry::Validation.JSON do
             required(:id).filled(:str?)
@@ -253,11 +262,6 @@ get "/users/:user_id/posts" do
   # more code
 end
 ```
-
-The **content type** also has to be sent in the request, so the request_handler
-knows whether to use the JsonApiDocumentParser or the JsonParser for the body.
-If `application/vnd.api+json` is sent either in the `Content-Type` header or as
-the `type` in multipart requests, JsonApiDocumentParser is used.
 
 ## Development
 

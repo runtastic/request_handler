@@ -2,9 +2,7 @@
 
 require 'request_handler/error'
 require 'request_handler/schema_parser'
-require 'request_handler/error'
-require 'request_handler/json_api_document_parser'
-require 'request_handler/json_parser'
+require 'request_handler/document_parser'
 
 module RequestHandler
   class MultipartsParser
@@ -38,16 +36,13 @@ module RequestHandler
 
     def parse_data(name)
       data = load_json(name)
-      parser = jsonapi?(name) ? JsonApiDocumentParser : JsonParser
-      parser.new(
+      type = multipart_config.dig(name.to_sym, :type)
+      DocumentParser.new(
+        type:             type,
         document:         data,
         schema:           lookup("#{name}.schema"),
         schema_options:   execute_options(lookup("#{name}.options"))
       ).run
-    end
-
-    def jsonapi?(name)
-      request.params[name][:type] == 'application/vnd.api+json'
     end
 
     def load_json(name)

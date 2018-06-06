@@ -3,7 +3,7 @@
 require 'spec_helper'
 require 'request_handler/multipart_parser'
 describe RequestHandler::MultipartsParser do
-  shared_examples 'returns expected result' do
+  shared_examples_for 'returns expected result' do
     it do
       result = handler.run
       expect(result[:meta]).to eq(id:         'fer342ref',
@@ -21,6 +21,16 @@ describe RequestHandler::MultipartsParser do
       expect(file[:name]).to eq('file')
       expect(file[:tempfile]).not_to be_nil
       expect(file[:head]).not_to be_nil
+    end
+  end
+
+  shared_examples_for 'an invalid multipart request' do
+    it do
+      expect do
+        described_class.new(request: request,
+                            multipart_config: config.multipart).run
+      end
+        .to raise_error(RequestHandler::MultipartParamsError)
     end
   end
 
@@ -60,6 +70,7 @@ describe RequestHandler::MultipartsParser do
       multipart do
         meta do
           required true
+          type 'jsonapi'
           schema(Dry::Validation.JSON do
             configure do
               option :query_id
@@ -93,16 +104,6 @@ describe RequestHandler::MultipartsParser do
     end
 
     it_behaves_like 'returns expected result'
-
-    shared_examples_for 'an invalid multipart request' do
-      it do
-        expect do
-          described_class.new(request: request,
-                              multipart_config: config.multipart).run
-        end
-          .to raise_error(RequestHandler::MultipartParamsError)
-      end
-    end
 
     context 'invalid json payload' do
       let(:meta_filename) { 'invalid_meta.json' }
@@ -160,6 +161,41 @@ describe RequestHandler::MultipartsParser do
       Rack::Multipart::UploadedFile.new("spec/fixtures/#{meta_filename}", 'application/json')
     end
 
+    let(:config) do
+      Confstruct::Configuration.new do
+        multipart do
+          meta do
+            required true
+            type 'json'
+            schema(Dry::Validation.JSON do
+              configure do
+                option :query_id
+              end
+              required(:id).value(eql?: query_id)
+              required(:type).value(eql?: 'post')
+              required(:user_id).filled(:str?)
+              required(:name).filled(:str?)
+              optional(:publish_on).filled(:time?)
+
+              required(:category).schema do
+                required(:id).filled(:str?)
+                required(:type).value(eql?: 'category')
+              end
+            end)
+            options(->(_parser, request) { { query_id: request.params['id'] } })
+          end
+
+          file do
+          end
+        end
+      end
+    end
+
     it_behaves_like 'returns expected result'
+
+    context 'invalid json payload' do
+      let(:meta_filename) { 'invalid_meta.json' }
+      it_behaves_like 'an invalid multipart request'
+    end
   end
 end

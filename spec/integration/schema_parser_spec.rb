@@ -32,48 +32,72 @@ describe RequestHandler do
         JSON
       end
       context 'valid schema' do
-        let(:testclass) do
-          Class.new(RequestHandler::Base) do
-            options do
-              body do
-                schema(Dry::Validation.JSON do
-                  required(:name).filled(:str?)
-                end)
+        context 'jsonapi' do
+          let(:testclass) do
+            Class.new(RequestHandler::Base) do
+              options do
+                body do
+                  type 'jsonapi'
+                  schema(Dry::Validation.JSON do
+                    required(:name).filled(:str?)
+                  end)
+                end
+              end
+              def to_dto
+                OpenStruct.new(
+                  body: body_params
+                )
               end
             end
-            def to_dto
-              OpenStruct.new(
-                body: body_params
-              )
-            end
+          end
+          it 'raises a SchemaValidationError with invalid data' do
+            request = build_mock_request(params: {}, headers: {}, body: invalid_jsonapi_body)
+            testhandler = testclass.new(request: request)
+            expect { testhandler.to_dto }.to raise_error(RequestHandler::SchemaValidationError)
+          end
+
+          it 'raises a MissingArgumentError with missing data' do
+            request = instance_double('Rack::Request', params: {}, env: {}, body: nil)
+            testhandler = testclass.new(request: request)
+            expect { testhandler.to_dto }.to raise_error(RequestHandler::MissingArgumentError)
+          end
+
+          it 'works for valid jsonapi document' do
+            request = build_mock_request(params: {},
+                                         headers: {},
+                                         body: valid_jsonapi_body)
+            testhandler = testclass.new(request: request)
+            expect(testhandler.to_dto)
+              .to eq(OpenStruct.new(body: { name: 'About naming stuff and cache invalidation' }))
           end
         end
-        it 'raises a SchemaValidationError with invalid data' do
-          request = build_mock_request(params: {}, headers: {}, body: invalid_jsonapi_body)
-          testhandler = testclass.new(request: request)
-          expect { testhandler.to_dto }.to raise_error(RequestHandler::SchemaValidationError)
-        end
 
-        it 'raises a MissingArgumentError with missing data' do
-          request = instance_double('Rack::Request', params: {}, env: {}, body: nil)
-          testhandler = testclass.new(request: request)
-          expect { testhandler.to_dto }.to raise_error(RequestHandler::MissingArgumentError)
-        end
-
-        it 'works for valid jsonapi document' do
-          request = build_mock_request(params: {},
-                                       headers: { 'Content-Type' => 'application/vnd.api+json' },
-                                       body: valid_jsonapi_body)
-          testhandler = testclass.new(request: request)
-          expect(testhandler.to_dto).to eq(OpenStruct.new(body: { name: 'About naming stuff and cache invalidation' }))
-        end
-
-        it 'works for valid json data' do
-          request = build_mock_request(params: {},
-                                       headers: { 'Content-Type' => 'application/json' },
-                                       body: valid_json_body)
-          testhandler = testclass.new(request: request)
-          expect(testhandler.to_dto).to eq(OpenStruct.new(body: { name: 'About naming stuff and cache invalidation' }))
+        context 'json' do
+          let(:testclass) do
+            Class.new(RequestHandler::Base) do
+              options do
+                body do
+                  type 'json'
+                  schema(Dry::Validation.JSON do
+                    required(:name).filled(:str?)
+                  end)
+                end
+              end
+              def to_dto
+                OpenStruct.new(
+                  body: body_params
+                )
+              end
+            end
+          end
+          it 'works for valid json data' do
+            request = build_mock_request(params: {},
+                                         headers: {},
+                                         body: valid_json_body)
+            testhandler = testclass.new(request: request)
+            expect(testhandler.to_dto)
+              .to eq(OpenStruct.new(body: { name: 'About naming stuff and cache invalidation' }))
+          end
         end
       end
       context 'invalid schema' do
@@ -81,6 +105,7 @@ describe RequestHandler do
           Class.new(RequestHandler::Base) do
             options do
               body do
+                type 'jsonapi'
                 schema 'Foo'
               end
             end

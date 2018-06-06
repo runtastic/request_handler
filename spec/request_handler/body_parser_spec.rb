@@ -9,7 +9,8 @@ describe RequestHandler::BodyParser do
   let(:handler) do
     described_class.new(
       schema:           schema,
-      request:          build_mock_request(params: {}, headers: headers, body: raw_body)
+      type:             type,
+      request:          build_mock_request(params: {}, body: raw_body, headers: {})
     )
   end
 
@@ -40,9 +41,8 @@ describe RequestHandler::BodyParser do
   end
 
   context 'jsonapi' do
-    let(:headers) { { 'Content-Type' => 'application/vnd.api+json' } }
-
-    it 'constructs and runs jsonApiDocumentParser correctly' do
+    let(:type) { 'jsonapi' }
+    it 'constructs and runs JsonApiDocumentParser correctly' do
       parser_double = instance_double(RequestHandler::JsonApiDocumentParser)
       expect(RequestHandler::JsonApiDocumentParser)
         .to receive(:new)
@@ -58,7 +58,8 @@ describe RequestHandler::BodyParser do
       schema = Dry::Validation.JSON {}
       expect do
         described_class.new(schema:  schema,
-                            request: instance_double('Rack::Request', params: {}, env: headers, body: nil))
+                            type: type,
+                            request: instance_double('Rack::Request', params: {}, body: nil))
       end
         .to raise_error(RequestHandler::MissingArgumentError)
     end
@@ -68,9 +69,9 @@ describe RequestHandler::BodyParser do
       expect do
         described_class.new(
           schema:  schema,
+          type: type,
           request: instance_double('Rack::Request',
                                    params: {},
-                                   env: headers,
                                    body: StringIO.new('{"include": [{"type": "foo", "id": "bar"}]}'))
         ).run
       end
@@ -79,8 +80,7 @@ describe RequestHandler::BodyParser do
   end
 
   context 'json' do
-    let(:headers) { { 'Content-Type' => 'application/json' } }
-
+    let(:type) { 'json' }
     it 'constructs and runs JsonParser correctly' do
       parser_double = instance_double(RequestHandler::JsonParser)
       expect(RequestHandler::JsonParser)
@@ -97,7 +97,8 @@ describe RequestHandler::BodyParser do
       schema = Dry::Validation.JSON {}
       expect do
         described_class.new(schema:  schema,
-                            request: instance_double('Rack::Request', params: {}, env: headers, body: nil))
+                            type: type,
+                            request: instance_double('Rack::Request', params: {}, body: nil))
       end
         .to raise_error(RequestHandler::MissingArgumentError)
     end
@@ -107,9 +108,9 @@ describe RequestHandler::BodyParser do
       expect do
         described_class.new(
           schema:  schema,
+          type: type,
           request: instance_double('Rack::Request',
                                    params: {},
-                                   env: headers,
                                    body: StringIO.new('{"include": [{"type": "foo", "id": "bar"}]}'))
         ).run
       end

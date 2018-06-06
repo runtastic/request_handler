@@ -78,6 +78,7 @@ end
 class IntegrationTestRequestHandlerWithBody < RequestHandler::Base
   options do
     body do
+      type type
       schema(Dry::Validation.JSON do
                configure do
                  option :query_id
@@ -123,6 +124,7 @@ class IntegrationTestRequestHandlerWithMultiparts < RequestHandler::Base
   options do
     multipart do
       meta do
+        type type
         schema(Dry::Validation.JSON do
           configure do
             option :query_id
@@ -165,14 +167,16 @@ describe RequestHandler do
     end
   end
 
+  let(:type) { 'jsonapi' }
+
   let(:headers) do
     {
       'HTTP_APP_KEY'          => 'some.app.key',
       'HTTP_USER_ID'          => '345',
-      'HTTP_SOME_OTHER_STUFF' => "doesn't matter",
-      'Content-Type'          => 'application/vnd.api+json'
+      'HTTP_SOME_OTHER_STUFF' => "doesn't matter"
     }
   end
+
   let(:expected_headers) do
     {
       app_key:          'some.app.key',
