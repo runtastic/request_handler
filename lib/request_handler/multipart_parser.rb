@@ -4,7 +4,7 @@ require 'request_handler/error'
 require 'request_handler/schema_parser'
 require 'request_handler/error'
 require 'request_handler/json_api_document_parser'
-require 'request_handler/sidecar_parser'
+require 'request_handler/json_parser'
 
 module RequestHandler
   class MultipartsParser
@@ -38,7 +38,7 @@ module RequestHandler
 
     def parse_data(name)
       data = load_json(name)
-      parser = jsonapi?(name) ? JsonApiDocumentParser : SidecarParser
+      parser = jsonapi?(name) ? JsonApiDocumentParser : JsonParser
       parser.new(
         document:         data,
         schema:           lookup("#{name}.schema"),

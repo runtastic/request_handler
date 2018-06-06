@@ -3,6 +3,9 @@ Changelog
 
 ## master
 
+## unreleased
+- added JsonParser for non-jsonapi documents in body an multipart files
+
 ## 0.14.0
 
 - support generic query params
@@ -23,13 +26,13 @@ Changelog
 
 ## 0.11.0
 
-- Parse `included` array from request body
-- Body no longer accepts a default
+- parse `included` array from request body
+- body no longer accepts a default
 
 ## 0.10.0
 
 - raise an error if mandatory options are missing in the handler configuration
-- Transform param keys to string before substitution
+- transform param keys to string before substitution
 - make gem compatible with ruby 2.1
 - add danger
 - raise an ExternalArgumentError if the body does not contain data
@@ -82,4 +85,4 @@ version bump for publishing
 
 ## 0.1
 
-Initial Gem
+initial Gem

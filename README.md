@@ -161,7 +161,7 @@ sort_options = SortOption.new(:posts__published_on, :asc)
 It is also possible to process and validate multipart requests, consisting of an arbitrary number of parts.
 You can require specific resources, all the other listed resources are optional
 
-The following request handler requires a question (which will be uploaded as a json-file) and accepts an additional 
+The following request handler requires a question (which will be uploaded as a json-file) and accepts an additional
 file related to the question
 
 ```ruby
@@ -174,11 +174,11 @@ class CreateQuestionHandler < RequestHandler::Base
           Dry::Validation.JSON do
             required(:id).filled(:str?)
             required(:type).filled(:str?)
-            required(:content).filled(:str?) 
+            required(:content).filled(:str?)
           end
         )
       end
-      
+
       file do
         # no validation necessary
       end
@@ -203,19 +203,19 @@ Assuming that the request consists of a json file `question.json` containing
     }
   }
 }
-``` 
+```
 
 and an additional file `image.png`, the resulting `multipart_params` will be the following:
 
 ``` ruby
 {
-  question: 
+  question:
     {
       id:      '1',
       type:    'questions',
       content: 'How much is the fish?'
     },
-  file: 
+  file:
     {
       filename: 'image.png',
       type:     'application/octet-stream'
@@ -226,7 +226,7 @@ and an additional file `image.png`, the resulting `multipart_params` will be the
 }
 ```
 
-Please note that each part's content has to be uploaded as a separate file currently. 
+Please note that each part's content has to be uploaded as a separate file currently.
 
 ### Configuration
 
@@ -253,6 +253,11 @@ get "/users/:user_id/posts" do
   # more code
 end
 ```
+
+The **content type** also has to be sent in the request, so the request_handler
+knows whether to use the JsonApiDocumentParser or the JsonParser for the body.
+If `application/vnd.api+json` is sent either in the `Content-Type` header or as
+the `type` in multipart requests, JsonApiDocumentParser is used.
 
 ## Development
 

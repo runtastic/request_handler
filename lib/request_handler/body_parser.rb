@@ -13,7 +13,8 @@ module RequestHandler
     end
 
     def run
-      JsonApiDocumentParser.new(
+      parser = jsonapi? ? JsonApiDocumentParser : JsonParser
+      parser.new(
         document: request_body,
         schema: schema,
         schema_options: schema_options
@@ -21,6 +22,10 @@ module RequestHandler
     end
 
     private
+
+    def jsonapi?
+      request.env['Content-Type'] == 'application/vnd.api+json'
+    end
 
     def request_body
       b = request.body

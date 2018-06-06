@@ -4,7 +4,7 @@ require 'spec_helper'
 describe RequestHandler do
   context 'SchemaParser' do
     context 'BodyParser' do
-      let(:valid_body) do
+      let(:valid_jsonapi_body) do
         <<-JSON
         {
           "data": {
@@ -15,7 +15,7 @@ describe RequestHandler do
         }
         JSON
       end
-      let(:invalid_body) do
+      let(:invalid_jsonapi_body) do
         <<-JSON
         {
           "data": {
@@ -24,6 +24,11 @@ describe RequestHandler do
             }
           }
         }
+        JSON
+      end
+      let(:valid_json_body) do
+        <<-JSON
+        { "name": "About naming stuff and cache invalidation" }
         JSON
       end
       context 'valid schema' do
@@ -44,7 +49,7 @@ describe RequestHandler do
           end
         end
         it 'raises a SchemaValidationError with invalid data' do
-          request = build_mock_request(params: {}, headers: {}, body: invalid_body)
+          request = build_mock_request(params: {}, headers: {}, body: invalid_jsonapi_body)
           testhandler = testclass.new(request: request)
           expect { testhandler.to_dto }.to raise_error(RequestHandler::SchemaValidationError)
         end
@@ -55,8 +60,18 @@ describe RequestHandler do
           expect { testhandler.to_dto }.to raise_error(RequestHandler::MissingArgumentError)
         end
 
-        it 'works for valid data' do
-          request = build_mock_request(params: {}, headers: {}, body: valid_body)
+        it 'works for valid jsonapi document' do
+          request = build_mock_request(params: {},
+                                       headers: { 'Content-Type' => 'application/vnd.api+json' },
+                                       body: valid_jsonapi_body)
+          testhandler = testclass.new(request: request)
+          expect(testhandler.to_dto).to eq(OpenStruct.new(body: { name: 'About naming stuff and cache invalidation' }))
+        end
+
+        it 'works for valid json data' do
+          request = build_mock_request(params: {},
+                                       headers: { 'Content-Type' => 'application/json' },
+                                       body: valid_json_body)
           testhandler = testclass.new(request: request)
           expect(testhandler.to_dto).to eq(OpenStruct.new(body: { name: 'About naming stuff and cache invalidation' }))
         end
@@ -77,7 +92,7 @@ describe RequestHandler do
           end
         end
         it 'raises a InternalArgumentError valid data' do
-          request = build_mock_request(params: {}, headers: {}, body: valid_body)
+          request = build_mock_request(params: {}, headers: {}, body: invalid_jsonapi_body)
           testhandler = testclass.new(request: request)
           expect { testhandler.to_dto }.to raise_error(RequestHandler::InternalArgumentError)
         end

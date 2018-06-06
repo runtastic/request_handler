@@ -169,7 +169,8 @@ describe RequestHandler do
     {
       'HTTP_APP_KEY'          => 'some.app.key',
       'HTTP_USER_ID'          => '345',
-      'HTTP_SOME_OTHER_STUFF' => "doesn't matter"
+      'HTTP_SOME_OTHER_STUFF' => "doesn't matter",
+      'Content-Type'          => 'application/vnd.api+json'
     }
   end
   let(:expected_headers) do
@@ -309,7 +310,7 @@ describe RequestHandler do
     let(:meta_file) do
       Rack::Multipart::UploadedFile.new("spec/fixtures/#{meta_filename}", 'application/vnd.api+json')
     end
-    let(:meta_filename) { 'meta.json' }
+    let(:meta_filename) { 'meta_jsonapi.json' }
 
     let(:other_file) do
       Rack::Multipart::UploadedFile.new('spec/fixtures/rt.png', 'image/png')

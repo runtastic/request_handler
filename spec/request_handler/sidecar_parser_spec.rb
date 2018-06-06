@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'request_handler/sidecar_parser'
+require 'request_handler/json_parser'
 
-describe RequestHandler::SidecarParser do
+describe RequestHandler::JsonParser do
   shared_examples 'invalid hash' do
     it 'raises an error' do
       expect { subject }.to raise_error(RequestHandler::SchemaValidationError)
