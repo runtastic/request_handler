@@ -32,7 +32,7 @@ describe RequestHandler do
         JSON
       end
       context 'valid schema' do
-        context 'jsonapi' do
+        context 'type jsonapi' do
           let(:testclass) do
             Class.new(RequestHandler::Base) do
               options do
@@ -72,7 +72,35 @@ describe RequestHandler do
           end
         end
 
-        context 'json' do
+        context 'type not configured' do
+          let(:testclass) do
+            Class.new(RequestHandler::Base) do
+              options do
+                body do
+                  schema(Dry::Validation.JSON do
+                    required(:name).filled(:str?)
+                  end)
+                end
+              end
+              def to_dto
+                OpenStruct.new(
+                  body: body_params
+                )
+              end
+            end
+          end
+
+          it 'defaults to jsonapi' do
+            request = build_mock_request(params: {},
+                                         headers: {},
+                                         body: valid_jsonapi_body)
+            testhandler = testclass.new(request: request)
+            expect(testhandler.to_dto)
+              .to eq(OpenStruct.new(body: { name: 'About naming stuff and cache invalidation' }))
+          end
+        end
+
+        context 'type json' do
           let(:testclass) do
             Class.new(RequestHandler::Base) do
               options do
@@ -117,7 +145,7 @@ describe RequestHandler do
           end
         end
         it 'raises a InternalArgumentError valid data' do
-          request = build_mock_request(params: {}, headers: {}, body: invalid_jsonapi_body)
+          request = build_mock_request(params: {}, headers: {}, body: valid_jsonapi_body)
           testhandler = testclass.new(request: request)
           expect { testhandler.to_dto }.to raise_error(RequestHandler::InternalArgumentError)
         end

@@ -47,7 +47,7 @@ if parameters should be validated which cannot be assigned to other predefined
 option blocks.
 
 A `type` param can be passed in the `body` block, or the `resource` block in
-multipart requests (like `question` in the example below).
+[multipart requests](#multipart-requests) (like `question` in the example below).
 At the moment there are only "jsonapi" and "json" available for `type`. This
 defines if the JsonApiDocumentParser or JsonParser is used.
 If nothing is defined, JsonApiDocumentParser will be used by default.
@@ -204,13 +204,9 @@ end
 Assuming that the request consists of a json file `question.json` containing  
 ``` json
 {
-  "data": {
-    "id": "1",
-    "type": "questions",
-    "attributes": {
-      "content": "How much is the fish?"
-    }
-  }
+  "id": "1",
+  "type": "questions",
+  "content": "How much is the fish?"
 }
 ```
 

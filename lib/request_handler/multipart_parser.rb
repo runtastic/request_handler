@@ -36,7 +36,7 @@ module RequestHandler
 
     def parse_data(name)
       data = load_json(name)
-      type = multipart_config.dig(name.to_sym, :type)
+      type = multipart_config[name.to_sym].nil? ? nil : multipart_config[name.to_sym][:type]
       DocumentParser.new(
         type:             type,
         document:         data,
