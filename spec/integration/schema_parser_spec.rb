@@ -37,7 +37,7 @@ describe RequestHandler do
             Class.new(RequestHandler::Base) do
               options do
                 body do
-                  type 'jsonapi'
+                  type :jsonapi
                   schema(Dry::Validation.JSON do
                     required(:name).filled(:str?)
                   end)
@@ -105,7 +105,7 @@ describe RequestHandler do
             Class.new(RequestHandler::Base) do
               options do
                 body do
-                  type 'json'
+                  type :json
                   schema(Dry::Validation.JSON do
                     required(:name).filled(:str?)
                   end)
@@ -133,7 +133,7 @@ describe RequestHandler do
           Class.new(RequestHandler::Base) do
             options do
               body do
-                type 'jsonapi'
+                type :jsonapi
                 schema 'Foo'
               end
             end

@@ -5,7 +5,7 @@ require 'request_handler/error'
 module RequestHandler
   class JsonParser < SchemaParser
     def initialize(document:, schema:, schema_options: {})
-      raise MissingArgumentError, "data": 'is missing' if document.nil?
+      raise MissingArgumentError, "json": 'no content sent in document' if document.nil?
       super(schema: schema, schema_options: schema_options)
       @document = document
     end

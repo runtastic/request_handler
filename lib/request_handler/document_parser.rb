@@ -9,6 +9,7 @@ module RequestHandler
 
     def new(**args)
       type = args.delete(:type)
+      type = type.to_sym unless type.nil?
       PARSER_MAPPING
         .fetch(type) { raise InternalArgumentError.new(detail: "parser for type '#{type}' not found") }
         .new(args)
@@ -16,8 +17,8 @@ module RequestHandler
 
     PARSER_MAPPING = {
       nil       => JsonApiDocumentParser, # no config defaults to jsonapi
-      'jsonapi' => JsonApiDocumentParser,
-      'json'    => JsonParser
+      :jsonapi  => JsonApiDocumentParser,
+      :json     => JsonParser
     }.freeze
   end
 end

@@ -48,6 +48,7 @@ option blocks.
 
 A `type` param can be passed in the `body` block, or the `resource` block in
 [multipart requests](#multipart-requests) (like `question` in the example below).
+You can pass either a symbol or a string.
 At the moment there are only "jsonapi" and "json" available for `type`. This
 defines if the JsonApiDocumentParser or JsonParser is used.
 If nothing is defined, JsonApiDocumentParser will be used by default.
@@ -97,7 +98,7 @@ class DemoHandler < RequestHandler::Base
     end
 
     body do
-      type "jsonapi"
+      type :jsonapi
       schema(
         Dry::Validation.JSON do
           configure do
