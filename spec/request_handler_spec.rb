@@ -78,6 +78,7 @@ end
 class IntegrationTestRequestHandlerWithBody < RequestHandler::Base
   options do
     body do
+      type type
       schema(Dry::Validation.JSON do
                configure do
                  option :query_id
@@ -123,6 +124,7 @@ class IntegrationTestRequestHandlerWithMultiparts < RequestHandler::Base
   options do
     multipart do
       meta do
+        type type
         schema(Dry::Validation.JSON do
           configure do
             option :query_id
@@ -149,7 +151,7 @@ class IntegrationTestRequestHandlerWithMultiparts < RequestHandler::Base
   def to_dto
     OpenStruct.new(
       multipart: multipart_params,
-      headers:    headers
+      headers:   headers
     )
   end
 end
@@ -165,6 +167,8 @@ describe RequestHandler do
     end
   end
 
+  let(:type) { 'jsonapi' }
+
   let(:headers) do
     {
       'HTTP_APP_KEY'          => 'some.app.key',
@@ -172,6 +176,7 @@ describe RequestHandler do
       'HTTP_SOME_OTHER_STUFF' => "doesn't matter"
     }
   end
+
   let(:expected_headers) do
     {
       app_key:          'some.app.key',
@@ -307,9 +312,9 @@ describe RequestHandler do
       }
     end
     let(:meta_file) do
-      Rack::Multipart::UploadedFile.new("spec/fixtures/#{meta_filename}", 'application/json')
+      Rack::Multipart::UploadedFile.new("spec/fixtures/#{meta_filename}", 'application/vnd.api+json')
     end
-    let(:meta_filename) { 'meta.json' }
+    let(:meta_filename) { 'meta_jsonapi.json' }
 
     let(:other_file) do
       Rack::Multipart::UploadedFile.new('spec/fixtures/rt.png', 'image/png')

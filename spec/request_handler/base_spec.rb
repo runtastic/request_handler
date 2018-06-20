@@ -293,6 +293,7 @@ describe RequestHandler::Base do
         options do
           body do
             schema 'schema'
+            type 'jsonapi'
             options(opts)
           end
         end
@@ -302,7 +303,8 @@ describe RequestHandler::Base do
       {
         request:          request,
         schema:           'schema',
-        schema_options:   tested_options[:output]
+        schema_options:   tested_options[:output],
+        type:             'jsonapi'
       }
     end
     let(:tested_method) { :body_params }

@@ -43,7 +43,15 @@ server (at least an empty configuration block int the page block), other options
 sent by the client are ignored and will cause a warning.
 
 Generic query params can be added by using the `query` block. This may be useful
-if parameters should be validated which cannot be assigned to other predefined option blocks.
+if parameters should be validated which cannot be assigned to other predefined
+option blocks.
+
+A `type` param can be passed in the `body` block, or the `resource` block in
+[multipart requests](#multipart-requests) (like `question` in the example below).
+You can pass either a symbol or a string.
+At the moment there are only "jsonapi" and "json" available for `type`. This
+defines if the JsonApiDocumentParser or JsonParser is used.
+If nothing is defined, JsonApiDocumentParser will be used by default.
 
 ```ruby
 require "dry-validation"
@@ -90,6 +98,7 @@ class DemoHandler < RequestHandler::Base
     end
 
     body do
+      type :jsonapi
       schema(
         Dry::Validation.JSON do
           configure do
@@ -161,7 +170,7 @@ sort_options = SortOption.new(:posts__published_on, :asc)
 It is also possible to process and validate multipart requests, consisting of an arbitrary number of parts.
 You can require specific resources, all the other listed resources are optional
 
-The following request handler requires a question (which will be uploaded as a json-file) and accepts an additional 
+The following request handler requires a question (which will be uploaded as a json-file) and accepts an additional
 file related to the question
 
 ```ruby
@@ -170,15 +179,16 @@ class CreateQuestionHandler < RequestHandler::Base
     multipart do
       question do
         required true
+        type "json"
         schema(
           Dry::Validation.JSON do
             required(:id).filled(:str?)
             required(:type).filled(:str?)
-            required(:content).filled(:str?) 
+            required(:content).filled(:str?)
           end
         )
       end
-      
+
       file do
         # no validation necessary
       end
@@ -195,27 +205,23 @@ end
 Assuming that the request consists of a json file `question.json` containing  
 ``` json
 {
-  "data": {
-    "id": "1",
-    "type": "questions",
-    "attributes": {
-      "content": "How much is the fish?"
-    }
-  }
+  "id": "1",
+  "type": "questions",
+  "content": "How much is the fish?"
 }
-``` 
+```
 
 and an additional file `image.png`, the resulting `multipart_params` will be the following:
 
 ``` ruby
 {
-  question: 
+  question:
     {
       id:      '1',
       type:    'questions',
       content: 'How much is the fish?'
     },
-  file: 
+  file:
     {
       filename: 'image.png',
       type:     'application/octet-stream'
@@ -226,7 +232,7 @@ and an additional file `image.png`, the resulting `multipart_params` will be the
 }
 ```
 
-Please note that each part's content has to be uploaded as a separate file currently. 
+Please note that each part's content has to be uploaded as a separate file currently.
 
 ### Configuration
 
