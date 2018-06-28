@@ -33,7 +33,6 @@ module RequestHandler
     def flatten_relationship_resource_linkages(relationships)
       relationships.each_with_object({}) do |(k, v), memo|
         resource_linkage = v['data']
-        next if resource_linkage.nil?
         memo[k] = resource_linkage
       end
     end
