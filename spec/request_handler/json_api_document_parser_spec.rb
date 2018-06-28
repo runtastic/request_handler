@@ -216,6 +216,32 @@ describe RequestHandler::JsonApiDocumentParser do
     it_behaves_like 'flattens the body as expected'
   end
 
+  context 'when relationship data is empty' do
+    let(:raw_body) do
+      <<-JSON
+      {
+        "data": {
+          "type": "post",
+          "id": "fer342ref",
+          "relationships":{
+            "category": {
+              "data": null
+            }
+          }
+        }
+      }
+      JSON
+    end
+    let(:wanted_result) do
+      {
+        'id'       => 'fer342ref',
+        'type'     => 'post',
+        'category' => nil
+      }
+    end
+    it_behaves_like 'flattens the body as expected'
+  end
+
   context 'without attributes' do
     let(:raw_body) do
       <<-JSON
