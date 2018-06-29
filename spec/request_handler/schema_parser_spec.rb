@@ -108,4 +108,12 @@ describe RequestHandler::SchemaParser do
     let(:error) { RequestHandler::SchemaValidationError }
     it_behaves_like 'handles invalid input data correctly'
   end
+
+  context 'data keys get symbolized when schema rules are symbols' do
+    let(:data) { { 'test1' => 't1', 'test2' => 't2',  'filter_type_in' => 'some' } }
+    it_behaves_like 'handles valid input data correctly' do
+      let(:data) { { test1: 't1', test2: '5', filter_type_in: 'some' } }
+      let(:output) { { test1: 't1', test2: 5, filter_type_in: ['some'] } }
+    end
+  end
 end
