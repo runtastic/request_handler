@@ -19,7 +19,7 @@ describe RequestHandler::SchemaParser do
       expect { handler.run }.to raise_error(error)
     end
     it 'raises an error with invalid input and with schema options' do
-      handler = testclass.new(schema: schema_without_options, schema_options: { testoption: 5 }, data: data)
+      handler = testclass.new(schema: schema_with_options, schema_options: { testoption: 5 }, data: data)
       expect { handler.run }.to raise_error(error)
     end
   end
