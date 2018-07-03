@@ -19,7 +19,7 @@ describe RequestHandler::SchemaParser do
       expect { handler.run }.to raise_error(error)
     end
     it 'raises an error with invalid input and with schema options' do
-      handler = testclass.new(schema: schema_without_options, schema_options: { testoption: 5 }, data: data)
+      handler = testclass.new(schema: schema_with_options, schema_options: { testoption: 5 }, data: data)
       expect { handler.run }.to raise_error(error)
     end
   end
@@ -107,5 +107,29 @@ describe RequestHandler::SchemaParser do
     let(:data) { { test1: 't1', test2: '5', filter_type_in: 'invalid' } }
     let(:error) { RequestHandler::SchemaValidationError }
     it_behaves_like 'handles invalid input data correctly'
+  end
+
+  context 'data keys get deep_symbolized when schema rules are symbols' do
+    let(:schema_without_options) do
+      Dry::Validation.Form do
+        configure { config.type_specs = true }
+
+        required(:simple, :int).filled(:int?)
+        optional(:nested, %i[nil hash]).maybe do
+          schema do
+            required(:attr1).filled(:str?)
+            required(:attr2).filled(:str?)
+          end
+        end
+      end
+    end
+
+    let(:data)   { { 'simple' => 5, 'nested' => { 'attr1' => 'a1', 'attr2' => 'a2' } } }
+    let(:output) { { simple: 5, nested: { attr1: 'a1', attr2: 'a2' } } }
+
+    it 'transforms keys' do
+      handler = testclass.new(schema: schema_without_options, data: data)
+      expect(handler.run).to eq(output)
+    end
   end
 end

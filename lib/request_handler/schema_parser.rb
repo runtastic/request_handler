@@ -17,6 +17,7 @@ module RequestHandler
 
     def validate_schema(data, with: schema)
       raise MissingArgumentError, data: 'is missing' if data.nil?
+      data = deep_symbolize_keys(data) if with.rules.keys.first.is_a?(Symbol)
       validator = validate(data, schema: with)
       validation_failure?(validator)
       validator.output
@@ -45,6 +46,19 @@ module RequestHandler
                   v.each { |(val, key)| add_note(val, key, memo) }
                 end
       memo
+    end
+
+    def deep_symbolize_keys(hash)
+      mem = {}
+      hash.map do |key, value|
+        if value.is_a?(Hash)
+          value = deep_symbolize_keys(value)
+        elsif value.is_a?(Array)
+          value.map! { |v| v.is_a?(Hash) ? deep_symbolize_keys(v) : v }
+        end
+        mem[key.to_sym] = value
+      end
+      mem
     end
 
     attr_reader :schema, :schema_options
