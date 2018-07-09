@@ -8,10 +8,11 @@ This gem allows easy and dry handling of requests based on the dry-validation
 gem for validation and data coersion. It allows to handle headers, filters,
 include_options, sorting and of course to validate the body.
 
-## ToDo
+## dry-gem dependency
 
-- update documentation
-- identify missing features compared to [jsonapi](https://jsonapi.org)
+Version 1.1 removes the strict dependency to dry-types v0.11 & dry-validation v0.11 and allows usage of newer versions of dry-gems. This gem uses these gems but only a very small interface with them therefore this gem itself is usually not impacted by smaller breaking changes each minor version of the dry-gems might introduce.
+
+**Please check your applications compatibility with each dry-types version and pin versions as necessary**
 
 ## Installation
 

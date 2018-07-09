@@ -8,7 +8,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Changed
 - loosen dry-gems restrictions, now allow all version > 0.11
 
-
 ## [1.0.0] - 2018-07-03
 ### Added
 - possibility to send NULL values in relationships
