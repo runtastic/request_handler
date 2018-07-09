@@ -25,7 +25,7 @@ describe RequestHandler::JsonParser do
     let(:schema) do
       Dry::Validation.JSON do
         required(:required, :bool).filled(:bool?)
-        optional(:optional, :int).filled(:int?)
+        optional(:optional, :integer).filled(:int?)
         optional(:maybe, :string).maybe(:str?)
       end
     end

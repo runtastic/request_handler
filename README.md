@@ -77,7 +77,7 @@ class DemoHandler < RequestHandler::Base
 
     filter do
       schema(
-        Dry::Validation.Form do
+        Dry::Validation.Params do
           configure do
             option :foo
           end
@@ -91,7 +91,7 @@ class DemoHandler < RequestHandler::Base
 
     query do
       schema(
-        Dry::Validation.Form do
+        Dry::Validation.Params do
           optional(:name).filled(:str?)
         end
       )
