@@ -172,7 +172,7 @@ describe RequestHandler do
           Class.new(RequestHandler::Base) do
             options do
               filter do
-                schema(Dry::Validation.Form do
+                schema(Dry::Validation.Params do
                   required(:name).filled(:str?)
                 end)
                 defaults(foo: 'bar')
@@ -248,7 +248,7 @@ describe RequestHandler do
           Class.new(RequestHandler::Base) do
             options do
               query do
-                schema(Dry::Validation.Form do
+                schema(Dry::Validation.Params do
                   optional(:name).filled(:str?)
                 end)
               end

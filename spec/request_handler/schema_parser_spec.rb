@@ -34,23 +34,23 @@ describe RequestHandler::SchemaParser do
   end
 
   let(:schema_without_options) do
-    Dry::Validation.Form do
+    Dry::Validation.Params do
       configure do
         config.type_specs = true
       end
       required(:test1, :string).filled(:str?)
-      required(:test2, :int).value(gt?: 0)
+      required(:test2, :integer).value(gt?: 0)
       optional(:filter_type_in, Types::ArrayFromCSV).each(Types::SupportedFilterKeys)
     end
   end
   let(:schema_with_options) do
-    Dry::Validation.Form do
+    Dry::Validation.Params do
       configure do
         option :testoption
         config.type_specs = true
       end
       required(:test1, :string).filled(:str?)
-      required(:test2, :int).value(eql?: testoption)
+      required(:test2, :integer).value(eql?: testoption)
       optional(:filter_type_in, Types::ArrayFromCSV).each(Types::SupportedFilterKeys)
     end
   end
@@ -111,10 +111,10 @@ describe RequestHandler::SchemaParser do
 
   context 'data keys get deep_symbolized when schema rules are symbols' do
     let(:schema_without_options) do
-      Dry::Validation.Form do
+      Dry::Validation.Params do
         configure { config.type_specs = true }
 
-        required(:simple, :int).filled(:int?)
+        required(:simple, :integer).filled(:int?)
         optional(:nested, %i[nil hash]).maybe do
           schema do
             required(:attr1).filled(:str?)

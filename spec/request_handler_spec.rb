@@ -29,7 +29,7 @@ class IntegrationTestRequestHandler < RequestHandler::Base
     end
 
     filter do
-      schema(Dry::Validation.Form do
+      schema(Dry::Validation.Params do
                required(:user_id).filled(:int?)
                required(:name).filled(:str?)
                optional(:age__gt).filled(:int?)
@@ -41,7 +41,7 @@ class IntegrationTestRequestHandler < RequestHandler::Base
     end
 
     query do
-      schema(Dry::Validation.Form do
+      schema(Dry::Validation.Params do
                required(:name).filled(:str?)
              end)
     end
@@ -99,7 +99,7 @@ class IntegrationTestRequestHandlerWithBody < RequestHandler::Base
     end
 
     filter do
-      schema(Dry::Validation.Form do
+      schema(Dry::Validation.Params do
                configure do
                  option :body_user_id
                end
