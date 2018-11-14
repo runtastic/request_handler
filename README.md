@@ -8,12 +8,6 @@ This gem allows easy and dry handling of requests based on the dry-validation
 gem for validation and data coersion. It allows to handle headers, filters,
 include_options, sorting and of course to validate the body.
 
-## dry-gem dependency
-
-Version 1.1 removes the strict dependency to dry-types v0.11 & dry-validation v0.11 and allows usage of newer versions of dry-gems. This gem uses these gems but only a very small interface with them therefore this gem itself is usually not impacted by smaller breaking changes each minor version of the dry-gems might introduce.
-
-**Please check your applications compatibility with each dry-types version and pin versions as necessary**
-
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -29,6 +23,17 @@ And then execute:
 Or install it yourself as:
 
     $ gem install request_handler
+
+## Configuration
+
+The default logger and separator can be changed globally:
+
+```ruby
+RequestHandler.configure do
+  logger Logger.new(STDERR)
+  separator '____'
+end
+```
 
 ## Usage
 
@@ -235,18 +240,6 @@ and an additional file `image.png`, the resulting `multipart_params` will be the
 
 Please note that each part's content has to be uploaded as a separate file currently.
 
-### Configuration
-
-The default logger and separator can be changed globally by using
-`RequestHandler.configure {}`.
-
-```ruby
-RequestHandler.configure do
-  logger Logger.new(STDERR)
-  separator '____'
-end
-```
-
 ### Caveats
 
 It is currently expected that _url_ parameter are already parsed and included in
@@ -263,23 +256,23 @@ end
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run
-`rake test` to run the tests. You can also run `bin/console` for an interactive
-prompt that will allow you to experiment.
+After checking out the repo, run `bin/setup` to install dependencies. You can
+also run `bin/console` for an interactive prompt that will allow you to experiment.
+
+Run `bundle exec rspec` to run the tests.
 
 To install this gem onto your local machine, run `bundle exec rake install`. To
 release a new version, update the version number in `version.rb`, and then run
-`bundle exec rake release`, which will create a git tag for the version, push
-git commits and tags, and push the `.gem` file
-to [rubygems.org](https://rubygems.org).
+`bundle exec rake release`, which will create a git tag for the version, push git
+commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
 ## Contributing
-Bug reports and pull requests are welcome on GitHub at
-https://github.com/runtastic/request_handler. This project is intended to be a
-safe, welcoming space for collaboration, and contributors are expected to adhere
-to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/runtastic/request_handler.
+This project is intended to be a safe, welcoming space for collaboration, and
+contributors are expected to adhere to the [code of conduct][cc].
 
 ## License
+The gem is available as open source under [the terms of the MIT License][mit].
 
-The gem is available as open source under the terms of
-the [MIT License](http://opensource.org/licenses/MIT).
+[mit]: https://choosealicense.com/licenses/mit/
+[cc]: ../CODE_OF_CONDUCT.md
