@@ -32,8 +32,24 @@ The default logger and separator can be changed globally:
 RequestHandler.configure do
   logger Logger.new(STDERR)
   separator '____'
+  validation_engine RequestHandler::Validation::DryEngine
 end
 ```
+
+### Validation Engine
+Per default this gem uses the `DryEngine` which relies on dry-validation. All
+examples in this Readme assume you are using this default engine. However
+you can also use the builtin `DefinitionEngine`, which uses [Definition](https://github.com/Goltergaul/definition) as validation library:
+
+```ruby
+RequestHandler.configure do
+  require 'request_handler/validation/definition_engine'
+  validation_engine RequestHandler::Validation::DefinitionEngine
+end
+```
+
+You can also implement your own engine to use any other library, by implementing
+the abstract class `RequestHandler::Validation::Engine`
 
 ## Usage
 

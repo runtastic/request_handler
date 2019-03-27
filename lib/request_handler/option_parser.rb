@@ -6,13 +6,13 @@ module RequestHandler
     def initialize(params:, allowed_options_type:)
       @params = params
       @allowed_options_type = allowed_options_type
-      raise InternalArgumentError, allowed_options_type: 'must be a Enum' unless enum?
+      raise InternalArgumentError, allowed_options_type: 'must be a Schema' unless schema?
     end
 
     private
 
-    def enum?
-      @allowed_options_type.class.equal?(Dry::Types::Enum)
+    def schema?
+      RequestHandler.engine.valid_schema?(@allowed_options_type)
     end
 
     def empty_param?(param)

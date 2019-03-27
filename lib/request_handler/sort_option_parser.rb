@@ -36,8 +36,8 @@ module RequestHandler
     end
 
     def allowed_option(name)
-      allowed_options_type.call(name)
-    rescue Dry::Types::ConstraintError
+      RequestHandler.engine.validate!(name, allowed_options_type).output
+    rescue Validation::Error
       raise OptionNotAllowedError, name.to_sym => 'is not an allowed sort option'
     end
 

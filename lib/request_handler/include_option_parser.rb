@@ -15,8 +15,8 @@ module RequestHandler
       options.map do |option|
         option.gsub!('.', ::RequestHandler.separator)
         begin
-          allowed_options_type.call(option).to_sym
-        rescue Dry::Types::ConstraintError
+          RequestHandler.engine.validate!(option, allowed_options_type).output.to_sym
+        rescue Validation::Error
           raise OptionNotAllowedError, option.to_sym => 'is not an allowed include option'
         end
       end

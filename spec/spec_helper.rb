@@ -12,10 +12,15 @@ end
 
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'request_handler'
-require_relative 'support/helper'
 require 'pry'
 require 'ostruct'
 require 'rack'
+
+[
+  'spec/support/**/*.rb'
+].each do |pattern|
+  Dir[File.join(pattern)].sort.each { |file| require "./#{file}" }
+end
 
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|

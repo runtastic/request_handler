@@ -8,8 +8,8 @@ module RequestHandler
       @params = params
       allowed.reject! { |_k, v| v == false }
       allowed.each_value do |option|
-        raise InternalArgumentError, allowed: 'must be a Enum or a Boolean' unless
-              option.is_a?(Dry::Types::Enum) || option.is_a?(TrueClass)
+        raise InternalArgumentError, allowed: 'must be a Schema or a Boolean' unless
+          RequestHandler.engine.valid_schema?(option) || option.is_a?(TrueClass)
       end
       @allowed = allowed
       raise InternalArgumentError, required: 'must be an Array' unless required.is_a?(Array)
@@ -39,9 +39,9 @@ module RequestHandler
       if allowed[type] == true
         option.to_sym
       else
-        allowed[type].call(option).to_sym
+        RequestHandler.engine.validate!(option, allowed[type]).output.to_sym
       end
-    rescue Dry::Types::ConstraintError
+    rescue Validation::Error
       raise FieldsetsParamsError, fieldsets: "invalid field: <#{option}> for type: #{type}"
     end
 
