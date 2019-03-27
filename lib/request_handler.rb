@@ -2,6 +2,7 @@
 
 require 'request_handler/version'
 require 'request_handler/base'
+require 'request_handler/validation/dry_engine'
 require 'confstruct'
 require 'dry-validation'
 require 'multi_json'
@@ -17,11 +18,16 @@ module RequestHandler
       @configuration ||= ::Confstruct::Configuration.new do
         logger Logger.new(STDOUT)
         separator '__'
+        validation_engine Validation::DryEngine
       end
     end
 
     def separator
       configuration.separator
+    end
+
+    def engine
+      configuration.validation_engine
     end
   end
 end
