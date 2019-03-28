@@ -14,7 +14,7 @@ Gem::Specification.new do |spec|
   spec.description   = 'shared base for request_handler using dry-* gems'
   spec.homepage      = 'https://github.com/runtastic/request_handler'
   spec.license       = 'MIT'
-  spec.required_ruby_version = '~> 2.2'
+  spec.required_ruby_version = '~> 2.4'
 
   spec.files = `git ls-files -z`.split("\x0").reject do |f|
     f.match(%r{^(test|spec|features)/})
@@ -30,7 +30,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'multi_json', '~> 1.12'
   spec.add_dependency 'activesupport', '> 4.0'
 
-  spec.add_development_dependency 'bundler', '~> 1.13'
+  spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'rake', '~> 10.0'
   spec.add_development_dependency 'rspec', '~> 3.5'
   spec.add_development_dependency 'fuubar', '~> 2.2'
