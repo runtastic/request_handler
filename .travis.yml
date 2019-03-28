@@ -1,12 +1,10 @@
 language: ruby
 cache: bundler
 rvm:
-  - 2.2.10
-  - 2.3.7
   - 2.4.4
-  - 2.5.1
-  - jruby-9.1.17.0
+  - 2.5.3
   - jruby-9.2.0.0
+  - jruby-9.2.7.0
 jdk:
   - oraclejdk8
 env:
@@ -14,27 +12,22 @@ env:
   - "JRUBY_OPTS='-Xcompile.invokedynamic=true --debug'"
 matrix:
   exclude:
-    - rvm: 2.2.10
-      jdk: oraclejdk8
-      env: "JRUBY_OPTS='-Xcompile.invokedynamic=true --debug'"
-    - rvm: 2.3.7
-      jdk: oraclejdk8
-      env: "JRUBY_OPTS='-Xcompile.invokedynamic=true --debug'"
     - rvm: 2.4.4
       jdk: oraclejdk8
       env: "JRUBY_OPTS='-Xcompile.invokedynamic=true --debug'"
-    - rvm: 2.5.1
+    - rvm: 2.5.3
       jdk: oraclejdk8
       env: "JRUBY_OPTS='-Xcompile.invokedynamic=true --debug'"
   allow_failures:
-    - rvm: jruby-9.1.17.0
-      jdk: oraclejdk8
-      env: "JRUBY_OPTS='-Xcompile.invokedynamic=true --debug'"
     - rvm: jruby-9.2.0.0
       jdk: oraclejdk8
       env: "JRUBY_OPTS='-Xcompile.invokedynamic=true --debug'"
+    - rvm: jruby-9.2.7.0
+      jdk: oraclejdk8
+      env: "JRUBY_OPTS='-Xcompile.invokedynamic=true --debug'"
+    - rvm: 2.6.2
 before_install:
   - gem update --system
-  - gem install bundler -v 1.16.2
+  - gem install bundler -v 2.0.1
 before_script:
   - bundle exec danger
