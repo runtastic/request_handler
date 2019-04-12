@@ -7,8 +7,8 @@ require 'request_handler/version'
 Gem::Specification.new do |spec|
   spec.name          = 'request_handler'
   spec.version       = RequestHandler::VERSION
-  spec.authors       = ['Andreas Eger', 'Raphael Hetzel']
-  spec.email         = ['andreas.eger@runtastic.com', 'raphael.hetzel@runtastic.com']
+  spec.authors       = ['Andreas Eger', 'Dominik Goltermann']
+  spec.email         = ['andreas.eger@runtastic.com', 'dominik.goltermann@runtastic.com']
 
   spec.summary       = 'shared base for request_handler using dry-* gems'
   spec.description   = 'shared base for request_handler using dry-* gems'
