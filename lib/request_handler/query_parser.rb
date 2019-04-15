@@ -14,6 +14,14 @@ module RequestHandler
 
     def run
       validate_schema(query)
+    rescue SchemaValidationError => e
+      raise ExternalArgumentError, (e.errors.map do |schema_error|
+        param = schema_error[:source][:pointer]
+        { status: '400',
+          code: "#{query[param] ? 'INVALID' : 'MISSING'}_QUERY_PARAMETER",
+          detail: schema_error[:detail],
+          source: { param: param } }
+      end)
     end
 
     private

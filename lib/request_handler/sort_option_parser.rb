@@ -8,12 +8,12 @@ module RequestHandler
     def run
       return [] unless params.key?('sort')
       sort_options = parse_options(fetch_options)
-      raise SortParamsError, sort_options: 'must be unique' if duplicates?(sort_options)
+      raise SortParamsError, [jsonapi_error('sort options must be unique')] if duplicates?(sort_options)
       sort_options
     end
 
     def fetch_options
-      raise SortParamsError, sort_options: 'the query paramter must not be empty' if empty_param?('sort')
+      raise SortParamsError, [jsonapi_error('must not be empty')] if empty_param?('sort')
       params.fetch('sort') { '' }.split(',')
     end
 
@@ -27,7 +27,7 @@ module RequestHandler
     end
 
     def parse_option(option)
-      raise SortParamsError, sort_options: 'must not contain a space' if option.include? ' '
+      raise SortParamsError, [jsonapi_error('must not contain spaces')] if option.include? ' '
       if option.start_with?('-')
         [option[1..-1], :desc]
       else
@@ -38,11 +38,22 @@ module RequestHandler
     def allowed_option(name)
       RequestHandler.engine.validate!(name, allowed_options_type).output
     rescue Validation::Error
-      raise OptionNotAllowedError, name.to_sym => 'is not an allowed sort option'
+      raise OptionNotAllowedError, [jsonapi_error("#{name} is not an allowed sort option")]
     end
 
     def duplicates?(options)
       !options.uniq!(&:field).nil?
+    end
+
+    private
+
+    def jsonapi_error(detail)
+      {
+        code: 'INVALID_QUERY_PARAMETER',
+        status: '400',
+        source: { param: 'sort' },
+        detail: detail
+      }
     end
   end
 end

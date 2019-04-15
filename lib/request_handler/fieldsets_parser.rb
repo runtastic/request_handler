@@ -42,22 +42,45 @@ module RequestHandler
         RequestHandler.engine.validate!(option, allowed[type]).output.to_sym
       end
     rescue Validation::Error
-      raise FieldsetsParamsError, fieldsets: "invalid field: <#{option}> for type: #{type}"
+      raise FieldsetsParamsError, [{ code: 'INVALID_QUERY_PARAMETER',
+                                     status: '400',
+                                     detail: "allowed fieldset does not include '#{option}'",
+                                     source: { param: "fields[#{type}]" } }]
     end
 
     def check_required_fieldsets_types(fieldsets)
-      return fieldsets if (required - fieldsets.keys).empty?
-      raise FieldsetsParamsError, fieldsets: 'missing required fieldsets parameter'
+      missing = required - fieldsets.keys
+      return fieldsets if missing.empty?
+      raise_missing_fieldsets!(missing)
     end
 
     def raise_invalid_field_option(type)
       return if allowed.key?(type)
-      raise OptionNotAllowedError, fieldsets: "fieldsets for type: #{type} not allowed"
+      raise OptionNotAllowedError, [
+        {
+          code: 'INVALID_QUERY_PARAMETER',
+          status: '400',
+          detail: "fieldset for '#{type}' not allowed",
+          source: { param: "fields[#{type}]" }
+        }
+      ]
     end
 
     def raise_missing_fields_param
       return if required.empty?
-      raise FieldsetsParamsError, fieldsets: 'missing required fields options'
+      raise_missing_fieldsets!(required)
+    end
+
+    def raise_missing_fieldsets!(missing)
+      errors = missing.map do |type|
+        {
+          code: 'MISSING_QUERY_PARAMETER',
+          status: '400',
+          source: { param: '' },
+          detail: "missing required parameter fields[#{type}]"
+        }
+      end
+      raise FieldsetsParamsError, errors
     end
 
     attr_reader :params, :allowed, :required

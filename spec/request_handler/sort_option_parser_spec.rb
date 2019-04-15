@@ -13,9 +13,12 @@ describe RequestHandler::SortOptionParser do
       expect(handler.run).to eq(output)
     end
   end
+  let(:jsonapi_error) { anything }
   shared_examples 'processes invalid sort options correctly' do
     it 'raises an error with invalid sort options' do
-      expect { handler.run }.to raise_error(error)
+      expect { handler.run }.to raise_error(error) do |raised_error|
+        expect(raised_error.errors).to match_array([jsonapi_error])
+      end
     end
   end
 
@@ -48,10 +51,20 @@ describe RequestHandler::SortOptionParser do
     it_behaves_like 'processes valid sort options correctly'
   end
 
+  let(:jsonapi_error) do
+    {
+      code: 'INVALID_QUERY_PARAMETER',
+      status: '400',
+      detail: expected_detail,
+      source: { param: 'sort' }
+    }
+  end
+
   context 'no sort options are specified' do
     let(:params) { { 'sort' => '' } }
     let(:output) { [] }
     let(:error) { RequestHandler::SortParamsError }
+    let(:expected_detail) { 'must not be empty' }
     it_behaves_like 'processes invalid sort options correctly'
   end
 
@@ -64,24 +77,28 @@ describe RequestHandler::SortOptionParser do
   context 'sort key is not unique and the order is different in the duplicate' do
     let(:params) { { 'sort' => 'id,-id' } }
     let(:error) { RequestHandler::SortParamsError }
+    let(:expected_detail) { 'sort options must be unique' }
     it_behaves_like 'processes invalid sort options correctly'
   end
 
   context 'sort key is not unique and the order is identical in the duplicate' do
     let(:params) { { 'sort' => 'id,id' } }
     let(:error) { RequestHandler::SortParamsError }
+    let(:expected_detail) { 'sort options must be unique' }
     it_behaves_like 'processes invalid sort options correctly'
   end
 
   context 'one of the sort keys contains spaces' do
     let(:params) { { 'sort' => 'id, foo' } }
     let(:error) { RequestHandler::SortParamsError }
+    let(:expected_detail) { 'must not contain spaces' }
     it_behaves_like 'processes invalid sort options correctly'
   end
 
   context 'option is not allowed' do
     let(:params) { { 'sort' => 'user' } }
     let(:error) { RequestHandler::OptionNotAllowedError }
+    let(:expected_detail) { 'user is not an allowed sort option' }
     it_behaves_like 'processes invalid sort options correctly'
   end
 end

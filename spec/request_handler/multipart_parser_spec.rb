@@ -26,14 +26,19 @@ describe RequestHandler::MultipartsParser do
 
   shared_examples_for 'an invalid multipart request' do
     it do
-      expect do
-        described_class.new(request: request,
-                            multipart_config: config.multipart).run
+      expect { handler.run }.to raise_error(RequestHandler::MultipartParamsError) do |raised_error|
+        expect(raised_error.errors).to match_array([jsonapi_error])
       end
-        .to raise_error(RequestHandler::MultipartParamsError)
     end
   end
 
+  let(:jsonapi_error) do
+    {
+      status: '400',
+      code: 'INVALID_MULTIPART_REQUEST',
+      detail: expected_jsonapi_error_detail
+    }
+  end
   let(:handler) do
     described_class.new(
       request:          request,
@@ -107,11 +112,13 @@ describe RequestHandler::MultipartsParser do
 
     context 'invalid json payload' do
       let(:meta_filename) { 'invalid_meta.json' }
+      let(:expected_jsonapi_error_detail) { 'sidecar resource is not valid JSON' }
       it_behaves_like 'an invalid multipart request'
     end
 
     context 'empty json payload' do
       let(:meta_filename) { 'empty_meta.json' }
+      let(:expected_jsonapi_error_detail) { 'sidecar resource is not valid JSON' }
       it_behaves_like 'an invalid multipart request'
     end
 
@@ -144,14 +151,11 @@ describe RequestHandler::MultipartsParser do
 
     context 'required sidecar resource not sent' do
       let(:params) do
-        {
-          'user_id' => 'awesome_user_id',
-          'id' =>      'fer342ref',
-          'file' =>    other_file
-        }
+        super().reject { |key| key == 'meta' }
       end
 
-      it { expect { handler.run }.to raise_error(RequestHandler::MultipartParamsError) }
+      let(:expected_jsonapi_error_detail) { 'missing required sidecar resource: meta' }
+      it_behaves_like 'an invalid multipart request'
     end
   end
 
@@ -195,6 +199,7 @@ describe RequestHandler::MultipartsParser do
 
     context 'invalid json payload' do
       let(:meta_filename) { 'invalid_meta.json' }
+      let(:expected_jsonapi_error_detail) { 'sidecar resource is not valid JSON' }
       it_behaves_like 'an invalid multipart request'
     end
   end

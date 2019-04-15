@@ -4,6 +4,8 @@ require 'request_handler/schema_parser'
 require 'request_handler/error'
 module RequestHandler
   class JsonApiDocumentParser < SchemaParser
+    NON_ATTRIBUTE_MEMBERS = %i[id type meta links].freeze
+
     def initialize(document:, schema:, schema_options: {})
       raise MissingArgumentError, "data": 'is missing' if document.nil?
       super(schema: schema, schema_options: schema_options)
@@ -19,7 +21,11 @@ module RequestHandler
 
     def flattened_document
       resource = document.fetch('data') do
-        raise BodyParamsError, resource: 'must contain data'
+        raise BodyParamsError, [{ code: 'INVALID_JSON_API',
+                                  status: '400',
+                                  title: 'Body is not valid JSON API payload',
+                                  detail: "Member 'data' is missing",
+                                  source: { pointer: '/' } }]
       end
       flatten_resource!(resource)
     end
@@ -35,6 +41,14 @@ module RequestHandler
         resource_linkage = v['data']
         memo[k] = resource_linkage
       end
+    end
+
+    def build_pointer(error)
+      non_nested_identifier = error[:schema_pointer] == error[:element].to_s
+      non_attribute_member = NON_ATTRIBUTE_MEMBERS.include?(error[:element])
+      ['/data',
+       ('attributes' unless non_attribute_member && non_nested_identifier),
+       error[:schema_pointer]].compact.join('/')
     end
 
     attr_reader :document

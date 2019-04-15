@@ -6,9 +6,13 @@ describe RequestHandler::JsonApiDocumentParser do
   let(:handler) do
     described_class.new(
       schema:           schema,
-      document:             raw_body.empty? ? {} : MultiJson.load(raw_body)
+      document:         document
     )
   end
+  let(:document) do
+    raw_body.empty? ? {} : MultiJson.load(raw_body)
+  end
+
   shared_examples 'flattens the body as expected' do
     it 'returns the flattened body' do
       expect(handler).to receive(:validate_schema).with(wanted_result)
@@ -274,23 +278,29 @@ describe RequestHandler::JsonApiDocumentParser do
     it_behaves_like 'flattens the body as expected'
   end
 
-  it 'fails if data is nil' do
-    schema = Dry::Validation.JSON {}
-    expect do
-      described_class.new(schema:  schema,
-                          document:    nil)
+  context 'when body is empty' do
+    let(:document) { nil }
+
+    it 'raises a MissingArgumentError' do
+      expect { handler }.to raise_error(RequestHandler::MissingArgumentError)
     end
-      .to raise_error(RequestHandler::MissingArgumentError)
   end
 
-  it 'fails if the request body does not contain a data hash' do
-    schema = Dry::Validation.JSON {}
-    expect do
-      described_class.new(
-        schema:  schema,
-        document:   JSON.parse('{"include": [{"type": "foo", "id": "bar"}]}')
-      ).run
+  context 'when body does not contain data hash' do
+    let(:document) { JSON.parse('{"include": [{"type": "foo", "id": "bar"}]}') }
+
+    it 'raises an ExternalArgumentError' do
+      expect { handler.run }.to raise_error do |error|
+        expect(error).to be_a(RequestHandler::ExternalArgumentError)
+        expected_error = {
+          code: 'INVALID_JSON_API',
+          status: '400',
+          title: 'Body is not valid JSON API payload',
+          detail: "Member 'data' is missing",
+          source: { pointer: '/' }
+        }
+        expect(error.errors).to contain_exactly(expected_error)
+      end
     end
-      .to raise_error(RequestHandler::ExternalArgumentError)
   end
 end

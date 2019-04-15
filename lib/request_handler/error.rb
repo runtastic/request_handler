@@ -18,15 +18,22 @@ module RequestHandler
   end
   class ExternalBaseError < BaseError
   end
+  class JsonApiError < ExternalBaseError
+    def message
+      errors.map do |error|
+        "#{error[:code]}: #{error[:source]} #{error[:detail]}"
+      end.join(',\n')
+    end
+  end
   class MissingArgumentError < InternalBaseError
   end
-  class ExternalArgumentError < ExternalBaseError
+  class ExternalArgumentError < JsonApiError
   end
   class InternalArgumentError < InternalBaseError
   end
-  class SchemaValidationError < ExternalBaseError
+  class SchemaValidationError < JsonApiError
   end
-  class OptionNotAllowedError < ExternalBaseError
+  class OptionNotAllowedError < JsonApiError
   end
   class NoConfigAvailableError < InternalBaseError
   end

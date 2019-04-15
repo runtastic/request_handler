@@ -16,25 +16,24 @@ describe RequestHandler::FieldsetsParser do
     end
   end
 
+  let(:allowed) { opts.lookup!('fieldsets.allowed') }
+  let(:required) { opts.lookup!('fieldsets.required') }
+  subject(:run) { described_class.new(params: params, allowed: allowed, required: required).run }
+
   shared_examples 'returns fieldsets' do
-    let(:allowed) { opts.lookup!('fieldsets.allowed') }
-    let(:required) { opts.lookup!('fieldsets.required') }
     let(:expected) { {} }
     it 'returns the hash' do
-      expect(described_class.new(params: params, allowed: allowed, required: required).run)
-        .to eq(expected)
+      expect(run).to eq(expected)
     end
   end
 
   shared_examples 'fails' do
     let(:error) { RequestHandler::FieldsetsParamsError }
+    let(:jsonapi_error) { {} }
     it 'raises an error' do
-      expect do
-        described_class.new(params:   params,
-                            allowed:  opts.lookup!('fieldsets.allowed'),
-                            required: opts.lookup!('fieldsets.required')).run
+      expect { run }.to raise_error(error) do |raised_error|
+        expect(raised_error.errors).to contain_exactly(jsonapi_error)
       end
-        .to raise_error(error)
     end
   end
 
@@ -80,6 +79,14 @@ describe RequestHandler::FieldsetsParser do
 
     context 'invalid fieldset wich fails because of unrecognized field in posts' do
       it_behaves_like 'fails' do
+        let(:jsonapi_error) do
+          {
+            code: 'INVALID_QUERY_PARAMETER',
+            status: '400',
+            detail: "allowed fieldset does not include 'good'",
+            source: { param: 'fields[posts]' }
+          }
+        end
         let(:params) { { 'fields' => { 'posts' => 'awesome,good' } } }
       end
     end
@@ -95,6 +102,14 @@ describe RequestHandler::FieldsetsParser do
 
     context 'invalid fieldset wich fails because of unrecognized field in posts' do
       it_behaves_like 'fails' do
+        let(:jsonapi_error) do
+          {
+            code: 'INVALID_QUERY_PARAMETER',
+            status: '400',
+            detail: "allowed fieldset does not include 'post1'",
+            source: { param: 'fields[posts]' }
+          }
+        end
         let(:params) { { 'fields' => { 'posts' => 'post1,post2', 'videos' => 'nr1,nr2' } } }
       end
     end
@@ -105,6 +120,14 @@ describe RequestHandler::FieldsetsParser do
           { 'fields' => { 'videos' => 'video1,video2,video3',
                           'musicfiles' => 'nr1,nr2' } }
         end
+        let(:jsonapi_error) do
+          {
+            code: 'INVALID_QUERY_PARAMETER',
+            status: '400',
+            detail: "fieldset for 'musicfiles' not allowed",
+            source: { param: 'fields[musicfiles]' }
+          }
+        end
         let(:error) { RequestHandler::OptionNotAllowedError }
       end
     end
@@ -114,6 +137,14 @@ describe RequestHandler::FieldsetsParser do
           { 'fields' => { 'videos' => 'video1,video2,video3',
                           'games' => 'nr1,nr2' } }
         end
+        let(:jsonapi_error) do
+          {
+            code: 'INVALID_QUERY_PARAMETER',
+            status: '400',
+            detail: "fieldset for 'games' not allowed",
+            source: { param: 'fields[games]' }
+          }
+        end
         let(:error) { RequestHandler::OptionNotAllowedError }
       end
     end
@@ -122,6 +153,14 @@ describe RequestHandler::FieldsetsParser do
   context 'failing' do
     context 'required type is not set in the request' do
       it_behaves_like 'fails' do
+        let(:jsonapi_error) do
+          {
+            code: 'MISSING_QUERY_PARAMETER',
+            status: '400',
+            detail: 'missing required parameter fields[posts]',
+            source: { param: '' }
+          }
+        end
         let(:params) { { 'fields' => { 'photos' => 'bar' } } }
       end
     end
@@ -130,22 +169,54 @@ describe RequestHandler::FieldsetsParser do
         opts.required = %i[posts photos]
       end
       it_behaves_like 'fails' do
+        let(:jsonapi_error) do
+          {
+            code: 'MISSING_QUERY_PARAMETER',
+            status: '400',
+            detail: 'missing required parameter fields[posts]',
+            source: { param: '' }
+          }
+        end
         let(:params) { { 'fields' => { 'photos' => 'bar' } } }
       end
     end
     context 'params are empty but there is a required type' do
       it_behaves_like 'fails' do
+        let(:jsonapi_error) do
+          {
+            code: 'MISSING_QUERY_PARAMETER',
+            status: '400',
+            detail: 'missing required parameter fields[posts]',
+            source: { param: '' }
+          }
+        end
         let(:params) { {} }
       end
     end
     context 'invalid type' do
       it_behaves_like 'fails' do
         let(:params) { { 'fields' => { 'post' => 'samples' } } }
+        let(:jsonapi_error) do
+          {
+            code: 'INVALID_QUERY_PARAMETER',
+            status: '400',
+            detail: "fieldset for 'post' not allowed",
+            source: { param: 'fields[post]' }
+          }
+        end
         let(:error) { RequestHandler::OptionNotAllowedError }
       end
     end
     context 'invalid option for type' do
       it_behaves_like 'fails' do
+        let(:jsonapi_error) do
+          {
+            code: 'INVALID_QUERY_PARAMETER',
+            status: '400',
+            detail: "allowed fieldset does not include 'bars'",
+            source: { param: 'fields[posts]' }
+          }
+        end
         let(:params) { { 'fields' => { 'posts' => 'bars' } } }
       end
     end

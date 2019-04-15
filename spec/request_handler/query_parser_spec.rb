@@ -3,14 +3,15 @@
 require 'spec_helper'
 require 'request_handler/query_parser'
 describe RequestHandler::QueryParser do
+  subject(:run) { described_class.new(schema: schema, params: params).run }
+
   shared_examples 'proccesses query params correctly' do
     it 'outputs the query params in a flat way' do
-      handler = described_class.new(schema: schema, params: params)
-      expect(handler.run).to eq(output)
+      expect(run).to eq(output)
     end
   end
 
-  context 'one query param' do
+  context 'one required query param' do
     let(:params) do
       { 'name' => 'foo' }
     end
@@ -23,6 +24,20 @@ describe RequestHandler::QueryParser do
       { 'name' => 'foo' }
     end
     it_behaves_like 'proccesses query params correctly'
+
+    context 'when the param is missing' do
+      let(:params) { {} }
+      it do
+        expect { run }.to raise_error(RequestHandler::ExternalArgumentError) do |raised_error|
+          expect(raised_error.errors).to match_array([{
+                                                       status: '400',
+                                                       code: 'MISSING_QUERY_PARAMETER',
+                                                       detail: 'is missing',
+                                                       source: { param: 'name' }
+                                                     }])
+        end
+      end
+    end
   end
 
   context 'one query param and multiple reserved params' do

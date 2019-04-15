@@ -16,6 +16,14 @@ module RequestHandler
         raise NotImplementedError
       end
 
+      def self.error_message(_validation_error)
+        raise NotImplementedError
+      end
+
+      def self.error_pointer(_validation_error)
+        raise NotImplementedError
+      end
+
       private
 
       attr_accessor :value, :schema, :options
