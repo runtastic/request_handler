@@ -36,6 +36,15 @@ RequestHandler.configure do
 end
 ```
 
+JSON:API-style error data can be included in validation errors raised by `RequestHandler`.
+
+```ruby
+RequestHandler.configure do
+  raise_jsonapi_errors = true # default: false
+end
+```
+
+
 ### Validation Engine
 Per default this gem uses the `DryEngine` which relies on dry-validation. All
 examples in this Readme assume you are using this default engine. However
@@ -255,6 +264,44 @@ and an additional file `image.png`, the resulting `multipart_params` will be the
 ```
 
 Please note that each part's content has to be uploaded as a separate file currently.
+
+### JSON:API errors
+
+Errors caused by bad requests respond to `:errors`.
+
+When the gem is configured to `raise_jsonapi_errors`, this method returns a list of hashes
+containing `code`, `status`, `detail`, (`links`) and `source` for each specific issue
+that contributed to the error. Otherwise it returns an empty array.
+
+The exception message contains `<error code>: <source> <detail>` for every issue,
+with one issue per line.
+
+| `:code`                   | `:status` | What is it? |
+|:--------------------------|:----------|:------------|
+| INVALID_RESOURCE_SCHEMA   | 422       | Resource did not pass configured validation |
+| INVALID_QUERY_PARAMETER   | 400       | Query parameter violates syntax or did not pass configured validation |
+| MISSING_QUERY_PARAMETER   | 400       | Query parameter required in configuration is missing |
+| INVALID_JSON_API          | 400       | Request body violates JSON:API syntax |
+| INVALID_MULTIPART_REQUEST | 400       | Sidecar resource missing or invalid JSON |
+
+#### Example
+```ruby
+rescue RequestHandler::SchemaValidationError => e
+  puts e.errors
+end
+```
+
+```ruby
+[
+  {
+    status: '422',
+    code: 'INVALID_RESOURCE_SCHEMA',
+    title: 'Invalid resource',
+    detail: 'is missing',
+    source: { pointer: '/data/attributes/name' }
+  }
+]
+```
 
 ### Caveats
 
