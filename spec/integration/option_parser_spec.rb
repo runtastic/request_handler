@@ -3,6 +3,8 @@
 require 'spec_helper'
 describe RequestHandler do
   shared_examples 'it validates options' do
+    subject(:to_dto) { testclass.new(request: request).to_dto }
+    let(:request) { build_mock_request(params: params, headers: {}, body: '') }
     context 'Option Parser' do
       context 'IncludeOptionParser' do
         let(:enum_values) { %w[user groups] }
@@ -22,30 +24,25 @@ describe RequestHandler do
             end
           end
         end
-        it 'raises an OptionNotAllowedError if there is a include query that is not allowed' do
-          request = build_mock_request(params: { 'include' => 'foo,bar' }, headers: {}, body: '')
-          testhandler = testclass.new(request: request)
-          expect { testhandler.to_dto }.to raise_error(RequestHandler::OptionNotAllowedError)
+        context 'with a forbidden include query' do
+          let(:params) { { include: 'foo,bar' } }
+          it { expect { to_dto }.to raise_error(RequestHandler::OptionNotAllowedError) }
         end
-        it 'raises an ExternalArgumentError if the query parameter contains as space' do
-          request = build_mock_request(params: { 'include' => 'user, groups' }, headers: {}, body: '')
-          testhandler = testclass.new(request: request)
-          expect { testhandler.to_dto }.to raise_error(RequestHandler::IncludeParamsError)
+        context 'with a space in the query parameter' do
+          let(:params) { { include: 'user, groups' } }
+          it { expect { to_dto }.to raise_error(RequestHandler::IncludeParamsError) }
         end
-        it 'raises a InternalArgumentError if params is set to nil' do
-          request = build_mock_request(params: nil, headers: {}, body: '')
-          testhandler = testclass.new(request: request)
-          expect { testhandler.to_dto }.to raise_error(RequestHandler::MissingArgumentError)
+        context 'with no params' do
+          let(:params) { nil }
+          it { expect { to_dto }.to raise_error(RequestHandler::MissingArgumentError) }
         end
-        it 'raises a ExternalArgumentError if params is no Hash' do
-          request = build_mock_request(params: 'Foo', headers: {}, body: '')
-          testhandler = testclass.new(request: request)
-          expect { testhandler.to_dto }.to raise_error(RequestHandler::ExternalArgumentError)
+        context 'with params not being a hash' do
+          let(:params) { 'Foo' }
+          it { expect { to_dto }.to raise_error(RequestHandler::ExternalArgumentError) }
         end
-        it 'works for valid paramaters and settings' do
-          request = build_mock_request(params: { 'include' => 'user' }, headers: {}, body: '')
-          testhandler = testclass.new(request: request)
-          expect(testhandler.to_dto).to eq(OpenStruct.new(include: [:user]))
+        context 'with valid parameters and settings' do
+          let(:params) { { include: 'user' } }
+          it { expect(to_dto).to eq(OpenStruct.new(include: [:user])) }
         end
       end
       context 'SortOptionParser' do
@@ -65,31 +62,25 @@ describe RequestHandler do
             end
           end
         end
-        it 'raises an OptionNotAllowedError if there is a sort query that is not allowed' do
-          request = build_mock_request(params: { 'sort' => 'foo,bar' }, headers: {}, body: '')
-          testhandler = testclass.new(request: request)
-          expect { testhandler.to_dto }.to raise_error(RequestHandler::OptionNotAllowedError)
+        context 'with a forbidden sort query' do
+          let(:params)  { { sort: 'foo,bar' } }
+          it { expect { to_dto }.to raise_error(RequestHandler::OptionNotAllowedError) }
         end
-        it 'raises an ExternalArgumentError if the query parameter contains as space' do
-          request = build_mock_request(params: { 'sort' => 'name, age' }, headers: {}, body: '')
-          testhandler = testclass.new(request: request)
-          expect { testhandler.to_dto }.to raise_error(RequestHandler::SortParamsError)
+        context 'with a space in the query parameter' do
+          let(:params) { { sort: 'name, age' } }
+          it { expect { to_dto }.to raise_error(RequestHandler::SortParamsError) }
         end
-        it 'raises an MissingArgumentError if params is set to nil' do
-          request = build_mock_request(params: nil, headers: {}, body: '')
-          testhandler = testclass.new(request: request)
-          expect { testhandler.to_dto }.to raise_error(RequestHandler::MissingArgumentError)
+        context 'with no params' do
+          let(:params) { nil }
+          it { expect { to_dto }.to raise_error(RequestHandler::MissingArgumentError) }
         end
-        it 'raises an ExternalArgumentError if params is not a Hash' do
-          request = build_mock_request(params: 'Foo', headers: {}, body: '')
-          testhandler = testclass.new(request: request)
-          expect { testhandler.to_dto }.to raise_error(RequestHandler::ExternalArgumentError)
+        context 'with params not being a hash' do
+          let(:params) { 'Foo' }
+          it { expect { to_dto }.to raise_error(RequestHandler::ExternalArgumentError) }
         end
-        it 'works for valid paramaters and settings' do
-          request = build_mock_request(params: { 'sort' => '-name' }, headers: {}, body: '')
-          testhandler = testclass.new(request: request)
-          expect(testhandler.to_dto)
-            .to eq(OpenStruct.new(sort: [RequestHandler::SortOption.new('name', :desc)]))
+        context 'with valid parameters and settings' do
+          let(:params) { { sort: '-name' } }
+          it { expect(to_dto).to eq(OpenStruct.new(sort: [RequestHandler::SortOption.new('name', :desc)])) }
         end
       end
     end

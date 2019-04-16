@@ -69,6 +69,15 @@ describe RequestHandler do
                   expect(raised_error.errors).to match_array([jsonapi_error])
                 end
               end
+
+              context 'when rendering json api errors is disabled' do
+                before { RequestHandler.configuration.raise_jsonapi_errors = false }
+                it 'raises a SchemaValidationError with empty list of errors' do
+                  expect { to_dto }.to raise_error(RequestHandler::SchemaValidationError) do |raised_error|
+                    expect(raised_error.errors).to match_array([])
+                  end
+                end
+              end
             end
 
             context 'when body is missing' do
@@ -76,7 +85,7 @@ describe RequestHandler do
               it { expect { to_dto }.to raise_error(RequestHandler::MissingArgumentError) }
             end
 
-            context "with a valid jsonapi document" do
+            context 'with a valid jsonapi document' do
               let(:request) do
                 build_mock_request(params: {}, headers: {}, body: valid_jsonapi_body)
               end
@@ -130,11 +139,11 @@ describe RequestHandler do
                 end
               end
             end
-            context "with valid json data" do
+            context 'with valid json data' do
               let(:request) do
                 build_mock_request(params: {}, headers: {}, body: valid_json_body)
               end
-              
+
               it { is_expected.to eq(OpenStruct.new(body: { name: 'About naming stuff and cache invalidation' })) }
             end
           end
@@ -195,7 +204,7 @@ describe RequestHandler do
             end
           end
 
-          context "with invalid data" do
+          context 'with invalid data' do
             let(:request) do
               build_mock_request(params: invalid_params, headers: {}, body: '')
             end
@@ -211,10 +220,10 @@ describe RequestHandler do
               end
             end
 
-            context "when rendering json api errors is disabled" do
+            context 'when raising json api error data is disabled' do
               before { RequestHandler.configuration.raise_jsonapi_errors = false }
 
-              it "raises a FilterParamsError without details" do
+              it 'raises a FilterParamsError without details' do
                 expect { to_dto }.to raise_error(RequestHandler::FilterParamsError) do |raised_error|
                   expect(raised_error.errors).to match_array([])
                 end
@@ -222,12 +231,12 @@ describe RequestHandler do
             end
           end
 
-          context "when params are missing" do
+          context 'when params are missing' do
             let(:request) { build_mock_request(params: nil, headers: {}, body: '') }
             it { expect { to_dto }.to raise_error(RequestHandler::MissingArgumentError) }
           end
 
-          context "with valid params" do
+          context 'with valid params' do
             let(:request) { build_mock_request(params: valid_params, headers: {}, body: '') }
             it { expect(to_dto).to eq(OpenStruct.new(filter: { name: 'foo', foo: 'bar' })) }
           end
@@ -285,17 +294,17 @@ describe RequestHandler do
               end
             end
           end
-          context "with invalid data" do
+          context 'with invalid data' do
             let(:request) { build_mock_request(params: invalid_params, headers: {}, body: '') }
             it { expect { to_dto }.to raise_error(RequestHandler::ExternalArgumentError) }
           end
 
-          context "with missing data" do
+          context 'with missing data' do
             let(:request) { build_mock_request(params: nil, headers: {}, body: '') }
             it { expect { to_dto }.to raise_error(RequestHandler::MissingArgumentError) }
           end
 
-          context "with valid data" do
+          context 'with valid data' do
             let(:request) { build_mock_request(params: valid_params, headers: {}, body: '') }
             it { expect(to_dto).to eq(OpenStruct.new(query: { name: 'foo' })) }
           end
@@ -315,7 +324,7 @@ describe RequestHandler do
               end
             end
           end
-          context "with valid data" do
+          context 'with valid data' do
             let(:request) { build_mock_request(params: valid_params, headers: {}, body: '') }
             it { expect { to_dto }.to raise_error(RequestHandler::InternalArgumentError) }
           end

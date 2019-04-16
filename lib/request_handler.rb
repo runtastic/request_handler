@@ -19,6 +19,7 @@ module RequestHandler
         logger Logger.new(STDOUT)
         separator '__'
         validation_engine Validation::DryEngine
+        raise_jsonapi_errors false
       end
     end
 

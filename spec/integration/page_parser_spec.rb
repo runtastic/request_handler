@@ -4,6 +4,8 @@ require 'spec_helper'
 
 describe RequestHandler do
   shared_examples 'it validates page' do
+    subject(:to_dto) { testclass.new(request: request).to_dto }
+    let(:request) { build_mock_request(params: params, headers: {}, body: '') }
     context 'PageParser' do
       context 'invalid settings' do
         let(:testclass) do
@@ -21,10 +23,9 @@ describe RequestHandler do
             end
           end
         end
-        it 'raises an ExternalArgumentError for invalid page options' do
-          request = build_mock_request(params: {}, headers: {}, body: '')
-          testhandler = testclass.new(request: request)
-          expect { testhandler.to_dto }.to raise_error(RequestHandler::InternalArgumentError)
+        context 'without page params' do
+          let(:params) { {} }
+          it { expect { to_dto }.to raise_error(RequestHandler::InternalArgumentError) }
         end
       end
       context 'valid settings' do
@@ -43,22 +44,14 @@ describe RequestHandler do
             end
           end
         end
-        it 'raises an MissingArgumentError if params is nil' do
-          request = build_mock_request(params: nil, headers: {}, body: '')
-          testhandler = testclass.new(request: request)
-          expect { testhandler.to_dto }.to raise_error(RequestHandler::MissingArgumentError)
+        context 'with no params' do
+          let(:params) { nil }
+          it { expect { to_dto }.to raise_error(RequestHandler::MissingArgumentError) }
         end
-        it 'works for valid data and valid options' do
-          request = build_mock_request(params:  {
-                                         'page' => {
-                                           'size'   => '500',
-                                           'number' => '2'
-                                         }
-                                       },
-                                       headers: {},
-                                       body:    '')
-          testhandler = testclass.new(request: request)
-          expect(testhandler.to_dto).to eq(OpenStruct.new(page: { number: 2, size: 100 }))
+
+        context 'with valid data and valid options' do
+          let(:params) { { 'page' => { 'size' => '500', 'number' => '2' } } }
+          it { expect(to_dto).to eq(OpenStruct.new(page: { number: 2, size: 100 })) }
         end
       end
       context 'valid settings with missing parts' do
@@ -75,10 +68,9 @@ describe RequestHandler do
             end
           end
         end
-        it 'raises an NoConfigAvailableError if there is no way to determine the size' do
-          request = build_mock_request(params: {}, headers: {}, body: '')
-          testhandler = testclass.new(request: request)
-          expect { testhandler.to_dto }.to raise_error(RequestHandler::NoConfigAvailableError)
+        context 'with no page params given' do
+          let(:params) { {} }
+          it { expect { to_dto }.to raise_error(RequestHandler::NoConfigAvailableError) }
         end
       end
     end

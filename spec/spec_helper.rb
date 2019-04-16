@@ -46,4 +46,6 @@ RSpec.configure do |config|
   config.define_derived_metadata do |meta|
     meta[:aggregate_failures] = true unless meta.key?(:aggregate_failures)
   end
+
+  config.before(:example) { RequestHandler.configure { |rh_config| rh_config.raise_jsonapi_errors = true } }
 end

@@ -20,9 +20,13 @@ module RequestHandler
   end
   class JsonApiError < ExternalBaseError
     def message
-      errors.map do |error|
+      @errors.map do |error|
         "#{error[:code]}: #{error[:source]} #{error[:detail]}"
       end.join(',\n')
+    end
+
+    def errors
+      RequestHandler.configuration.raise_jsonapi_errors ? @errors : []
     end
   end
   class MissingArgumentError < InternalBaseError
