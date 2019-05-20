@@ -6,24 +6,24 @@ rvm:
   - jruby-9.2.0.0
   - jruby-9.2.7.0
 jdk:
-  - oraclejdk8
+  - oraclejdk9
 env:
   - "JRUBY_OPTS='--dev --debug'"
   - "JRUBY_OPTS='-Xcompile.invokedynamic=true --debug'"
 matrix:
   exclude:
     - rvm: 2.4.4
-      jdk: oraclejdk8
+      jdk: oraclejdk9
       env: "JRUBY_OPTS='-Xcompile.invokedynamic=true --debug'"
     - rvm: 2.5.3
-      jdk: oraclejdk8
+      jdk: oraclejdk9
       env: "JRUBY_OPTS='-Xcompile.invokedynamic=true --debug'"
   allow_failures:
     - rvm: jruby-9.2.0.0
-      jdk: oraclejdk8
+      jdk: oraclejdk9
       env: "JRUBY_OPTS='-Xcompile.invokedynamic=true --debug'"
     - rvm: jruby-9.2.7.0
-      jdk: oraclejdk8
+      jdk: oraclejdk9
       env: "JRUBY_OPTS='-Xcompile.invokedynamic=true --debug'"
     - rvm: 2.6.2
 before_install:
