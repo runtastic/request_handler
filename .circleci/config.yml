@@ -7,14 +7,14 @@ common_steps: &common_steps
   - checkout
   - run: gem update --system
   - restore_cache:
-      key: gem-cache-{{ .Branch }}-{{ checksum "Gemfile" }}
+      key: gem-cache-{{ .Branch }}-{{ checksum "request_handler.gemspec" }}
   - run:
       name: install dependencies
       command: |
         gem update bundler
         bundle install --jobs=4 --retry=3 --path vendor/bundle
   - save_cache:
-      key: gem-cache-{{ .Branch }}-{{ checksum "Gemfile" }}
+      key: gem-cache-{{ .Branch }}-{{ checksum "request_handler.gemspec" }}
       paths:
         - vendor/bundle
 
