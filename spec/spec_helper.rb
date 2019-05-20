@@ -2,7 +2,7 @@
 
 ENV['RACK_ENV'] = ENV['ENVIRONMENT'] ||= 'test'
 require 'simplecov'
-if ENV['TRAVIS']
+if ENV['CIRCLECI']
   require 'codecov'
   SimpleCov.formatter SimpleCov::Formatter::Codecov
 end

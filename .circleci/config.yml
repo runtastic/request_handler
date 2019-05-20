@@ -19,6 +19,7 @@ common_steps: &common_steps
         - vendor/bundle
 
   - run: ruby -v
+  - run: bundle exec danger
   - run: 
       name: run tests
       command: |
@@ -38,6 +39,7 @@ common_steps: &common_steps
   - store_artifacts:
       path: /tmp/test-results
       destination: test-results
+
 version: 2
 jobs:
   ruby-2.4:
