@@ -10,14 +10,12 @@ module RequestHandler
       @request = request
       @params = request.params
       @multipart_config = multipart_config
-      missing_arguments = []
-      missing_arguments << { multipart_config: 'is missing' } if multipart_config.nil?
-      raise MissingArgumentError, missing_arguments unless missing_arguments.empty?
+      raise MissingArgumentError, [{ multipart_config: 'is missing' }] if multipart_config.nil?
     end
 
     def run
       multipart_config.each_with_object({}) do |(name, config), memo|
-        raise MultipartParamsError, multipart: "#{name} missing" if config[:required] && !params.key?(name.to_s)
+        validate_presence!(name) if config[:required]
         next if params[name.to_s].nil?
         memo[name] = parse_part(name.to_s)
       end
@@ -25,8 +23,21 @@ module RequestHandler
 
     private
 
+    def validate_presence!(sidecar_name)
+      return if params.key?(sidecar_name.to_s)
+      raise multipart_params_error("missing required sidecar resource: #{sidecar_name}")
+    end
+
+    def multipart_params_error(detail = '')
+      MultipartParamsError.new([{
+                                 status: '400',
+                                 code: 'INVALID_MULTIPART_REQUEST',
+                                 detail: detail
+                               }])
+    end
+
     def parse_part(name)
-      params[name].fetch(:tempfile) { raise MultipartParamsError, multipart_file: 'missing' }
+      params[name].fetch(:tempfile) { raise MultipartParamsError, [{ multipart_file: 'missing' }] }
       if lookup("#{name}.schema")
         parse_data(name)
       else
@@ -51,7 +62,7 @@ module RequestHandler
       file = file.read
       MultiJson.load(file)
     rescue MultiJson::ParseError
-      raise MultipartParamsError, multipart_file: 'invalid JSON'
+      raise multipart_params_error('sidecar resource is not valid JSON')
     end
 
     def multipart_file(name)

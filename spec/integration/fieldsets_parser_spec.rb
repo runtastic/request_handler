@@ -4,6 +4,7 @@ require 'spec_helper'
 describe RequestHandler do
   shared_examples 'it validates fieldsets' do
     let(:enum_values) { %w[foo bar] }
+    subject(:to_dto) { testclass.new(request: request).to_dto }
     context 'with required fieldset' do
       let(:testclass) do
         schema = enum_schema
@@ -24,28 +25,47 @@ describe RequestHandler do
         end
       end
 
-      it 'works for a valid request' do
-        request = build_mock_request(params: { 'fields' => { 'posts' => 'foo,bar' } }, headers: nil, body: '')
-        testhandler = testclass.new(request: request)
-        expect(testhandler.to_dto).to eq(OpenStruct.new(fieldsets: { posts: %i[foo bar] }))
+      context 'with valid request' do
+        let(:request) { build_mock_request(params: { 'fields' => { 'posts' => 'foo,bar' } }, headers: nil, body: '') }
+        it { expect(to_dto).to eq(OpenStruct.new(fieldsets: { posts: %i[foo bar] })) }
       end
 
-      it 'raises an OptionNotAllowedError if the client sends a type not allowed on the server' do
-        request = build_mock_request(params: { 'fields' => { 'photos' => 'bar' } }, headers: nil, body: '')
-        testhandler = testclass.new(request: request)
-        expect { testhandler.to_dto }.to raise_error(RequestHandler::OptionNotAllowedError)
+      context 'with a request containing a not allowed option' do
+        let(:request) { build_mock_request(params: { 'fields' => { 'photos' => 'bar' } }, headers: nil, body: '') }
+        let(:expected_message) do
+          /INVALID_QUERY_PARAMETER:.*param.*fields\[photos\].*fieldset for 'photos' not allowed/
+        end
+        it do
+          expect { to_dto }.to raise_error(RequestHandler::OptionNotAllowedError) do |raised_error|
+            expect(raised_error.message).to match(expected_message)
+            jsonapi_error = { code: 'INVALID_QUERY_PARAMETER',
+                              status: '400',
+                              detail: "fieldset for 'photos' not allowed",
+                              source: { param: 'fields[photos]' } }
+            expect(raised_error.errors).to match_array([jsonapi_error])
+          end
+        end
+
+        context 'when raising json api error data is disabled' do
+          before { RequestHandler.configuration.raise_jsonapi_errors = false }
+          it do
+            expect { to_dto }.to raise_error(RequestHandler::OptionNotAllowedError) do |raised_error|
+              expect(raised_error.errors).to match_array([])
+              expect(raised_error.message).to match(expected_message)
+            end
+          end
+        end
       end
 
-      it 'raises an ExternalArgumentError if the client sends a value that is not allowed for a type' do
-        request = build_mock_request(params: { 'fields' => { 'posts' => 'no' } }, headers: nil, body: '')
-        testhandler = testclass.new(request: request)
-        expect { testhandler.to_dto }.to raise_error(RequestHandler::FieldsetsParamsError)
+      context 'with a value not allowed for a type' do
+        let(:request) { build_mock_request(params: { 'fields' => { 'posts' => 'no' } }, headers: nil, body: '') }
+        it { expect { to_dto }.to raise_error(RequestHandler::FieldsetsParamsError) }
       end
-      it 'raises an InternalArgumentError if the client sends a value that is not allowed for a type' do
-        testclass.config.fieldsets.allowed.posts = %w[foo bar]
-        request = build_mock_request(params: { 'fields' => { 'posts' => 'foo' } }, headers: nil, body: '')
-        testhandler = testclass.new(request: request)
-        expect { testhandler.to_dto }.to raise_error(RequestHandler::InternalArgumentError)
+
+      context 'with a value that is not allowed for a type' do
+        before { testclass.config.fieldsets.allowed.posts = %w[foo bar] }
+        let(:request) { build_mock_request(params: { 'fields' => { 'posts' => 'foo' } }, headers: nil, body: '') }
+        it { expect { to_dto }.to raise_error(RequestHandler::InternalArgumentError) }
       end
     end
 
@@ -61,35 +81,29 @@ describe RequestHandler do
           end
 
           def to_dto
-            OpenStruct.new(
-              fieldsets: fieldsets_params
-            )
+            OpenStruct.new(fieldsets: fieldsets_params)
           end
         end
       end
 
-      it 'works fields is an empty hash' do
-        request = build_mock_request(params: { 'fields' => {} }, headers: nil, body: '')
-        testhandler = testclass.new(request: request)
-        expect(testhandler.to_dto).to eq(OpenStruct.new(fieldsets: {}))
+      context 'with fields an empty hash' do
+        let(:request) { build_mock_request(params: { 'fields' => {} }, headers: nil, body: '') }
+        it { expect(to_dto).to eq(OpenStruct.new(fieldsets: {})) }
       end
 
-      it 'works when fields is filled with allowed params' do
-        request = build_mock_request(params: { 'fields' => { 'posts' => 'foo,bar' } }, headers: nil, body: '')
-        testhandler = testclass.new(request: request)
-        expect(testhandler.to_dto).to eq(OpenStruct.new(fieldsets: { posts: %i[foo bar] }))
+      context 'with fields filled with allowed params' do
+        let(:request) { build_mock_request(params: { 'fields' => { 'posts' => 'foo,bar' } }, headers: nil, body: '') }
+        it { expect(to_dto).to eq(OpenStruct.new(fieldsets: { posts: %i[foo bar] })) }
       end
 
-      it 'works when fields is not passed' do
-        request = build_mock_request(params: { 'filter' => {} }, headers: nil, body: '')
-        testhandler = testclass.new(request: request)
-        expect(testhandler.to_dto).to eq(OpenStruct.new(fieldsets: {}))
+      context 'without fields' do
+        let(:request) { build_mock_request(params: { 'filter' => {} }, headers: nil, body: '') }
+        it { expect(to_dto).to eq(OpenStruct.new(fieldsets: {})) }
       end
 
-      it 'raises an OptionNotAllowedError if the client sends a type not allowed on the server' do
-        request = build_mock_request(params: { 'fields' => { 'photos' => 'bar' } }, headers: nil, body: '')
-        testhandler = testclass.new(request: request)
-        expect { testhandler.to_dto }.to raise_error(RequestHandler::OptionNotAllowedError)
+      context 'with fields for a forbidden type' do
+        let(:request) { build_mock_request(params: { 'fields' => { 'photos' => 'bar' } }, headers: nil, body: '') }
+        it { expect { to_dto }.to raise_error(RequestHandler::OptionNotAllowedError) }
       end
     end
   end

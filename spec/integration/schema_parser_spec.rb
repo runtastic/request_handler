@@ -4,6 +4,7 @@ require 'spec_helper'
 describe RequestHandler do
   shared_examples 'it validates schemas' do
     context 'SchemaParser' do
+      subject(:to_dto) { testclass.new(request: request).to_dto }
       context 'BodyParser' do
         let(:valid_jsonapi_body) do
           <<-JSON
@@ -50,25 +51,48 @@ describe RequestHandler do
                 end
               end
             end
-            it 'raises a SchemaValidationError with invalid data' do
-              request = build_mock_request(params: {}, headers: {}, body: invalid_jsonapi_body)
-              testhandler = testclass.new(request: request)
-              expect { testhandler.to_dto }.to raise_error(RequestHandler::SchemaValidationError)
+
+            context 'when body does not conform to configured schema' do
+              let(:request) { build_mock_request(params: {}, headers: {}, body: invalid_jsonapi_body) }
+              let(:jsonapi_error) do
+                {
+                  status: '422',
+                  code: 'INVALID_RESOURCE_SCHEMA',
+                  title: 'Invalid resource',
+                  detail: anything,
+                  source: { pointer: '/data/attributes/name' }
+                }
+              end
+
+              it 'raises a SchemaValidationError with invalid data' do
+                expect { to_dto }.to raise_error(RequestHandler::SchemaValidationError) do |raised_error|
+                  expect(raised_error.errors).to match_array([jsonapi_error])
+                end
+              end
+
+              context 'when rendering json api errors is disabled' do
+                before { RequestHandler.configuration.raise_jsonapi_errors = false }
+                it 'raises a SchemaValidationError with empty list of errors' do
+                  expect { to_dto }.to raise_error(RequestHandler::SchemaValidationError) do |raised_error|
+                    expect(raised_error.errors).to match_array([])
+                  end
+                end
+              end
             end
 
-            it 'raises a MissingArgumentError with missing data' do
-              request = instance_double('Rack::Request', params: {}, env: {}, body: nil)
-              testhandler = testclass.new(request: request)
-              expect { testhandler.to_dto }.to raise_error(RequestHandler::MissingArgumentError)
+            context 'when body is missing' do
+              let(:request) { instance_double('Rack::Request', params: {}, env: {}, body: nil) }
+              it { expect { to_dto }.to raise_error(RequestHandler::MissingArgumentError) }
             end
 
-            it 'works for valid jsonapi document' do
-              request = build_mock_request(params: {},
-                                           headers: {},
-                                           body: valid_jsonapi_body)
-              testhandler = testclass.new(request: request)
-              expect(testhandler.to_dto)
-                .to eq(OpenStruct.new(body: { name: 'About naming stuff and cache invalidation' }))
+            context 'with a valid jsonapi document' do
+              let(:request) do
+                build_mock_request(params: {}, headers: {}, body: valid_jsonapi_body)
+              end
+
+              it do
+                expect(to_dto).to eq(OpenStruct.new(body: { name: 'About naming stuff and cache invalidation' }))
+              end
             end
           end
 
@@ -89,13 +113,12 @@ describe RequestHandler do
               end
             end
 
+            let(:request) do
+              build_mock_request(params: {}, headers: {}, body: valid_jsonapi_body)
+            end
+
             it 'defaults to jsonapi' do
-              request = build_mock_request(params: {},
-                                           headers: {},
-                                           body: valid_jsonapi_body)
-              testhandler = testclass.new(request: request)
-              expect(testhandler.to_dto)
-                .to eq(OpenStruct.new(body: { name: 'About naming stuff and cache invalidation' }))
+              expect(to_dto).to eq(OpenStruct.new(body: { name: 'About naming stuff and cache invalidation' }))
             end
           end
 
@@ -116,13 +139,12 @@ describe RequestHandler do
                 end
               end
             end
-            it 'works for valid json data' do
-              request = build_mock_request(params: {},
-                                           headers: {},
-                                           body: valid_json_body)
-              testhandler = testclass.new(request: request)
-              expect(testhandler.to_dto)
-                .to eq(OpenStruct.new(body: { name: 'About naming stuff and cache invalidation' }))
+            context 'with valid json data' do
+              let(:request) do
+                build_mock_request(params: {}, headers: {}, body: valid_json_body)
+              end
+
+              it { is_expected.to eq(OpenStruct.new(body: { name: 'About naming stuff and cache invalidation' })) }
             end
           end
         end
@@ -142,10 +164,9 @@ describe RequestHandler do
               end
             end
           end
-          it 'raises a InternalArgumentError valid data' do
-            request = build_mock_request(params: {}, headers: {}, body: valid_jsonapi_body)
-            testhandler = testclass.new(request: request)
-            expect { testhandler.to_dto }.to raise_error(RequestHandler::InternalArgumentError)
+          let(:request) { build_mock_request(params: {}, headers: {}, body: valid_jsonapi_body) }
+          it 'raises a InternalArgumentError' do
+            expect { to_dto }.to raise_error(RequestHandler::InternalArgumentError)
           end
         end
       end
@@ -182,22 +203,42 @@ describe RequestHandler do
               end
             end
           end
-          it 'raises a SchemaValidationError with invalid data' do
-            request = build_mock_request(params: invalid_params, headers: {}, body: '')
-            testhandler = testclass.new(request: request)
-            expect { testhandler.to_dto }.to raise_error(RequestHandler::SchemaValidationError)
+
+          context 'with invalid data' do
+            let(:request) do
+              build_mock_request(params: invalid_params, headers: {}, body: '')
+            end
+
+            it 'raises a FilterParamsError' do
+              expect { to_dto }.to raise_error(RequestHandler::FilterParamsError) do |raised_error|
+                expect(raised_error.errors).to match_array([{
+                                                             status: '400',
+                                                             code: 'INVALID_QUERY_PARAMETER',
+                                                             detail: anything,
+                                                             source: { param: 'filter[name]' }
+                                                           }])
+              end
+            end
+
+            context 'when raising json api error data is disabled' do
+              before { RequestHandler.configuration.raise_jsonapi_errors = false }
+
+              it 'raises a FilterParamsError without details' do
+                expect { to_dto }.to raise_error(RequestHandler::FilterParamsError) do |raised_error|
+                  expect(raised_error.errors).to match_array([])
+                end
+              end
+            end
           end
 
-          it 'raises a MissingArgumentError with missing data' do
-            request = build_mock_request(params: nil, headers: {}, body: '')
-            testhandler = testclass.new(request: request)
-            expect { testhandler.to_dto }.to raise_error(RequestHandler::MissingArgumentError)
+          context 'when params are missing' do
+            let(:request) { build_mock_request(params: nil, headers: {}, body: '') }
+            it { expect { to_dto }.to raise_error(RequestHandler::MissingArgumentError) }
           end
 
-          it 'works for valid data' do
-            request = build_mock_request(params: valid_params, headers: {}, body: '')
-            testhandler = testclass.new(request: request)
-            expect(testhandler.to_dto).to eq(OpenStruct.new(filter: { name: 'foo', foo: 'bar' }))
+          context 'with valid params' do
+            let(:request) { build_mock_request(params: valid_params, headers: {}, body: '') }
+            it { expect(to_dto).to eq(OpenStruct.new(filter: { name: 'foo', foo: 'bar' })) }
           end
         end
         context 'invalid schema' do
@@ -215,11 +256,8 @@ describe RequestHandler do
               end
             end
           end
-          it 'raises a InternalArgumentError with valid data' do
-            request = build_mock_request(params: valid_params, headers: {}, body: '')
-            testhandler = testclass.new(request: request)
-            expect { testhandler.to_dto }.to raise_error(RequestHandler::InternalArgumentError)
-          end
+          let(:request) { build_mock_request(params: valid_params, headers: {}, body: '') }
+          it { expect { to_dto }.to raise_error(RequestHandler::InternalArgumentError) }
         end
       end
 
@@ -256,22 +294,19 @@ describe RequestHandler do
               end
             end
           end
-          it 'raises a SchemaValidationError with invalid data' do
-            request = build_mock_request(params: invalid_params, headers: {}, body: '')
-            testhandler = testclass.new(request: request)
-            expect { testhandler.to_dto }.to raise_error(RequestHandler::SchemaValidationError)
+          context 'with invalid data' do
+            let(:request) { build_mock_request(params: invalid_params, headers: {}, body: '') }
+            it { expect { to_dto }.to raise_error(RequestHandler::ExternalArgumentError) }
           end
 
-          it 'raises a MissingArgumentError with missing data' do
-            request = build_mock_request(params: nil, headers: {}, body: '')
-            testhandler = testclass.new(request: request)
-            expect { testhandler.to_dto }.to raise_error(RequestHandler::MissingArgumentError)
+          context 'with missing data' do
+            let(:request) { build_mock_request(params: nil, headers: {}, body: '') }
+            it { expect { to_dto }.to raise_error(RequestHandler::MissingArgumentError) }
           end
 
-          it 'works for valid data' do
-            request = build_mock_request(params: valid_params, headers: {}, body: '')
-            testhandler = testclass.new(request: request)
-            expect(testhandler.to_dto).to eq(OpenStruct.new(query: { name: 'foo' }))
+          context 'with valid data' do
+            let(:request) { build_mock_request(params: valid_params, headers: {}, body: '') }
+            it { expect(to_dto).to eq(OpenStruct.new(query: { name: 'foo' })) }
           end
         end
         context 'invalid schema' do
@@ -289,10 +324,9 @@ describe RequestHandler do
               end
             end
           end
-          it 'raises a InternalArgumentError with valid data' do
-            request = build_mock_request(params: valid_params, headers: {}, body: '')
-            testhandler = testclass.new(request: request)
-            expect { testhandler.to_dto }.to raise_error(RequestHandler::InternalArgumentError)
+          context 'with valid data' do
+            let(:request) { build_mock_request(params: valid_params, headers: {}, body: '') }
+            it { expect { to_dto }.to raise_error(RequestHandler::InternalArgumentError) }
           end
         end
       end

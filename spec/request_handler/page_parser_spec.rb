@@ -9,10 +9,13 @@ describe RequestHandler::PageParser do
       expect(handler.run).to eq(output)
     end
   end
+  let(:jsonapi_error) { anything }
   shared_examples 'input that causes an error' do
     it 'raises an error' do
       handler = RequestHandler::PageParser.new(params: params, page_config: config.lookup!('page'))
-      expect { handler.run }.to raise_error(error)
+      expect { handler.run }.to raise_error(error) do |raised_error|
+        expect(raised_error.errors).to contain_exactly(jsonapi_error)
+      end
     end
   end
   shared_examples 'input that causes a warning' do
@@ -109,6 +112,15 @@ describe RequestHandler::PageParser do
       it_behaves_like 'valid input'
     end
 
+    let(:jsonapi_error) do
+      {
+        code: 'INVALID_QUERY_PARAMETER',
+        status: '400',
+        detail: 'must be a positive integer',
+        source: { param: expected_param }
+      }
+    end
+
     context 'number is set to a non integer string' do
       let(:error) { RequestHandler::PageParamsError }
       let(:params) do
@@ -117,6 +129,7 @@ describe RequestHandler::PageParser do
           'users__number' => 'asdf'
         } }
       end
+      let(:expected_param) { 'page[users.number]' }
       it_behaves_like 'input that causes an error'
     end
 
@@ -128,6 +141,7 @@ describe RequestHandler::PageParser do
           'users__number' => '-20'
         } }
       end
+      let(:expected_param) { 'page[users.number]' }
       it_behaves_like 'input that causes an error'
     end
 
@@ -139,6 +153,7 @@ describe RequestHandler::PageParser do
           'users__number' => '20'
         } }
       end
+      let(:expected_param) { 'page[users.size]' }
       it_behaves_like 'input that causes an error'
     end
 
@@ -150,6 +165,7 @@ describe RequestHandler::PageParser do
           'users__number' => '2'
         } }
       end
+      let(:expected_param) { 'page[users.size]' }
       it_behaves_like 'input that causes an error'
     end
   end

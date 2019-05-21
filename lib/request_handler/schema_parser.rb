@@ -28,10 +28,44 @@ module RequestHandler
 
     def validation_failure?(validator)
       return if validator.valid?
-      errors = validator.errors.each_with_object({}) do |(k, v), memo|
-        add_note(v, k, memo)
+
+      errors = build_errors(validator.errors).map do |error|
+        jsonapi_error(error)
       end
       raise SchemaValidationError, errors
+    end
+
+    def build_errors(error_hash, path = [])
+      errors = []
+      error_hash.each do |k, v|
+        errors += build_errors(v, path << k).flatten if v.is_a?(Hash)
+        v.each { |error| errors << error(path, k, error) } if v.is_a?(Array)
+        errors << error(path, k, v) if v.is_a?(String)
+      end
+      errors
+    end
+
+    def error(path, element, failure)
+      schema_pointer = RequestHandler.engine.error_pointer(failure) || (path + [element]).join('/')
+      {
+        schema_pointer:  schema_pointer,
+        element: element,
+        message: RequestHandler.engine.error_message(failure)
+      }
+    end
+
+    def jsonapi_error(error)
+      {
+        status: '422',
+        code: 'INVALID_RESOURCE_SCHEMA',
+        title: 'Invalid resource',
+        detail: error[:message],
+        source: { pointer: build_pointer(error) }
+      }
+    end
+
+    def build_pointer(error)
+      error[:schema_pointer]
     end
 
     def add_note(v, k, memo)

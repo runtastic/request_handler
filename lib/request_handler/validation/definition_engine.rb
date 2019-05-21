@@ -21,6 +21,14 @@ module RequestHandler
           raise Validation::Error unless result.valid?
         end
       end
+
+      def self.error_message(validation_error)
+        validation_error.message
+      end
+
+      def self.error_pointer(validation_error)
+        validation_error.error_path.join('/')
+      end
     end
   end
 end

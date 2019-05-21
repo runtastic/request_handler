@@ -37,6 +37,14 @@ module RequestHandler
           Result.new(output: result, errors: {})
         end
       end
+
+      def self.error_message(validation_error)
+        validation_error
+      end
+
+      def self.error_pointer(_validation_error)
+        nil
+      end
     end
   end
 end

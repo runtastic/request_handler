@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Added
+- Serializable JSONAPI error objects out of validation failures
+- Configuration option to enable returning validation failures in errors method of exceptions
+
+### Changed
+- Format of error messages for external causes (bad requests)
+- Inheritance chain of error classes
+
 ## [1.2.0] - 2019-04-15
 ### Added
 - Apart from dry-validation, now definition or any other validation library can be used
