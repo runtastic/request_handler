@@ -9,4 +9,5 @@ group :development, :test do
   gem 'danger'
   gem 'danger-commit_lint'
   gem 'danger-rubocop'
+  gem 'rspec_junit_formatter'
 end
