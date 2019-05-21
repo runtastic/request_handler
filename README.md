@@ -1,7 +1,7 @@
 # RequestHandler
 
 [![Gem Version](https://badge.fury.io/rb/request_handler.svg)](https://badge.fury.io/rb/request_handler)
-[![Build Status](https://travis-ci.org/runtastic/request_handler.svg?branch=master)](https://travis-ci.org/runtastic/request_handler)
+[![CircleCI](https://circleci.com/gh/andreaseger/receptacle.svg?style=svg)](https://circleci.com/gh/runtastic/request_handler)
 [![codecov](https://codecov.io/gh/runtastic/request_handler/branch/master/graph/badge.svg)](https://codecov.io/gh/runtastic/request_handler)
 
 This gem allows easy and dry handling of requests based on the dry-validation
