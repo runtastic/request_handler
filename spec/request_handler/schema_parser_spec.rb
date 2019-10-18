@@ -34,24 +34,23 @@ describe RequestHandler::SchemaParser do
   end
 
   let(:schema_without_options) do
-    Dry::Validation.Params do
-      configure do
-        config.type_specs = true
-      end
-      required(:test1, :string).filled(:str?)
-      required(:test2, :integer).value(gt?: 0)
-      optional(:filter_type_in, Types::ArrayFromCSV).each(Types::SupportedFilterKeys)
+    Dry::Schema.Params do
+      required(:test1).filled(:string)
+      required(:test2).filled(:integer, gt?: 0)
+      optional(:filter_type_in).filled(Types::ArrayFromCSV).each(Types::SupportedFilterKeys)
     end
   end
   let(:schema_with_options) do
-    Dry::Validation.Params do
-      configure do
-        option :testoption
-        config.type_specs = true
+    Class.new(Dry::Validation::Contract) do
+      option :testoption
+      params do
+        required(:test1).filled(:string)
+        required(:test2).filled(:integer)
+        optional(:filter_type_in).filled(Types::ArrayFromCSV).each(Types::SupportedFilterKeys)
       end
-      required(:test1, :string).filled(:str?)
-      required(:test2, :integer).value(eql?: testoption)
-      optional(:filter_type_in, Types::ArrayFromCSV).each(Types::SupportedFilterKeys)
+      rule(:test2) do
+        key.failure('invalid test_2') unless values[:test2] == testoption
+      end
     end
   end
   let(:testclass) do
@@ -111,14 +110,12 @@ describe RequestHandler::SchemaParser do
 
   context 'data keys get deep_symbolized when schema rules are symbols' do
     let(:schema_without_options) do
-      Dry::Validation.Params do
-        configure { config.type_specs = true }
-
-        required(:simple, :integer).filled(:int?)
-        optional(:nested, %i[nil hash]).maybe do
+      Dry::Schema.Params do
+        required(:simple).filled(:integer)
+        optional(:nested).maybe(%i[nil hash]) do
           schema do
-            required(:attr1).filled(:str?)
-            required(:attr2).filled(:str?)
+            required(:attr1).filled(:string)
+            required(:attr2).filled(:string)
           end
         end
       end

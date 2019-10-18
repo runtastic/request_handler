@@ -85,7 +85,6 @@ defines if the JsonApiDocumentParser or JsonParser is used.
 If nothing is defined, JsonApiDocumentParser will be used by default.
 
 ```ruby
-require "dry-validation"
 require "request_handler"
 class DemoHandler < RequestHandler::Base
   options do
@@ -108,11 +107,11 @@ class DemoHandler < RequestHandler::Base
 
     filter do
       schema(
-        Dry::Validation.Params do
-          configure do
-            option :foo
+        Class.new(Dry::Validation::Contract) do
+          option :foo
+          params do
+            required(:name).filled(:string)
           end
-          required(:name).filled(:str?)
         end
       )
       additional_url_filter %i(user_id id)
@@ -122,8 +121,8 @@ class DemoHandler < RequestHandler::Base
 
     query do
       schema(
-        Dry::Validation.Params do
-          optional(:name).filled(:str?)
+        Dry::Schema.Params do
+          optional(:name).filled(:string)
         end
       )
     end
@@ -131,11 +130,11 @@ class DemoHandler < RequestHandler::Base
     body do
       type :jsonapi
       schema(
-        Dry::Validation.JSON do
-          configure do
-            option :foo
+        Class.new(Dry::Validation::Contract) do
+          option :foo
+          json do
+            required(:id).filled(:string)
           end
-          required(:id).filled(:str?)
         end
       )
       options(->(_handler, _request) { { foo: "bar" } })
@@ -212,10 +211,10 @@ class CreateQuestionHandler < RequestHandler::Base
         required true
         type "json"
         schema(
-          Dry::Validation.JSON do
-            required(:id).filled(:str?)
-            required(:type).filled(:str?)
-            required(:content).filled(:str?)
+          Dry::Schema.JSON do
+            required(:id).filled(:string)
+            required(:type).filled(:string)
+            required(:content).filled(:string)
           end
         )
       end

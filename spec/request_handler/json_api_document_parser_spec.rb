@@ -20,7 +20,7 @@ describe RequestHandler::JsonApiDocumentParser do
     end
   end
 
-  let(:schema) { Dry::Validation.JSON {} }
+  let(:schema) { Dry::Schema.JSON {} }
 
   context 'one relationships' do
     let(:raw_body) do

@@ -16,12 +16,12 @@ describe RequestHandler::QueryParser do
       { 'name' => 'foo' }
     end
     let(:schema) do
-      Dry::Validation.Schema do
-        required('name').filled
+      Dry::Schema.Params do
+        required(:name).filled
       end
     end
-    let(:output)  do
-      { 'name' => 'foo' }
+    let(:output) do
+      { name: 'foo' }
     end
     it_behaves_like 'proccesses query params correctly'
 
@@ -59,12 +59,12 @@ describe RequestHandler::QueryParser do
       }
     end
     let(:schema) do
-      Dry::Validation.Schema do
-        required('name').filled
+      Dry::Schema.Params do
+        required(:name).filled
       end end
     let(:output) do
       {
-        'name' => 'foo'
+        name: 'foo'
       }
     end
     it_behaves_like 'proccesses query params correctly'
@@ -72,15 +72,15 @@ describe RequestHandler::QueryParser do
 
   context 'no query params set' do
     let(:params) { {} }
-    let(:schema) { Dry::Validation.Schema {} }
+    let(:schema) { Dry::Schema.Params {} }
     let(:output) { {} }
     it_behaves_like 'proccesses query params correctly'
   end
 
   context 'optional query param' do
     let(:schema) do
-      Dry::Validation.Schema do
-        optional('name').filled
+      Dry::Schema.Params do
+        optional(:name).filled
       end
     end
     context 'param given' do
@@ -89,7 +89,7 @@ describe RequestHandler::QueryParser do
       end
       let(:output) do
         {
-          'name' => 'foo'
+          name: 'foo'
         }
       end
       it_behaves_like 'proccesses query params correctly'

@@ -29,19 +29,19 @@ class IntegrationTestRequestHandler < RequestHandler::Base
     end
 
     filter do
-      schema(Dry::Validation.Params do
-               required(:user_id).filled(:int?)
-               required(:name).filled(:str?)
-               optional(:age__gt).filled(:int?)
-               optional(:age__gte).filled(:int?)
-               optional(:posts__awesome).filled(:bool?)
-               optional(:posts__samples__photos__has_thumbnail).filled(:bool?)
+      schema(Dry::Schema.Params do
+               required(:user_id).filled(:integer)
+               required(:name).filled(:string)
+               optional(:age__gt).filled(:integer)
+               optional(:age__gte).filled(:integer)
+               optional(:posts__awesome).filled(:bool)
+               optional(:posts__samples__photos__has_thumbnail).filled(:bool)
              end)
       additional_url_filter %i[user_id]
     end
 
     query do
-      schema(Dry::Validation.Params do
+      schema(Dry::Schema.Params do
                required(:name).filled(:str?)
              end)
     end
@@ -79,19 +79,23 @@ class IntegrationTestRequestHandlerWithBody < RequestHandler::Base
   options do
     body do
       type type
-      schema(Dry::Validation.JSON do
-               configure do
-                 option :query_id
-               end
-               required(:id).value(eql?: query_id)
-               required(:type).value(eql?: 'post')
-               required(:user_id).filled(:str?)
-               required(:name).filled(:str?)
-               optional(:publish_on).filled(:time?)
+      schema(Class.new(Dry::Validation::Contract) do
+               option :query_id
+               params do
+                 required(:id).filled(:string)
+                 required(:type).value(eql?: 'post')
+                 required(:user_id).filled(:string)
+                 required(:name).filled(:string)
+                 optional(:publish_on).filled(:time)
 
-               required(:category).schema do
-                 required(:id).filled(:str?)
-                 required(:type).value(eql?: 'category')
+                 required(:category).schema do
+                   required(:id).filled(:string)
+                   required(:type).value(eql?: 'category')
+                 end
+               end
+
+               rule(:id) do
+                 key.failure('invalid id') unless values[:id] == query_id
                end
              end)
 
@@ -99,12 +103,16 @@ class IntegrationTestRequestHandlerWithBody < RequestHandler::Base
     end
 
     filter do
-      schema(Dry::Validation.Params do
-               configure do
-                 option :body_user_id
+      schema(Class.new(Dry::Validation::Contract) do
+               option :body_user_id
+               params do
+                 required(:user_id).filled(:string)
+                 required(:id).filled(:string)
                end
-               required(:user_id).value(eql?: body_user_id)
-               required(:id).filled(:str?)
+
+               rule(:user_id) do
+                 key.failure('invalid user_id') unless values[:user_id] == body_user_id
+               end
              end)
       additional_url_filter %i[user_id id]
       options(->(handler, _request) { { body_user_id: handler.body_params[:user_id] } })
@@ -125,19 +133,23 @@ class IntegrationTestRequestHandlerWithMultiparts < RequestHandler::Base
     multipart do
       meta do
         type type
-        schema(Dry::Validation.JSON do
-          configure do
-            option :query_id
-          end
-          required(:id).value(eql?: query_id)
-          required(:type).value(eql?: 'post')
-          required(:user_id).filled(:str?)
-          required(:name).filled(:str?)
-          optional(:publish_on).filled(:time?)
+        schema(Class.new(Dry::Validation::Contract) do
+          option :query_id
+          params do
+            required(:id).filled(:string)
+            required(:type).value(eql?: 'post')
+            required(:user_id).filled(:string)
+            required(:name).filled(:string)
+            optional(:publish_on).filled(:time)
 
-          required(:category).schema do
-            required(:id).filled(:str?)
-            required(:type).value(eql?: 'category')
+            required(:category).schema do
+              required(:id).filled(:string)
+              required(:type).value(eql?: 'category')
+            end
+          end
+
+          rule(:id) do
+            key.failure('invalid id') unless values[:id] == query_id
           end
         end)
         options(->(_parser, request) { { query_id: request.params['id'] } })

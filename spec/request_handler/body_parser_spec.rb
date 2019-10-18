@@ -14,7 +14,7 @@ describe RequestHandler::BodyParser do
     )
   end
 
-  let(:schema) { Dry::Validation.JSON {} }
+  let(:schema) { Dry::Schema.JSON {} }
 
   let(:raw_body) do
     <<-JSON
@@ -55,7 +55,7 @@ describe RequestHandler::BodyParser do
     end
 
     it 'fails if the request body is nil' do
-      schema = Dry::Validation.JSON {}
+      schema = Dry::Schema.JSON {}
       expect do
         described_class.new(schema:  schema,
                             type: type,
@@ -65,7 +65,7 @@ describe RequestHandler::BodyParser do
     end
 
     it 'fails if the request body does not contain a data hash' do
-      schema = Dry::Validation.JSON {}
+      schema = Dry::Schema.JSON {}
       expect do
         described_class.new(
           schema:  schema,
@@ -94,7 +94,7 @@ describe RequestHandler::BodyParser do
     end
 
     it 'fails if the request body is nil' do
-      schema = Dry::Validation.JSON {}
+      schema = Dry::Schema.JSON {}
       expect do
         described_class.new(schema:  schema,
                             type: type,
@@ -104,7 +104,7 @@ describe RequestHandler::BodyParser do
     end
 
     it "doesn't fail if the request body does not contain a data hash" do
-      schema = Dry::Validation.JSON {}
+      schema = Dry::Schema.JSON {}
       expect do
         described_class.new(
           schema:  schema,

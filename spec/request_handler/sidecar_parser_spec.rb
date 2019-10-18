@@ -10,10 +10,10 @@ describe RequestHandler::JsonParser do
     end
   end
 
-  let(:schema) { Dry::Validation.JSON {} }
+  let(:schema) { Dry::Schema.JSON {} }
 
   it 'fails if there is no data' do
-    schema = Dry::Validation.JSON {}
+    schema = Dry::Schema.JSON {}
     expect do
       described_class.new(schema:  schema,
                           document:    nil)
@@ -23,10 +23,10 @@ describe RequestHandler::JsonParser do
 
   describe 'schema' do
     let(:schema) do
-      Dry::Validation.JSON do
-        required(:required, :bool).filled(:bool?)
-        optional(:optional, :integer).filled(:int?)
-        optional(:maybe, :string).maybe(:str?)
+      Dry::Schema.JSON do
+        required(:required).filled(:bool?)
+        optional(:optional).filled(:int?)
+        optional(:maybe).maybe(:str?)
       end
     end
 

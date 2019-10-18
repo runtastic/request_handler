@@ -335,7 +335,7 @@ describe RequestHandler do
 
   context 'with dry engine' do
     let(:required_name_schema) do
-      Dry::Validation.JSON do
+      Dry::Schema.JSON do
         required(:name).filled(:str?)
       end
     end
