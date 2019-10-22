@@ -13,9 +13,9 @@ module RequestHandler
 
     def allowed_options(options)
       options.map do |option|
-        option.gsub!('.', ::RequestHandler.separator)
+        option.gsub!('.', ::RequestHandler.configuration.separator)
         begin
-          RequestHandler.engine.validate!(option, allowed_options_type).output.to_sym
+          RequestHandler.configuration.validation_engine.validate!(option, allowed_options_type).output.to_sym
         rescue Validation::Error
           raise_error('OPTION_NOT_ALLOWED', "#{option} is not an allowed include option", OptionNotAllowedError)
         end

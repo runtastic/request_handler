@@ -8,7 +8,7 @@ module RequestHandler
       missing_arguments << { schema: 'is missing' } if schema.nil?
       missing_arguments << { schema_options: 'is missing' } if schema_options.nil?
       raise MissingArgumentError, missing_arguments unless missing_arguments.empty?
-      raise InternalArgumentError, schema: 'must be a Schema' unless RequestHandler.engine.valid_schema?(schema)
+      raise InternalArgumentError, schema: 'must be a Schema' unless validation_engine.valid_schema?(schema)
       @schema = schema
       @schema_options = schema_options
     end
@@ -23,7 +23,7 @@ module RequestHandler
     end
 
     def validate(data, schema:)
-      RequestHandler.engine.validate(data, schema, options: schema_options)
+      validation_engine.validate(data, schema, options: schema_options)
     end
 
     def validation_failure?(validator)
@@ -46,11 +46,11 @@ module RequestHandler
     end
 
     def error(path, element, failure)
-      schema_pointer = RequestHandler.engine.error_pointer(failure) || (path + [element]).join('/')
+      schema_pointer = validation_engine.error_pointer(failure) || (path + [element]).join('/')
       {
         schema_pointer:  schema_pointer,
         element: element,
-        message: RequestHandler.engine.error_message(failure)
+        message: validation_engine.error_message(failure)
       }
     end
 
@@ -75,6 +75,10 @@ module RequestHandler
                   v.each { |(val, key)| add_note(val, key, memo) }
                 end
       memo
+    end
+
+    def validation_engine
+      RequestHandler.configuration.validation_engine
     end
 
     attr_reader :schema, :schema_options

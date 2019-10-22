@@ -26,34 +26,51 @@ Or install it yourself as:
 
 ## Configuration
 
+You have to chose a validation engine and configure it globally:
+```ruby
+RequestHandler.configure do |config|
+  config.validation_engine = RequestHandler::Validation::DryEngine
+end
+```
+
+If you want to use the included dry engine you also have to add the dry gems to
+your Gemfile:
+```ruby
+  gem 'dry-validation', '~> 1.0'
+  gem 'dry-types', '~> 1.0'
+```
+Note that only dry >= 1.0 is supported.
+
 The default logger and separator can be changed globally:
 
 ```ruby
-RequestHandler.configure do
-  logger Logger.new(STDERR)
-  separator '____'
-  validation_engine RequestHandler::Validation::DryEngine
+RequestHandler.configure do |config|
+  config.logger = Logger.new(STDERR)
+  config.separator = '____'
 end
 ```
 
 JSON:API-style error data can be included in validation errors raised by `RequestHandler`.
 
 ```ruby
-RequestHandler.configure do
-  raise_jsonapi_errors = true # default: false
+RequestHandler.configure do |config|
+  config.raise_jsonapi_errors = true # default: false
 end
 ```
 
 
 ### Validation Engine
-Per default this gem uses the `DryEngine` which relies on dry-validation. All
-examples in this Readme assume you are using this default engine. However
-you can also use the builtin `DefinitionEngine`, which uses [Definition](https://github.com/Goltergaul/definition) as validation library:
+You have to chose a validation engine and configure it globally (see
+configuration section above).
+All examples in this Readme assume you are using the `DryEngine` which relies on
+dry-validation. However you can also use the builtin `DefinitionEngine`, which
+uses [Definition](https://github.com/Goltergaul/definition) as validation
+library:
 
 ```ruby
-RequestHandler.configure do
+RequestHandler.configure do |config|
   require 'request_handler/validation/definition_engine'
-  validation_engine RequestHandler::Validation::DefinitionEngine
+  config.validation_engine = RequestHandler::Validation::DefinitionEngine
 end
 ```
 

@@ -173,12 +173,6 @@ describe RequestHandler do
     expect(described_class::VERSION).not_to be_nil
   end
 
-  before do
-    RequestHandler.configure do
-      separator '__'
-    end
-  end
-
   let(:type) { 'jsonapi' }
 
   let(:headers) do

@@ -9,7 +9,7 @@ module RequestHandler
       allowed.reject! { |_k, v| v == false }
       allowed.each_value do |option|
         raise InternalArgumentError, allowed: 'must be a Schema or a Boolean' unless
-          RequestHandler.engine.valid_schema?(option) || option.is_a?(TrueClass)
+          RequestHandler.configuration.validation_engine.valid_schema?(option) || option.is_a?(TrueClass)
       end
       @allowed = allowed
       raise InternalArgumentError, required: 'must be an Array' unless required.is_a?(Array)
@@ -39,7 +39,7 @@ module RequestHandler
       if allowed[type] == true
         option.to_sym
       else
-        RequestHandler.engine.validate!(option, allowed[type]).output.to_sym
+        RequestHandler.configuration.validation_engine.validate!(option, allowed[type]).output.to_sym
       end
     rescue Validation::Error
       raise FieldsetsParamsError, [{ code: 'INVALID_QUERY_PARAMETER',

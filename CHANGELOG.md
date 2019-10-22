@@ -7,9 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 ### Added
 - Support for dry-* 1.x
+- Required configuration of validation engine
 
 ### Removed
 - Support for dry-* 0.x
+- Dry dependency
 
 ## [1.3.0] - 2019-05-21
 ### Added

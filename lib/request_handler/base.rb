@@ -162,12 +162,16 @@ module RequestHandler
       raise MissingArgumentError, params: 'is missing' if request.params.nil?
       raise ExternalArgumentError, [] unless request.params.is_a?(Hash)
       @params ||= Helper.deep_transform_keys_in_object(request.params) do |k|
-        k.to_s.gsub('.', ::RequestHandler.separator)
+        k.to_s.gsub('.', separator)
       end
     end
 
     def config
       self.class.instance_variable_get('@config')
+    end
+
+    def separator
+      ::RequestHandler.configuration.separator
     end
   end
 end
