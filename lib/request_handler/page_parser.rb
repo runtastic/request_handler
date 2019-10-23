@@ -17,8 +17,8 @@ module RequestHandler
       base = { number: extract_number, size: extract_size }
       cfg = config.keys.reduce(base) do |memo, key|
         next memo if TOP_LEVEL_PAGE_KEYS.include?(key)
-        memo.merge!("#{key}#{::RequestHandler.separator}number".to_sym => extract_number(prefix: key),
-                    "#{key}#{::RequestHandler.separator}size".to_sym   => extract_size(prefix: key))
+        memo.merge!("#{key}#{separator}number".to_sym => extract_number(prefix: key),
+                    "#{key}#{separator}size".to_sym   => extract_size(prefix: key))
       end
       check_for_missing_options(cfg)
       cfg
@@ -32,7 +32,7 @@ module RequestHandler
     def check_for_missing_options(config)
       missing_arguments = page_options.keys - config.keys.map(&:to_s)
       return if missing_arguments.empty?
-      missing_arguments.map! { |e| e.gsub(::RequestHandler.separator, '.') }
+      missing_arguments.map! { |e| e.gsub(separator, '.') }
       warn 'client sent unknown option ' + missing_arguments.to_s unless missing_arguments.empty?
     end
 
@@ -97,7 +97,7 @@ module RequestHandler
     end
 
     def lookup_nested_params_key(key, prefix)
-      key = prefix ? "#{prefix}#{::RequestHandler.separator}#{key}" : key
+      key = prefix ? "#{prefix}#{separator}#{key}" : key
       page_options.fetch(key, nil)
     end
 
@@ -105,12 +105,16 @@ module RequestHandler
       ::RequestHandler.configuration.logger.warn(message)
     end
 
-    def raise_no_default_size(prefix, sep = ::RequestHandler.separator)
+    def raise_no_default_size(prefix, sep = separator)
       raise NoConfigAvailableError, :"#{prefix}#{sep}size" => 'has no default_size'
     end
 
-    def raise_not_positive(prefix, key, sep = ::RequestHandler.separator)
+    def raise_not_positive(prefix, key, sep = separator)
       raise InternalArgumentError, :"#{prefix}#{sep}#{key}" => 'must be a positive Integer'
+    end
+
+    def separator
+      ::RequestHandler.configuration.separator
     end
   end
 end

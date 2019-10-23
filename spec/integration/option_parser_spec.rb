@@ -97,6 +97,12 @@ describe RequestHandler do
   end
 
   context 'with definition engine' do
+    before do
+      RequestHandler.configure do |rh_config|
+        rh_config.validation_engine = RequestHandler::Validation::DefinitionEngine
+      end
+    end
+
     let(:enum_schema) do
       Definition.Enum(*enum_values)
     end

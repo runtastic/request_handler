@@ -19,12 +19,12 @@ describe RequestHandler::FilterParser do
       { 'filter' => { 'name' => 'foo' } }
     end
     let(:schema) do
-      Dry::Validation.Schema do
-        required('name').filled
+      Dry::Schema.Params do
+        required(:name).filled
       end
     end
-    let(:output)  do
-      { 'name' => 'foo' }
+    let(:output) do
+      { name: 'foo' }
     end
     it_behaves_like 'proccesses the filters correctly'
   end
@@ -37,13 +37,13 @@ describe RequestHandler::FilterParser do
     end
     let(:additional_url_filter) { ['name'] }
     let(:schema) do
-      Dry::Validation.Schema do
-        required('name').filled
+      Dry::Schema.Params do
+        required(:name).filled
       end
     end
     let(:output) do
       {
-        'name' => 'foo'
+        name: 'foo'
       }
     end
     it_behaves_like 'proccesses the filters correctly'
@@ -60,14 +60,14 @@ describe RequestHandler::FilterParser do
     end
     let(:additional_url_filter) { ['name'] }
     let(:schema) do
-      Dry::Validation.Schema do
-        required('name').filled
-        required('test').filled
+      Dry::Schema.Params do
+        required(:name).filled
+        required(:test).filled
       end end
     let(:output) do
       {
-        'name' => 'foo',
-        'test' => 'bar'
+        name: 'foo',
+        test: 'bar'
       }
     end
     it_behaves_like 'proccesses the filters correctly'
@@ -80,7 +80,7 @@ describe RequestHandler::FilterParser do
         }
       }
     end
-    let(:schema) { Dry::Validation.Schema {} }
+    let(:schema) { Dry::Schema.Params {} }
     let(:output) { {} }
     it_behaves_like 'proccesses the filters correctly'
   end
@@ -90,7 +90,7 @@ describe RequestHandler::FilterParser do
       {
       }
     end
-    let(:schema) { Dry::Validation.Schema {} }
+    let(:schema) { Dry::Schema.Params {} }
     let(:output) { {} }
     it_behaves_like 'proccesses the filters correctly'
   end
@@ -104,14 +104,14 @@ describe RequestHandler::FilterParser do
         }
       }
     end
-    let(:schema) { Dry::Validation.Schema { required('name').filled } }
-    let(:additional_url_filter) { ['name'] }
+    let(:schema) { Dry::Schema.Params { required(:name).filled } }
+    let(:additional_url_filter) { [:name] }
     it { expect { instance }.to raise_error(RequestHandler::InternalArgumentError) }
   end
 
   context 'when filter param is a string' do
     let(:params) { { 'filter' => 'nope' } }
-    let(:schema) { Dry::Validation.Schema { required('name').filled } }
+    let(:schema) { Dry::Schema.Params { required(:name).filled } }
     it do
       expect { instance }.to raise_error(RequestHandler::FilterParamsError) do |raised_error|
         jsonapi_error = {

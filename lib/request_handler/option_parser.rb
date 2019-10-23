@@ -12,7 +12,7 @@ module RequestHandler
     private
 
     def schema?
-      RequestHandler.engine.valid_schema?(@allowed_options_type)
+      RequestHandler.configuration.validation_engine.valid_schema?(@allowed_options_type)
     end
 
     def empty_param?(param)

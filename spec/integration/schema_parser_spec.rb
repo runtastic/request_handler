@@ -335,7 +335,7 @@ describe RequestHandler do
 
   context 'with dry engine' do
     let(:required_name_schema) do
-      Dry::Validation.JSON do
+      Dry::Schema.JSON do
         required(:name).filled(:str?)
       end
     end
@@ -346,6 +346,12 @@ describe RequestHandler do
   end
 
   context 'with definition engine' do
+    before do
+      RequestHandler.configure do |rh_config|
+        rh_config.validation_engine = RequestHandler::Validation::DefinitionEngine
+      end
+    end
+
     let(:required_name_schema) do
       Definition.Keys do
         option :ignore_extra_keys

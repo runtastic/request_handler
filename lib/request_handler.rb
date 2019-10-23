@@ -7,28 +7,15 @@ require 'confstruct'
 require 'dry-validation'
 require 'multi_json'
 require 'logger'
+require 'gem_config'
 
 module RequestHandler
-  class << self
-    def configure(&block)
-      configuration.configure(&block)
-    end
+  include GemConfig::Base
 
-    def configuration
-      @configuration ||= ::Confstruct::Configuration.new do
-        logger Logger.new(STDOUT)
-        separator '__'
-        validation_engine Validation::DryEngine
-        raise_jsonapi_errors false
-      end
-    end
-
-    def separator
-      configuration.separator
-    end
-
-    def engine
-      configuration.validation_engine
-    end
+  with_configuration do
+    has :validation_engine
+    has :logger, default: Logger.new(STDOUT)
+    has :separator, classes: [String], default: '__'
+    has :raise_jsonapi_errors, default: false
   end
 end

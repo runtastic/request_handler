@@ -20,7 +20,7 @@ module RequestHandler
     def parse_options(options)
       options.map do |option|
         name, order = parse_option(option)
-        name.gsub!('.', ::RequestHandler.separator)
+        name.gsub!('.', ::RequestHandler.configuration.separator)
         allowed_option(name)
         SortOption.new(name, order)
       end
@@ -36,7 +36,7 @@ module RequestHandler
     end
 
     def allowed_option(name)
-      RequestHandler.engine.validate!(name, allowed_options_type).output
+      RequestHandler.configuration.validation_engine.validate!(name, allowed_options_type).output
     rescue Validation::Error
       raise OptionNotAllowedError, [jsonapi_error("#{name} is not an allowed sort option")]
     end
