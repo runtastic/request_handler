@@ -9,14 +9,15 @@ describe RequestHandler do
       let(:testclass) do
         schema = enum_schema
         Class.new(RequestHandler::Base) do
-          options do
-            fieldsets do
-              allowed do
-                posts(schema)
-              end
-              required [:posts]
-            end
-          end
+          options(
+            fieldsets: {
+              allowed: {
+                posts: schema
+              },
+              required: [:posts]
+            }
+          )
+
           def to_dto
             OpenStruct.new(
               fieldsets: fieldsets_params
@@ -63,7 +64,7 @@ describe RequestHandler do
       end
 
       context 'with a value that is not allowed for a type' do
-        before { testclass.config.fieldsets.allowed.posts = %w[foo bar] }
+        before { testclass.config[:fieldsets][:allowed][:posts] = %w[foo bar] }
         let(:request) { build_mock_request(params: { 'fields' => { 'posts' => 'foo' } }, headers: nil, body: '') }
         it { expect { to_dto }.to raise_error(RequestHandler::InternalArgumentError) }
       end
@@ -72,13 +73,13 @@ describe RequestHandler do
     context 'with optional fieldset' do
       let(:testclass) do
         Class.new(RequestHandler::Base) do
-          options do
-            fieldsets do
-              allowed do
-                posts true
-              end
-            end
-          end
+          options(
+            fieldsets: {
+              allowed: {
+                posts: true
+              }
+            }
+          )
 
           def to_dto
             OpenStruct.new(fieldsets: fieldsets_params)

@@ -14,9 +14,8 @@ require 'confstruct'
 module RequestHandler
   class Base
     class << self
-      def options(&block)
-        @config ||= ::Confstruct::Configuration.new
-        @config.configure(&block)
+      def options(hash)
+        @config ||= hash
       end
 
       def inherited(subclass)
@@ -149,13 +148,17 @@ module RequestHandler
     end
 
     def lookup!(key)
-      config.lookup!(key).tap do |data|
+      config.dig(*symbolize_key(key)) do |data|
         raise NoConfigAvailableError, key.to_sym => 'is not configured' if data.nil?
       end
     end
 
     def lookup(key)
-      config.lookup!(key)
+      config.dig(*symbolize_key(key))
+    end
+
+    def symbolize_key(key)
+      key.split('.').map(&:to_sym)
     end
 
     def params
