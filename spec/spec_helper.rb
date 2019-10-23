@@ -15,6 +15,7 @@ require 'request_handler'
 require 'pry'
 require 'ostruct'
 require 'rack'
+require 'dry-validation'
 
 [
   'spec/support/**/*.rb'
