@@ -1,0 +1,33 @@
+# frozen_string_literal: true
+
+require "request_handler/builder/base"
+
+Filter = Struct.new(:schema, :additional_url_filter, :options, :defaults)
+
+module RequestHandler
+  module Builder
+    class FilterBuilder < Base
+      def create_klass_struct
+        @result = Filter.new
+      end
+
+      def schema(&block)
+        @result.schema = Class.new(Dry::Validation::Contract) do
+          instance_eval(&block)
+        end
+      end
+
+      def additional_url_filter(value)
+        @result.additional_url_filter = value
+      end
+
+      def options(value)
+        @result.options = value
+      end
+
+      def defaults(value)
+        @result.defaults = value
+      end
+    end
+  end
+end

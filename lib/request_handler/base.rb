@@ -17,7 +17,6 @@ module RequestHandler
     class << self
       def options(&block)
         @config ||= Docile.dsl_eval(RequestHandler::Builder::OptionsBuilder.new, &block).build
-        binding.pry
       end
 
       def inherited(subclass)
