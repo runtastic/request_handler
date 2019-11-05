@@ -10,13 +10,14 @@ require 'request_handler/multipart_parser'
 require 'request_handler/fieldsets_parser'
 require 'request_handler/query_parser'
 require 'request_handler/helper'
-require 'confstruct'
+require 'request_handler/builder/options_builder'
+
 module RequestHandler
   class Base
     class << self
       def options(&block)
-        @config ||= ::Confstruct::Configuration.new
-        @config.configure(&block)
+        @config ||= Docile.dsl_eval(RequestHandler::Builder::OptionsBuilder.new, &block).build
+        binding.pry
       end
 
       def inherited(subclass)
