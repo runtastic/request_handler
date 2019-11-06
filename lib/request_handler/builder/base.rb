@@ -8,6 +8,7 @@ module RequestHandler
 
       def initialize
         create_klass_struct
+
         # create_block_methods(blocks)
         # create_variables_methods(variables)
       end
@@ -43,6 +44,15 @@ module RequestHandler
 
       def build
         result
+      end
+
+      def respond_to(method_name)
+        return super if super
+        raise RequestHandler::SchemaValidationError
+      end
+
+      def method_missing(name, *args, &block)
+        raise RequestHandler::SchemaValidationError
       end
     end
   end

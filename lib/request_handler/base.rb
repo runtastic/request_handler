@@ -11,12 +11,16 @@ require 'request_handler/fieldsets_parser'
 require 'request_handler/query_parser'
 require 'request_handler/helper'
 require 'request_handler/builder/options_builder'
+require 'request_handler/concerns/config_helper'
 
 module RequestHandler
   class Base
+    include RequestHandler::Concerns::ConfigHelper
+
     class << self
       def options(&block)
         @config ||= Docile.dsl_eval(RequestHandler::Builder::OptionsBuilder.new, &block).build
+        # @config = deep_to_h(@config)
       end
 
       def inherited(subclass)
@@ -26,6 +30,7 @@ module RequestHandler
 
       attr_accessor :config
     end
+
     def initialize(request:)
       raise MissingArgumentError, request: 'is missing' if request.nil?
       @request = request
@@ -38,7 +43,7 @@ module RequestHandler
     def page_params
       @page_params ||= PageParser.new(
         params:      params,
-        page_config: lookup!('page')
+        page_config: lookup!(config, 'page')
       ).run
     end
 
@@ -82,7 +87,7 @@ module RequestHandler
       defaults = fetch_defaults('filter.defaults', {})
       defaults.merge(FilterParser.new(
         params:                params,
-        schema:                lookup!('filter.schema'),
+        schema:                lookup!(config, 'filter.schema'),
         additional_url_filter: lookup('filter.additional_url_filter'),
         schema_options:        execute_options(lookup('filter.options'))
       ).run)
@@ -100,7 +105,7 @@ module RequestHandler
       defaults = fetch_defaults("#{type}.defaults", [])
       result = parser.new(
         params:               params,
-        allowed_options_type: lookup!("#{type}.allowed")
+        allowed_options_type: lookup!(config, "#{type}.allowed")
       ).run
       result.empty? ? defaults : result
     end
@@ -108,7 +113,7 @@ module RequestHandler
     def parse_body_params
       BodyParser.new(
         request:          request,
-        schema:           lookup!('body.schema'),
+        schema:           lookup!(config, 'body.schema'),
         schema_options:   execute_options(lookup('body.options')),
         type:             lookup('body.type')
       ).run
@@ -117,20 +122,20 @@ module RequestHandler
     def parse_multipart_params
       MultipartsParser.new(
         request:           request,
-        multipart_config: lookup!('multipart')
+        multipart_config: lookup!(config, 'multipart')
       ).run
     end
 
     def parse_fieldsets_params
       FieldsetsParser.new(params:   params,
-                          allowed:  lookup!('fieldsets.allowed'),
+                          allowed:  lookup!(config, 'fieldsets.allowed'),
                           required: lookup('fieldsets.required') || []).run
     end
 
     def parse_query_params
       QueryParser.new(
         params:         params,
-        schema:         lookup!('query.schema'),
+        schema:         lookup!(config, 'query.schema'),
         schema_options: execute_options(lookup('query.options'))
       ).run
     end
@@ -148,14 +153,8 @@ module RequestHandler
       options.call(self, request)
     end
 
-    def lookup!(key)
-      config.lookup!(key).tap do |data|
-        raise NoConfigAvailableError, key.to_sym => 'is not configured' if data.nil?
-      end
-    end
-
     def lookup(key)
-      config.lookup!(key)
+      config.dig(*symbolize_key(key))
     end
 
     def params

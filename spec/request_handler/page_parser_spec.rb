@@ -5,14 +5,14 @@ require 'request_handler/page_parser'
 describe RequestHandler::PageParser do
   shared_examples 'valid input' do
     it 'uses the value from the params if its within the limits' do
-      handler = RequestHandler::PageParser.new(params: params, page_config: config.lookup!('page'))
+      handler = RequestHandler::PageParser.new(params: params, page_config: lookup!(config, 'page'))
       expect(handler.run).to eq(output)
     end
   end
   let(:jsonapi_error) { anything }
   shared_examples 'input that causes an error' do
     it 'raises an error' do
-      handler = RequestHandler::PageParser.new(params: params, page_config: config.lookup!('page'))
+      handler = RequestHandler::PageParser.new(params: params, page_config: lookup!(config, 'page'))
       expect { handler.run }.to raise_error(error) do |raised_error|
         expect(raised_error.errors).to contain_exactly(jsonapi_error)
       end
@@ -20,30 +20,35 @@ describe RequestHandler::PageParser do
   end
   shared_examples 'input that causes a warning' do
     it 'prints a warning' do
-      handler = RequestHandler::PageParser.new(params: params, page_config: config.lookup!('page'))
+      handler = RequestHandler::PageParser.new(params: params, page_config: lookup!(config, 'page'))
       expect(RequestHandler.configuration.logger).to receive(:warn).with(warning)
       expect(handler.run).to eq(output)
     end
   end
 
   let(:config) do
-    Confstruct::Configuration.new do
+    build_docile(RequestHandler::Builder::OptionsBuilder, &block)
+  end
+
+  let(:block) do
+    Proc.new do
       page do
         default_size 15
         max_size 50
 
-        posts do
+        resource :posts do
           default_size 30
           max_size 50
         end
 
-        users do
+        resource :users do
           default_size 20
           max_size 40
         end
       end
     end
   end
+
   context 'valid params and config' do
     context 'size from the params is below the limit' do
       let(:params) do
@@ -171,17 +176,22 @@ describe RequestHandler::PageParser do
   end
   context 'configuration problems' do
     let(:context_config) do
-      Confstruct::Configuration.new do
+      build_docile(RequestHandler::Builder::OptionsBuilder, &block)
+    end
+
+    let(:block) do
+      Proc.new do
         page do
           default_size 15
           max_size 50
-          posts do
+          resource :posts do
             default_size 30
             max_size 40
           end
         end
       end
     end
+
     let(:params) do
       {
         'page' => {

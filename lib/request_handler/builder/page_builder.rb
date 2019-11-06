@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require "request_handler/builder/base"
-require "request_handler/builder/resource_builder"
+require "request_handler/builder/page_resource_builder"
 require 'ostruct'
 
 module RequestHandler
@@ -20,11 +20,11 @@ module RequestHandler
       end
 
       def resource(name, &block)
-        @result[name.to_sym] = build_resource(&block)
+        @result[name.to_sym] = build_page_resource(&block)
       end
 
-      def build_resource(&block)
-        Docile.dsl_eval(ResourceBuilder.new, &block).build
+      def build_page_resource(&block)
+        Docile.dsl_eval(PageResourceBuilder.new, &block).build
       end
     end
   end

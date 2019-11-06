@@ -1,11 +1,13 @@
 # frozen_string_literal: true
 
 require 'request_handler/error'
+require 'request_handler/base_parser'
 require 'request_handler/schema_parser'
 require 'request_handler/document_parser'
 
 module RequestHandler
-  class MultipartsParser
+  class MultipartsParser < BaseParser
+
     def initialize(request:, multipart_config:)
       @request = request
       @params = request.params
@@ -14,7 +16,7 @@ module RequestHandler
     end
 
     def run
-      multipart_config.each_with_object({}) do |(name, config), memo|
+      deep_to_h(multipart_config).each_with_object({}) do |(name, config), memo|
         validate_presence!(name) if config[:required]
         next if params[name.to_s].nil?
         memo[name] = parse_part(name.to_s)
@@ -70,7 +72,7 @@ module RequestHandler
     end
 
     def lookup(key)
-      multipart_config.lookup!(key)
+      lookup!(multipart_config, key)
     end
 
     def execute_options(options)

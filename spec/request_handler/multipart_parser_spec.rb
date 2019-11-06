@@ -71,33 +71,37 @@ describe RequestHandler::MultipartsParser do
   end
 
   let(:config) do
-    Confstruct::Configuration.new do
+    build_docile(RequestHandler::Builder::OptionsBuilder, &block)
+  end
+
+  let(:block) do
+    Proc.new do
       multipart do
-        meta do
+        resource :meta do
           required true
           type 'jsonapi'
-          schema(Class.new(Dry::Validation::Contract) do
-                   option :query_id
-                   params do
-                     required(:id).value(:string)
-                     required(:type).value(eql?: 'post')
-                     required(:user_id).filled(:string)
-                     required(:name).filled(:string)
-                     optional(:publish_on).filled(:time)
+          schema do
+            option :query_id
+            params do
+              required(:id).value(:string)
+              required(:type).value(eql?: 'post')
+              required(:user_id).filled(:string)
+              required(:name).filled(:string)
+              optional(:publish_on).filled(:time)
 
-                     required(:category).schema do
-                       required(:id).filled(:string)
-                       required(:type).value(eql?: 'category')
-                     end
-                   end
-                   rule(:id) do
-                     key.failure('invalid id') unless values[:id] == query_id
-                   end
-                 end)
+              required(:category).schema do
+                required(:id).filled(:string)
+                required(:type).value(eql?: 'category')
+              end
+            end
+            rule(:id) do
+             key.failure('invalid id') unless values[:id] == query_id
+            end
+          end
           options(->(_parser, request) { { query_id: request.params['id'] } })
         end
 
-        file do
+        resource :file do
         end
       end
     end
@@ -169,33 +173,37 @@ describe RequestHandler::MultipartsParser do
     end
 
     let(:config) do
-      Confstruct::Configuration.new do
+      build_docile(RequestHandler::Builder::OptionsBuilder, &block)
+    end
+
+    let(:block) do
+      Proc.new do
         multipart do
-          meta do
+          resource :meta do
             required true
             type 'json'
-            schema(Class.new(Dry::Validation::Contract) do
-                     option :query_id
-                     params do
-                       required(:id).value(:string)
-                       required(:type).value(eql?: 'post')
-                       required(:user_id).filled(:string)
-                       required(:name).filled(:string)
-                       optional(:publish_on).filled(:time)
+            schema do
+              option :query_id
+              params do
+                required(:id).value(:string)
+                required(:type).value(eql?: 'post')
+                required(:user_id).filled(:string)
+                required(:name).filled(:string)
+                optional(:publish_on).filled(:time)
 
-                       required(:category).schema do
-                         required(:id).filled(:string)
-                         required(:type).value(eql?: 'category')
-                       end
-                     end
-                     rule(:id) do
-                       key.failure('invalid id') unless values[:id] == query_id
-                     end
-                   end)
+                required(:category).schema do
+                  required(:id).filled(:string)
+                  required(:type).value(eql?: 'category')
+                end
+              end
+              rule(:id) do
+                key.failure('invalid id') unless values[:id] == query_id
+              end
+            end
             options(->(_parser, request) { { query_id: request.params['id'] } })
           end
 
-          file do
+          resource :file do
           end
         end
       end

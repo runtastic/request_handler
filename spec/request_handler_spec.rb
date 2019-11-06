@@ -8,42 +8,46 @@ class IntegrationTestRequestHandler < RequestHandler::Base
       default_size 15
       max_size 50
 
-      posts do
+      resource :posts do
         default_size 30
         max_size 50
       end
 
-      posts__samples__photos do
+      resource :posts__samples__photos do
         default_size 3
       end
 
-      users do
+      resource :users do
         default_size 20
         max_size 40
       end
 
-      assets do
+      resource :assets do
         default_size 10
         max_size 15
       end
     end
 
     filter do
-      schema(Dry::Schema.Params do
-               required(:user_id).filled(:integer)
-               required(:name).filled(:string)
-               optional(:age__gt).filled(:integer)
-               optional(:age__gte).filled(:integer)
-               optional(:posts__awesome).filled(:bool)
-               optional(:posts__samples__photos__has_thumbnail).filled(:bool)
-             end)
+      schema do
+        params do
+          required(:user_id).filled(:integer)
+          required(:name).filled(:string)
+          optional(:age__gt).filled(:integer)
+          optional(:age__gte).filled(:integer)
+          optional(:posts__awesome).filled(:bool)
+          optional(:posts__samples__photos__has_thumbnail).filled(:bool)
+       end
+     end
       additional_url_filter %i[user_id]
     end
 
     query do
-      schema(Dry::Schema.Params do
-               required(:name).filled(:str?)
-             end)
+      schema do
+        params do
+          required(:name).filled(:str?)
+        end
+      end
     end
 
     include_options do
@@ -56,7 +60,7 @@ class IntegrationTestRequestHandler < RequestHandler::Base
 
     fieldsets do
       allowed do
-        posts Dry::Types['strict.string'].enum('awesome', 'samples')
+        resource :posts, Dry::Types['strict.string'].enum('awesome', 'samples')
       end
       required [:posts]
     end
@@ -78,42 +82,41 @@ end
 class IntegrationTestRequestHandlerWithBody < RequestHandler::Base
   options do
     body do
-      type type
-      schema(Class.new(Dry::Validation::Contract) do
-               option :query_id
-               params do
-                 required(:id).filled(:string)
-                 required(:type).value(eql?: 'post')
-                 required(:user_id).filled(:string)
-                 required(:name).filled(:string)
-                 optional(:publish_on).filled(:time)
+      type "jsonapi"
+      schema do
+        option :query_id
+        params do
+          required(:id).filled(:string)
+          required(:type).value(eql?: 'post')
+          required(:user_id).filled(:string)
+          required(:name).filled(:string)
+          optional(:publish_on).filled(:time)
+          required(:category).schema do
+            required(:id).filled(:string)
+            required(:type).value(eql?: 'category')
+          end
+        end
 
-                 required(:category).schema do
-                   required(:id).filled(:string)
-                   required(:type).value(eql?: 'category')
-                 end
-               end
-
-               rule(:id) do
-                 key.failure('invalid id') unless values[:id] == query_id
-               end
-             end)
+        rule(:id) do
+          key.failure('invalid id') unless values[:id] == query_id
+        end
+      end
 
       options(->(_parser, request) { { query_id: request.params['id'] } })
     end
 
     filter do
-      schema(Class.new(Dry::Validation::Contract) do
-               option :body_user_id
-               params do
-                 required(:user_id).filled(:string)
-                 required(:id).filled(:string)
-               end
+      schema do
+        option :body_user_id
+        params do
+          required(:user_id).filled(:string)
+          required(:id).filled(:string)
+        end
 
-               rule(:user_id) do
-                 key.failure('invalid user_id') unless values[:user_id] == body_user_id
-               end
-             end)
+        rule(:user_id) do
+         key.failure('invalid user_id') unless values[:user_id] == body_user_id
+        end
+      end
       additional_url_filter %i[user_id id]
       options(->(handler, _request) { { body_user_id: handler.body_params[:user_id] } })
     end
@@ -131,9 +134,9 @@ end
 class IntegrationTestRequestHandlerWithMultiparts < RequestHandler::Base
   options do
     multipart do
-      meta do
-        type type
-        schema(Class.new(Dry::Validation::Contract) do
+      resource :meta do
+        type "jsonapi"
+        schema do
           option :query_id
           params do
             required(:id).filled(:string)
@@ -151,11 +154,11 @@ class IntegrationTestRequestHandlerWithMultiparts < RequestHandler::Base
           rule(:id) do
             key.failure('invalid id') unless values[:id] == query_id
           end
-        end)
+        end
         options(->(_parser, request) { { query_id: request.params['id'] } })
       end
 
-      file do
+      resource :file do
       end
     end
   end
@@ -172,8 +175,6 @@ describe RequestHandler do
   it 'has a version' do
     expect(described_class::VERSION).not_to be_nil
   end
-
-  let(:type) { 'jsonapi' }
 
   let(:headers) do
     {
