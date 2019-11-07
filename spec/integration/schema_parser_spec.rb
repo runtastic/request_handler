@@ -41,7 +41,9 @@ describe RequestHandler do
                 options do
                   body do
                     type :jsonapi
-                    schema(schema)
+                    schema do
+                      schema
+                    end
                   end
                 end
                 def to_dto
@@ -102,7 +104,9 @@ describe RequestHandler do
               Class.new(RequestHandler::Base) do
                 options do
                   body do
-                    schema(schema)
+                    schema do
+                      schema
+                    end
                   end
                 end
                 def to_dto
@@ -129,7 +133,9 @@ describe RequestHandler do
                 options do
                   body do
                     type :json
-                    schema(schema)
+                    schema do
+                      schema
+                    end
                   end
                 end
                 def to_dto
@@ -192,7 +198,9 @@ describe RequestHandler do
             Class.new(RequestHandler::Base) do
               options do
                 filter do
-                  schema(schema)
+                  schema do
+                    schema
+                  end
                   defaults(foo: 'bar')
                 end
               end
@@ -284,7 +292,11 @@ describe RequestHandler do
             Class.new(RequestHandler::Base) do
               options do
                 query do
-                  schema(schema)
+                  schema do
+                    Dry::Schema.JSON do
+                      required(:name).filled(:str?)
+                    end
+                  end
                 end
               end
               def to_dto
@@ -344,24 +356,24 @@ describe RequestHandler do
       it_behaves_like 'it validates schemas'
     end
   end
-
-  context 'with definition engine' do
-    before do
-      RequestHandler.configure do |rh_config|
-        rh_config.validation_engine = RequestHandler::Validation::DefinitionEngine
-      end
-    end
-
-    let(:required_name_schema) do
-      Definition.Keys do
-        option :ignore_extra_keys
-
-        required :name, Definition.NonEmptyString
-      end
-    end
-
-    include_context 'with definition validation engine' do
-      it_behaves_like 'it validates schemas'
-    end
-  end
+  #
+  # context 'with definition engine' do
+  #   before do
+  #     RequestHandler.configure do |rh_config|
+  #       rh_config.validation_engine = RequestHandler::Validation::DefinitionEngine
+  #     end
+  #   end
+  #
+  #   let(:required_name_schema) do
+  #     Definition.Keys do
+  #       option :ignore_extra_keys
+  #
+  #       required :name, Definition.NonEmptyString
+  #     end
+  #   end
+  #
+  #   include_context 'with definition validation engine' do
+  #     it_behaves_like 'it validates schemas'
+  #   end
+  # end
 end

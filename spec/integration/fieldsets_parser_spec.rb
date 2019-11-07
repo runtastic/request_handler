@@ -12,7 +12,7 @@ describe RequestHandler do
           options do
             fieldsets do
               allowed do
-                posts(schema)
+                resource :posts, schema
               end
               required [:posts]
             end
@@ -75,7 +75,7 @@ describe RequestHandler do
           options do
             fieldsets do
               allowed do
-                posts true
+                resource :posts, true
               end
             end
           end

@@ -34,45 +34,25 @@ describe RequestHandler::SchemaParser do
   end
 
   let(:schema_without_options) do
-    build_docile(RequestHandler::Builder::OptionsBuilder, &block).body.schema
-  end
-
-  let(:block) do
-    Proc.new do
-      body do
-        schema do
-          params do
-            required(:test1).filled(:string)
-            required(:test2).filled(:integer, gt?: 0)
-            optional(:filter_type_in).filled(Types::ArrayFromCSV).each(Types::SupportedFilterKeys)
-          end
-        end
-      end
+    Dry::Schema.Params do
+      required(:test1).filled(:string)
+      required(:test2).filled(:integer, gt?: 0)
+      optional(:filter_type_in).filled(Types::ArrayFromCSV).each(Types::SupportedFilterKeys)
     end
   end
-
   let(:schema_with_options) do
-    build_docile(RequestHandler::Builder::OptionsBuilder, &block).body.schema
-  end
-
-  let(:block) do
-    Proc.new do
-      body do
-        schema do
-          option :testoption
-          params do
-            required(:test1).filled(:string)
-            required(:test2).filled(:integer)
-            optional(:filter_type_in).filled(Types::ArrayFromCSV).each(Types::SupportedFilterKeys)
-          end
-          rule(:test2) do
-            key.failure('invalid test_2') unless values[:test2] == testoption
-          end
-        end
+    Class.new(Dry::Validation::Contract) do
+      option :testoption
+      params do
+        required(:test1).filled(:string)
+        required(:test2).filled(:integer)
+        optional(:filter_type_in).filled(Types::ArrayFromCSV).each(Types::SupportedFilterKeys)
+      end
+      rule(:test2) do
+        key.failure('invalid test_2') unless values[:test2] == testoption
       end
     end
   end
-
   let(:testclass) do
     Class.new(described_class) do
       def initialize(schema:, schema_options: {}, data: nil)
@@ -130,20 +110,12 @@ describe RequestHandler::SchemaParser do
 
   context 'data keys get deep_symbolized when schema rules are symbols' do
     let(:schema_without_options) do
-      build_docile(RequestHandler::Builder::OptionsBuilder, &block).body.schema
-    end
-
-    let(:block) do
-      Proc.new do
-        body do
+      Dry::Schema.Params do
+        required(:simple).filled(:integer)
+        optional(:nested).maybe(%i[nil hash]) do
           schema do
-            required(:simple).filled(:integer)
-            optional(:nested).maybe(%i[nil hash]) do
-              schema do
-                required(:attr1).filled(:string)
-                required(:attr2).filled(:string)
-              end
-            end
+            required(:attr1).filled(:string)
+            required(:attr2).filled(:string)
           end
         end
       end

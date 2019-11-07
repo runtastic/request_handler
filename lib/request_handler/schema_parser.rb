@@ -17,7 +17,6 @@ module RequestHandler
 
     def validate_schema(data, with: schema)
       raise MissingArgumentError, data: 'is missing' if data.nil?
-      binding.pry
       validator = validate(data, schema: with)
       validation_failure?(validator)
       validator.output

@@ -14,7 +14,7 @@ describe RequestHandler do
             options do
               include_options do
                 allowed schema
-                defaults %i[foo bar]
+                default %i[foo bar]
               end
             end
             def to_dto
