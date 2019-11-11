@@ -16,8 +16,7 @@ module RequestHandler
     end
 
     def run
-      base = { number: extract_number, size: extract_size }
-      cfg = deep_to_h(config).keys.reduce(base) do |memo, key|
+      cfg = deep_to_h(config).keys.reduce(base_page) do |memo, key|
         next memo if TOP_LEVEL_PAGE_KEYS.include?(key)
         memo.merge!("#{key}#{separator}number".to_sym => extract_number(prefix: key),
                     "#{key}#{separator}size".to_sym   => extract_size(prefix: key))
@@ -30,6 +29,10 @@ module RequestHandler
 
     TOP_LEVEL_PAGE_KEYS = Set.new(%i[default_size max_size])
     attr_reader :page_options, :config
+
+    def base_page
+      { number: extract_number, size: extract_size }
+    end
 
     def check_for_missing_options(config)
       missing_arguments = page_options.keys - config.keys.map(&:to_s)
@@ -96,6 +99,8 @@ module RequestHandler
     def lookup_nested_config_key(key, prefix)
       key = prefix ? "#{prefix}.#{key}" : key
       lookup!(config, key)
+    rescue NoConfigAvailableError
+      nil
     end
 
     def lookup_nested_params_key(key, prefix)

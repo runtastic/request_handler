@@ -7,7 +7,6 @@ require 'request_handler/document_parser'
 
 module RequestHandler
   class MultipartsParser < BaseParser
-
     def initialize(request:, multipart_config:)
       @request = request
       @params = request.params
@@ -40,11 +39,17 @@ module RequestHandler
 
     def parse_part(name)
       params[name].fetch(:tempfile) { raise MultipartParamsError, [{ multipart_file: 'missing' }] }
-      if lookup("#{name}.schema")
+      if schema(name)
         parse_data(name)
       else
         params[name]
       end
+    end
+
+    def schema(name)
+      lookup("#{name}.schema")
+    rescue NoConfigAvailableError
+      nil
     end
 
     def parse_data(name)

@@ -417,16 +417,16 @@ describe RequestHandler::Base do
     let(:handler) { testclass.new(request: request) }
 
     it 'fails for a missing filter schema' do
-      expect { handler.send(:filter_params) }.to raise_error(RequestHandler::MissingArgumentError)
+      expect { handler.send(:filter_params) }.to raise_error(RequestHandler::NoConfigAvailableError)
     end
     it 'fails for a missing page options' do
-      expect { handler.send(:page_params) }.to raise_error(RequestHandler::MissingArgumentError)
+      expect { handler.send(:page_params) }.to raise_error(RequestHandler::NoConfigAvailableError)
     end
     it 'fails for a missing allowed include options' do
-      expect { handler.send(:include_params) }.to raise_error(RequestHandler::InternalArgumentError)
+      expect { handler.send(:include_params) }.to raise_error(RequestHandler::NoConfigAvailableError)
     end
     it 'fails for a missing allowed sort options' do
-      expect { handler.send(:sort_params) }.to raise_error(RequestHandler::InternalArgumentError)
+      expect { handler.send(:sort_params) }.to raise_error(RequestHandler::NoConfigAvailableError)
     end
     it 'fails for a missing allowed sort options' do
       expect { handler.send(:sort_params) }.to raise_error(RequestHandler::NoConfigAvailableError)
