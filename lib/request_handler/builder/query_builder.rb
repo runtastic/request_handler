@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "request_handler/builder/base"
+require 'request_handler/builder/base'
 
 Query = Struct.new(:schema, :options)
 
@@ -11,10 +11,8 @@ module RequestHandler
         @result = Query.new
       end
 
-      def schema(&block)
-        @result.schema = Class.new(Dry::Validation::Contract) do
-          instance_eval(&block)
-        end
+      def schema(value)
+        @result.schema = value
       end
 
       def options(value)

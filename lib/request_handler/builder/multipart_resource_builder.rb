@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "request_handler/builder/base"
+require 'request_handler/builder/base'
 
 MultipartResource = Struct.new(:required, :schema, :type, :options)
 
@@ -23,10 +23,8 @@ module RequestHandler
         @result[name.to_sym] = build_multipart_resource(&block)
       end
 
-      def schema(&block)
-        @result.schema = Class.new(Dry::Validation::Contract) do
-          instance_eval(&block)
-        end
+      def schema(value)
+        @result.schema = value
       end
 
       def options(value)

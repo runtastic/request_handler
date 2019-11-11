@@ -75,29 +75,29 @@ describe RequestHandler::MultipartsParser do
   end
 
   let(:block) do
-    Proc.new do
+    proc do
       multipart do
         resource :meta do
           required true
           type 'jsonapi'
-          schema do
-            option :query_id
-            params do
-              required(:id).value(:string)
-              required(:type).value(eql?: 'post')
-              required(:user_id).filled(:string)
-              required(:name).filled(:string)
-              optional(:publish_on).filled(:time)
+          schema(Class.new(Dry::Validation::Contract) do
+                   option :query_id
+                   params do
+                     required(:id).value(:string)
+                     required(:type).value(eql?: 'post')
+                     required(:user_id).filled(:string)
+                     required(:name).filled(:string)
+                     optional(:publish_on).filled(:time)
 
-              required(:category).schema do
-                required(:id).filled(:string)
-                required(:type).value(eql?: 'category')
-              end
-            end
-            rule(:id) do
-             key.failure('invalid id') unless values[:id] == query_id
-            end
-          end
+                     required(:category).schema do
+                       required(:id).filled(:string)
+                       required(:type).value(eql?: 'category')
+                     end
+                   end
+                   rule(:id) do
+                     key.failure('invalid id') unless values[:id] == query_id
+                   end
+                 end)
           options(->(_parser, request) { { query_id: request.params['id'] } })
         end
 
@@ -177,29 +177,29 @@ describe RequestHandler::MultipartsParser do
     end
 
     let(:block) do
-      Proc.new do
+      proc do
         multipart do
           resource :meta do
             required true
             type 'json'
-            schema do
-              option :query_id
-              params do
-                required(:id).value(:string)
-                required(:type).value(eql?: 'post')
-                required(:user_id).filled(:string)
-                required(:name).filled(:string)
-                optional(:publish_on).filled(:time)
+            schema(Class.new(Dry::Validation::Contract) do
+                     option :query_id
+                     params do
+                       required(:id).value(:string)
+                       required(:type).value(eql?: 'post')
+                       required(:user_id).filled(:string)
+                       required(:name).filled(:string)
+                       optional(:publish_on).filled(:time)
 
-                required(:category).schema do
-                  required(:id).filled(:string)
-                  required(:type).value(eql?: 'category')
-                end
-              end
-              rule(:id) do
-                key.failure('invalid id') unless values[:id] == query_id
-              end
-            end
+                       required(:category).schema do
+                         required(:id).filled(:string)
+                         required(:type).value(eql?: 'category')
+                       end
+                     end
+                     rule(:id) do
+                       key.failure('invalid id') unless values[:id] == query_id
+                     end
+                   end)
             options(->(_parser, request) { { query_id: request.params['id'] } })
           end
 

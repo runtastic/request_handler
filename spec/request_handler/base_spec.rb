@@ -111,8 +111,7 @@ describe RequestHandler::Base do
       Class.new(RequestHandler::Base) do
         options do
           filter do
-            schema do
-            end
+            schema 'schema'
             additional_url_filter 'url_filter'
             options(opts)
             defaults(defs)
@@ -123,7 +122,7 @@ describe RequestHandler::Base do
     let(:expected_args) do
       {
         params:                params,
-        schema:                Proc.new,
+        schema:                'schema',
         additional_url_filter: 'url_filter',
         schema_options:        tested_options[:output]
       }
@@ -262,8 +261,7 @@ describe RequestHandler::Base do
         options do
           multipart do
             resource :meta do
-              schema do
-              end
+              schema 'schema'
               options opts
             end
             resource :file do
@@ -275,11 +273,10 @@ describe RequestHandler::Base do
     let(:expected_args) do
       {
         request:           request,
-        multipart_config: { meta: { schema: schema, options: anything }, file: {} }
+        multipart_config: { meta: { schema: 'schema', options: anything }, file: {} }
       }
     end
 
-    let(:schema) { Proc.new {}}
     let(:tested_method) { :multipart_params }
     let(:tested_parser) { RequestHandler::MultipartsParser }
     let(:tested_options) do
@@ -296,9 +293,7 @@ describe RequestHandler::Base do
       Class.new(RequestHandler::Base) do
         options do
           body do
-            schema do
-
-            end
+            schema 'schema'
             type 'jsonapi'
             options(opts)
           end
@@ -433,5 +428,117 @@ describe RequestHandler::Base do
     it 'fails for a missing allowed sort options' do
       expect { handler.send(:sort_params) }.to raise_error(RequestHandler::InternalArgumentError)
     end
+    it 'fails for a missing allowed sort options' do
+      expect { handler.send(:sort_params) }.to raise_error(RequestHandler::NoConfigAvailableError)
+    end
+    it 'fails for a missing body schema' do
+      expect { handler.send(:body_params) }.to raise_error(RequestHandler::NoConfigAvailableError)
+    end
+    it 'fails for a missing required fieldset params' do
+      handler.send(:config).push!(fieldset: { allowed: Dry::Types['strict.string'].enum('foo', 'bar') })
+      expect { handler.send(:fieldsets_params) }.to raise_error(RequestHandler::NoConfigAvailableError)
+    end
+    it 'fails for a missing alowed fieldset params' do
+      handler.send(:config).push!(fieldset: { required: ['Foo'] })
+      expect { handler.send(:fieldsets_params) }.to raise_error(RequestHandler::NoConfigAvailableError)
+    end
   end
+
+  # context 'config inheritence' do
+  #   class Parent < RequestHandler::Base
+  #     options do
+  #       level0_overwritten 'parent_0_o'
+  #       level0_parent 'parent_0_n'
+  #       level_1 do
+  #         level1_overwritten 'parent_1_o'
+  #         level1_parent 'parent_1_n'
+  #         level_2 do
+  #           level2_overwritten 'parent_2_o'
+  #           level2_parent 'parent_2_n'
+  #         end
+  #       end
+  #     end
+  #   end
+  #   class Child < Parent
+  #     options do
+  #       level0_overwritten 'child_0_o'
+  #       level0_child 'child_0_c'
+  #       level_1 do
+  #         level1_overwritten 'child_1_o'
+  #         level1_child 'child_1_c'
+  #         level_2 do
+  #           level2_overwritten 'child_2_o'
+  #           level2_child 'child_2_c'
+  #         end
+  #       end
+  #     end
+  #   end
+
+  #   let(:parent) { Parent.new(request: request) }
+  #   let(:child) { Child.new(request: request) }
+
+  #   context 'the parentclass' do
+  #     it 'still has the correct not nested attribute after being inherited' do
+  #       expect(parent.send(:config).lookup!('level0_overwritten')).to eq('parent_0_o')
+  #     end
+  #     it 'still has the correct not nested attribute that is not overwritten after being inherited' do
+  #       expect(parent.send(:config).lookup!('level0_parent')).to eq('parent_0_n')
+  #     end
+  #     it 'does not have the not nested attribute that was introduced in the child' do
+  #       expect(parent.send(:config).lookup!('level0_child')).to eq(nil)
+  #     end
+
+  #     it 'still has the correct nested attribute after being inherited' do
+  #       expect(parent.send(:config).lookup!('level_1.level1_overwritten')).to eq('parent_1_o')
+  #     end
+  #     it 'still has the correct nested attribute that is not overwritten after being inherited' do
+  #       expect(parent.send(:config).lookup!('level_1.level1_parent')).to eq('parent_1_n')
+  #     end
+  #     it 'does not have the nested attribute that was introduced in the child' do
+  #       expect(parent.send(:config).lookup!('level_1.level1_child')).to eq(nil)
+  #     end
+
+  #     it 'still has the correct double nested attribute after being inherited' do
+  #       expect(parent.send(:config).lookup!('level_1.level_2.level2_overwritten')).to eq('parent_2_o')
+  #     end
+  #     it 'still has the correct double nested attribute that is not overwritten after being inherited' do
+  #       expect(parent.send(:config).lookup!('level_1.level_2.level2_parent')).to eq('parent_2_n')
+  #     end
+  #     it 'does not have the double nested attribute that was introduced in the child' do
+  #       expect(parent.send(:config).lookup!('level_1.level_2.level2_child')).to eq(nil)
+  #     end
+  #   end
+
+  #   context 'the childclass' do
+  #     it 'overwrites the not nested attribute correctly' do
+  #       expect(child.send(:config).lookup!('level0_overwritten')).to eq('child_0_o')
+  #     end
+  #     it "doesn't overwrite the not nested attribute that it shoudn't" do
+  #       expect(child.send(:config).lookup!('level0_parent')).to eq('parent_0_n')
+  #     end
+  #     it 'has the not nested attribute that was introduced by the child' do
+  #       expect(child.send(:config).lookup!('level0_child')).to eq('child_0_c')
+  #     end
+
+  #     it 'overwrites the nested attribute correctly' do
+  #       expect(child.send(:config).lookup!('level_1.level1_overwritten')).to eq('child_1_o')
+  #     end
+  #     it "doesn't overwrite the nested attribute that it shoudn't" do
+  #       expect(child.send(:config).lookup!('level_1.level1_parent')).to eq('parent_1_n')
+  #     end
+  #     it 'has the nested attribute that was introduced by the child' do
+  #       expect(child.send(:config).lookup!('level_1.level1_child')).to eq('child_1_c')
+  #     end
+
+  #     it 'overwrites the double nested attribute correctly' do
+  #       expect(child.send(:config).lookup!('level_1.level_2.level2_overwritten')).to eq('child_2_o')
+  #     end
+  #     it "doesn't overwrite the double nested attribute that it shoudn't" do
+  #       expect(child.send(:config).lookup!('level_1.level_2.level2_parent')).to eq('parent_2_n')
+  #     end
+  #     it 'has the double nested attribute that was introduced by the child' do
+  #       expect(child.send(:config).lookup!('level_1.level_2.level2_child')).to eq('child_2_c')
+  #     end
+  # end
+  # end
 end
