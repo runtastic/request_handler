@@ -2,7 +2,7 @@
 
 require 'request_handler/builder/base'
 
-IncludeOptions = Struct.new(:allowed, :default)
+IncludeOptions = Struct.new(:allowed, :defaults)
 
 module RequestHandler
   module Builder
@@ -15,8 +15,8 @@ module RequestHandler
         @result.allowed = value
       end
 
-      def default(value)
-        @result.default = value
+      def defaults(value)
+        @result.defaults = value
       end
     end
   end

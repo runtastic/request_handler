@@ -192,7 +192,7 @@ describe RequestHandler::Base do
         options do
           include_options do
             allowed 'allowed_options'
-            default defs
+            defaults defs
           end
         end
       end
@@ -219,7 +219,7 @@ describe RequestHandler::Base do
         options do
           sort_options do
             allowed 'allowed_options'
-            default defs
+            defaults defs
           end
         end
       end

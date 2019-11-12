@@ -108,7 +108,7 @@ class DemoHandler < RequestHandler::Base
     page do
       default_size 10
       max_size 20
-      comments do
+      resource :comments do
         default_size 20
         max_size 100
       end
@@ -224,7 +224,7 @@ file related to the question
 class CreateQuestionHandler < RequestHandler::Base
   options do
     multipart do
-      question do
+      resource :question do
         required true
         type "json"
         schema(
@@ -236,7 +236,7 @@ class CreateQuestionHandler < RequestHandler::Base
         )
       end
 
-      file do
+      resource :file do
         # no validation necessary
       end
     end
