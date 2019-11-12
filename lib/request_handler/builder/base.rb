@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-require 'pry'
+require 'ostruct'
+
 module RequestHandler
   module Builder
     class Base

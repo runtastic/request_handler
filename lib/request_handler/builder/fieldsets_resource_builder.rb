@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-require 'request_handler/builder/base'
-require 'ostruct'
+require "request_handler/builder/base"
 
 module RequestHandler
   module Builder

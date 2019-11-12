@@ -8,5 +8,4 @@ end
 
 def build_docile(class_name, &block)
   Docile.dsl_eval(class_name.new, &block).build
-  # deep_to_h(config)
 end

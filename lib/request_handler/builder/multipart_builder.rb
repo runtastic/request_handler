@@ -2,7 +2,6 @@
 
 require 'request_handler/builder/base'
 require 'request_handler/builder/multipart_resource_builder'
-require 'ostruct'
 
 module RequestHandler
   module Builder
