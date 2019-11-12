@@ -262,7 +262,6 @@ describe RequestHandler::Base do
           multipart do
             resource :meta do
               schema 'schema'
-              options opts
             end
             resource :file do
             end
@@ -273,7 +272,7 @@ describe RequestHandler::Base do
     let(:expected_args) do
       {
         request:           request,
-        multipart_config: { meta: { schema: 'schema', options: anything }, file: {} }
+        multipart_config: { meta: MultipartResource.new(nil, "schema"), file: MultipartResource.new }
       }
     end
 
@@ -435,11 +434,15 @@ describe RequestHandler::Base do
       expect { handler.send(:body_params) }.to raise_error(RequestHandler::NoConfigAvailableError)
     end
     it 'fails for a missing required fieldset params' do
-      handler.send(:config).push!(fieldset: { allowed: Dry::Types['strict.string'].enum('foo', 'bar') })
+      config = handler.send(:config)
+      resource = OpenStruct.new(posts: Dry::Types['strict.string'].enum('foo', 'bar'))
+      config.fieldsets = Fieldsets.new(resource)
       expect { handler.send(:fieldsets_params) }.to raise_error(RequestHandler::NoConfigAvailableError)
     end
-    it 'fails for a missing alowed fieldset params' do
-      handler.send(:config).push!(fieldset: { required: ['Foo'] })
+
+    it 'fails for a missing allowed fieldset params' do
+      config = handler.send(:config)
+      config.fieldsets = Fieldsets.new(nil, ['Foo'])
       expect { handler.send(:fieldsets_params) }.to raise_error(RequestHandler::NoConfigAvailableError)
     end
   end

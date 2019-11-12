@@ -122,7 +122,7 @@ module RequestHandler
     def parse_multipart_params
       MultipartsParser.new(
         request:           request,
-        multipart_config: lookup!(config, 'multipart')
+        multipart_config: lookup!(config, 'multipart').to_h
       ).run
     end
 

@@ -3,13 +3,13 @@
 require "request_handler/builder/base"
 require "request_handler/builder/fieldsets_resource_builder"
 
-Fieldset = Struct.new(:allowed, :required)
+Fieldsets = Struct.new(:allowed, :required)
 
 module RequestHandler
   module Builder
     class FieldsetsBuilder < Base
       def create_klass_struct
-        @result = Fieldset.new
+        @result = Fieldsets.new
       end
 
       def allowed(&block)

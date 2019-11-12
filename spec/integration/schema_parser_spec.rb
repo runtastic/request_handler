@@ -280,14 +280,11 @@ describe RequestHandler do
         end
         context 'valid schema' do
           let(:testclass) do
+            schema = required_name_schema
             Class.new(RequestHandler::Base) do
               options do
                 query do
-                  schema(
-                    Dry::Schema.JSON do
-                      required(:name).filled(:str?)
-                    end
-                  )
+                  schema(schema)
                 end
               end
               def to_dto
