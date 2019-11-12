@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "request_handler/builder/base"
+require 'request_handler/builder/base'
 
 PageResource = Struct.new(:default_size, :max_size)
 

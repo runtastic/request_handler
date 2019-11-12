@@ -256,7 +256,6 @@ describe RequestHandler::Base do
 
   context '#multipart_params' do
     let(:testclass) do
-      opts = tested_options[:input]
       Class.new(RequestHandler::Base) do
         options do
           multipart do
@@ -272,7 +271,7 @@ describe RequestHandler::Base do
     let(:expected_args) do
       {
         request:           request,
-        multipart_config: { meta: MultipartResource.new(nil, "schema"), file: MultipartResource.new }
+        multipart_config: { meta: MultipartResource.new(nil, 'schema'), file: MultipartResource.new }
       }
     end
 
@@ -433,11 +432,11 @@ describe RequestHandler::Base do
     it 'fails for a missing body schema' do
       expect { handler.send(:body_params) }.to raise_error(RequestHandler::NoConfigAvailableError)
     end
-    it 'fails for a missing required fieldset params' do
+    it "doesn't fails for a missing required fieldset params" do
       config = handler.send(:config)
       resource = OpenStruct.new(posts: Dry::Types['strict.string'].enum('foo', 'bar'))
       config.fieldsets = Fieldsets.new(resource)
-      expect { handler.send(:fieldsets_params) }.to raise_error(RequestHandler::NoConfigAvailableError)
+      expect { handler.send(:fieldsets_params) }.not_to raise_error(RequestHandler::NoConfigAvailableError)
     end
 
     it 'fails for a missing allowed fieldset params' do

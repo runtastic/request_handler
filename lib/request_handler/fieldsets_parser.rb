@@ -7,7 +7,7 @@ module RequestHandler
     def initialize(params:, allowed: {}, required: [])
       @params = params
       allowed.reject! { |_k, v| v == false }
-      allowed.each_pair do |key, value|
+      allowed.each_pair do |_key, value|
         raise InternalArgumentError, allowed: 'must be a Schema or a Boolean' unless
           RequestHandler.configuration.validation_engine.valid_schema?(value) ||
           value.is_a?(TrueClass) || value.is_a?(FalseClass)

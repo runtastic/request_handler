@@ -7,7 +7,7 @@ describe RequestHandler::FieldsetsParser do
   end
 
   let(:block) do
-    Proc.new do
+    proc do
       fieldsets do
         allowed do
           resource :posts, Dry::Types['strict.string'].enum('awesome', 'samples')

@@ -1,17 +1,17 @@
 # frozen_string_literal: true
 
-require "request_handler/builder/base"
-require "request_handler/builder/page_builder"
-require "request_handler/builder/include_options_builder"
-require "request_handler/builder/sort_options_builder"
-require "request_handler/builder/filter_builder"
-require "request_handler/builder/query_builder"
-require "request_handler/builder/body_builder"
-require "request_handler/builder/multipart_builder"
-require "request_handler/builder/fieldsets_builder"
+require 'request_handler/builder/base'
+require 'request_handler/builder/page_builder'
+require 'request_handler/builder/include_options_builder'
+require 'request_handler/builder/sort_options_builder'
+require 'request_handler/builder/filter_builder'
+require 'request_handler/builder/query_builder'
+require 'request_handler/builder/body_builder'
+require 'request_handler/builder/multipart_builder'
+require 'request_handler/builder/fieldsets_builder'
 
 Options = Struct.new(:page, :include_options, :sort_options, :filter, :query, :body,
-                      :multipart, :fieldsets)
+                     :multipart, :fieldsets)
 
 module RequestHandler
   module Builder

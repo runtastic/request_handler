@@ -31,7 +31,7 @@ describe RequestHandler::PageParser do
   end
 
   let(:block) do
-    Proc.new do
+    proc do
       page do
         default_size 15
         max_size 50
@@ -180,7 +180,7 @@ describe RequestHandler::PageParser do
     end
 
     let(:block) do
-      Proc.new do
+      proc do
         page do
           default_size 15
           max_size 50
