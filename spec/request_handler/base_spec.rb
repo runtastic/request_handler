@@ -426,9 +426,6 @@ describe RequestHandler::Base do
     it 'fails for a missing allowed sort options' do
       expect { handler.send(:sort_params) }.to raise_error(RequestHandler::NoConfigAvailableError)
     end
-    it 'fails for a missing allowed sort options' do
-      expect { handler.send(:sort_params) }.to raise_error(RequestHandler::NoConfigAvailableError)
-    end
     it 'fails for a missing body schema' do
       expect { handler.send(:body_params) }.to raise_error(RequestHandler::NoConfigAvailableError)
     end
