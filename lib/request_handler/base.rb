@@ -12,6 +12,7 @@ require 'request_handler/query_parser'
 require 'request_handler/helper'
 require 'request_handler/builder/options_builder'
 require 'request_handler/concerns/config_helper'
+require 'docile'
 
 module RequestHandler
   class Base
