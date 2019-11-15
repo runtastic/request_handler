@@ -2,11 +2,11 @@
 
 require 'request_handler/builder/base'
 
-PageResource = Struct.new(:default_size, :max_size)
-
 module RequestHandler
   module Builder
     class PageResourceBuilder < Base
+      PageResource = Struct.new(:default_size, :max_size)
+
       def create_klass_struct
         @result = PageResource.new
       end

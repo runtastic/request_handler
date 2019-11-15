@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-require "request_handler/builder/base"
-
-SortOptions = Struct.new(:allowed, :defaults)
+require 'request_handler/builder/base'
 
 module RequestHandler
   module Builder
     class SortOptionsBuilder < Base
+      SortOptions = Struct.new(:allowed, :defaults)
+
       def create_klass_struct
         @result = SortOptions.new
       end

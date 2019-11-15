@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-require "request_handler/builder/base"
-require "request_handler/builder/fieldsets_resource_builder"
-
-Fieldsets = Struct.new(:allowed, :required)
+require 'request_handler/builder/base'
+require 'request_handler/builder/fieldsets_resource_builder'
 
 module RequestHandler
   module Builder
     class FieldsetsBuilder < Base
+      Fieldsets = Struct.new(:allowed, :required)
+
       def create_klass_struct
         @result = Fieldsets.new
       end

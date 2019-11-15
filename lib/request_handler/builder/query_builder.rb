@@ -2,11 +2,11 @@
 
 require 'request_handler/builder/base'
 
-Query = Struct.new(:schema, :options)
-
 module RequestHandler
   module Builder
     class QueryBuilder < Base
+      Query = Struct.new(:schema, :options)
+
       def create_klass_struct
         @result = Query.new
       end

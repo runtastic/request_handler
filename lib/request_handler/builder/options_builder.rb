@@ -10,12 +10,12 @@ require 'request_handler/builder/body_builder'
 require 'request_handler/builder/multipart_builder'
 require 'request_handler/builder/fieldsets_builder'
 
-Options = Struct.new(:page, :include_options, :sort_options, :filter, :query, :body,
-                     :multipart, :fieldsets)
-
 module RequestHandler
   module Builder
     class OptionsBuilder < Base
+      Options = Struct.new(:page, :include_options, :sort_options, :filter, :query, :body,
+                           :multipart, :fieldsets)
+
       def create_klass_struct
         @result = Options.new
       end

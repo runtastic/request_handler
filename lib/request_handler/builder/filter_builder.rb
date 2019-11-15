@@ -2,11 +2,11 @@
 
 require 'request_handler/builder/base'
 
-Filter = Struct.new(:schema, :additional_url_filter, :options, :defaults)
-
 module RequestHandler
   module Builder
     class FilterBuilder < Base
+      Filter = Struct.new(:schema, :additional_url_filter, :options, :defaults)
+
       def create_klass_struct
         @result = Filter.new
       end

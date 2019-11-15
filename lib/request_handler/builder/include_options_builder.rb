@@ -2,11 +2,11 @@
 
 require 'request_handler/builder/base'
 
-IncludeOptions = Struct.new(:allowed, :defaults)
-
 module RequestHandler
   module Builder
     class IncludeOptionsBuilder < Base
+      IncludeOptions = Struct.new(:allowed, :defaults)
+
       def create_klass_struct
         @result = IncludeOptions.new
       end

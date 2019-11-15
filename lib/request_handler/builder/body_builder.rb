@@ -2,11 +2,11 @@
 
 require 'request_handler/builder/base'
 
-Body = Struct.new(:type, :schema, :options)
-
 module RequestHandler
   module Builder
     class BodyBuilder < Base
+      Body = Struct.new(:type, :schema, :options)
+
       def create_klass_struct
         @result = Body.new
       end
