@@ -98,9 +98,7 @@ module RequestHandler
 
     def lookup_nested_config_key(key, prefix)
       key = prefix ? "#{prefix}.#{key}" : key
-      lookup!(config, key)
-    rescue NoConfigAvailableError
-      nil
+      lookup(config, key)
     end
 
     def lookup_nested_params_key(key, prefix)

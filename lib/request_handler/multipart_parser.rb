@@ -47,19 +47,17 @@ module RequestHandler
     end
 
     def schema(name)
-      lookup("#{name}.schema")
-    rescue NoConfigAvailableError
-      nil
+      lookup(multipart_config, "#{name}.schema")
     end
 
     def parse_data(name)
       data = load_json(name)
-      type = lookup("#{name}.type")
+      type = lookup(multipart_config, "#{name}.type")
       DocumentParser.new(
         type:             type,
         document:         data,
-        schema:           lookup("#{name}.schema"),
-        schema_options:   execute_options(lookup("#{name}.options"))
+        schema:           lookup(multipart_config, "#{name}.schema"),
+        schema_options:   execute_options(lookup(multipart_config, "#{name}.options"))
       ).run
     end
 
@@ -74,10 +72,6 @@ module RequestHandler
 
     def multipart_file(name)
       params[name][:tempfile]
-    end
-
-    def lookup(key)
-      lookup!(multipart_config, key)
     end
 
     def execute_options(options)

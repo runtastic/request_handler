@@ -9,6 +9,10 @@ module RequestHandler
         end
       end
 
+      def lookup(config, key)
+        config.dig(*symbolize_key(key))
+      end
+
       def symbolize_key(key)
         key.split('.').map(&:to_sym)
       end

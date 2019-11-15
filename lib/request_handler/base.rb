@@ -88,8 +88,8 @@ module RequestHandler
       defaults.merge(FilterParser.new(
         params:                params,
         schema:                lookup!(config, 'filter.schema'),
-        additional_url_filter: lookup('filter.additional_url_filter'),
-        schema_options:        execute_options(lookup('filter.options'))
+        additional_url_filter: lookup(config, 'filter.additional_url_filter'),
+        schema_options:        execute_options(lookup(config, 'filter.options'))
       ).run)
     end
 
@@ -114,8 +114,8 @@ module RequestHandler
       BodyParser.new(
         request:          request,
         schema:           lookup!(config, 'body.schema'),
-        schema_options:   execute_options(lookup('body.options')),
-        type:             lookup('body.type')
+        schema_options:   execute_options(lookup(config, 'body.options')),
+        type:             lookup(config, 'body.type')
       ).run
     end
 
@@ -129,19 +129,19 @@ module RequestHandler
     def parse_fieldsets_params
       FieldsetsParser.new(params:   params,
                           allowed:  lookup!(config, 'fieldsets.allowed'),
-                          required: lookup('fieldsets.required') || []).run
+                          required: lookup(config, 'fieldsets.required') || []).run
     end
 
     def parse_query_params
       QueryParser.new(
         params:         params,
         schema:         lookup!(config, 'query.schema'),
-        schema_options: execute_options(lookup('query.options'))
+        schema_options: execute_options(lookup(config, 'query.options'))
       ).run
     end
 
     def fetch_defaults(key, default)
-      value = lookup(key)
+      value = lookup(config, key)
       return default if value.nil?
       return value unless value.respond_to?(:call)
       value.call(request)
@@ -151,10 +151,6 @@ module RequestHandler
       return {} if options.nil?
       return options unless options.respond_to?(:call)
       options.call(self, request)
-    end
-
-    def lookup(key)
-      config.dig(*symbolize_key(key))
     end
 
     def params
