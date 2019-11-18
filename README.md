@@ -115,7 +115,7 @@ class DemoHandler < RequestHandler::Base
     end
 
     include_options do
-      allowed Dry::Types["strict.string"].enum("comments", "author")
+      allowed Dry::Types::Strict::String.enum("comments", "author")
     end
 
     sort_options do
@@ -363,9 +363,9 @@ In request_handler 1.x it was possible to define custom resource names like this
 
 ```ruby
 options  do
-  page do
-    comments do
-      default_size 20
+  fieldsets do
+    allowed do
+      posts schema
     end
   end
 end
@@ -376,10 +376,10 @@ Starting with version 2.0 you will have to define those custom resources via the
 `resource` key:
 
 ```ruby
-options  do
-  page do
-    resource :comments do
-      default_size 20
+options do
+  fieldsets do
+    allowed do
+      resource :posts, schema
     end
   end
 end

@@ -15,10 +15,10 @@ module RequestHandler
     end
 
     def run
-      deep_to_h(multipart_config).each_with_object({}) do |(name, config), memo|
+      deep_to_h(multipart_config).each_with_object({}) do |(name, config), indexed_parts|
         validate_presence!(name) if config[:required]
         next if params[name.to_s].nil?
-        memo[name] = parse_part(name.to_s)
+        indexed_parts[name] = parse_part(name.to_s)
       end
     end
 

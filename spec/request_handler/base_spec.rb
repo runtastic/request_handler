@@ -432,7 +432,7 @@ describe RequestHandler::Base do
     it 'fails for a missing body schema' do
       expect { handler.send(:body_params) }.to raise_error(RequestHandler::NoConfigAvailableError)
     end
-    it "doesn't fails for a missing required fieldset params" do
+    it "doesn't fail for a missing required fieldset params" do
       config = handler.send(:config)
       resource = OpenStruct.new(posts: Dry::Types['strict.string'].enum('foo', 'bar'))
       config.fieldsets = RequestHandler::Builder::FieldsetsBuilder::Fieldsets.new(resource)
