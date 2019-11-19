@@ -4,9 +4,7 @@ module RequestHandler
   module Concerns
     module ConfigHelper
       def lookup!(hash, key)
-        hash.dig(*symbolize_key(key)).tap do |data|
-          raise NoConfigAvailableError, key.to_sym => 'is not configured' if data.nil?
-        end
+        lookup(hash, key) || (raise NoConfigAvailableError, key.to_sym => 'is not configured')
       end
 
       def lookup(config, key)

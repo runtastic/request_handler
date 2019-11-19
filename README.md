@@ -115,7 +115,7 @@ class DemoHandler < RequestHandler::Base
     end
 
     include_options do
-      allowed Dry::Types::Strict::String.enum("comments", "author")
+      allowed Dry::Types["strict.string"].enum("comments", "author")
     end
 
     sort_options do
