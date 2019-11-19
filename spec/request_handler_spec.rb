@@ -8,21 +8,21 @@ class IntegrationTestRequestHandler < RequestHandler::Base
       default_size 15
       max_size 50
 
-      posts do
+      resource :posts do
         default_size 30
         max_size 50
       end
 
-      posts__samples__photos do
+      resource :posts__samples__photos do
         default_size 3
       end
 
-      users do
+      resource :users do
         default_size 20
         max_size 40
       end
 
-      assets do
+      resource :assets do
         default_size 10
         max_size 15
       end
@@ -56,7 +56,7 @@ class IntegrationTestRequestHandler < RequestHandler::Base
 
     fieldsets do
       allowed do
-        posts Dry::Types['strict.string'].enum('awesome', 'samples')
+        resource :posts, Dry::Types['strict.string'].enum('awesome', 'samples')
       end
       required [:posts]
     end
@@ -78,7 +78,7 @@ end
 class IntegrationTestRequestHandlerWithBody < RequestHandler::Base
   options do
     body do
-      type type
+      type 'jsonapi'
       schema(Class.new(Dry::Validation::Contract) do
                option :query_id
                params do
@@ -98,7 +98,6 @@ class IntegrationTestRequestHandlerWithBody < RequestHandler::Base
                  key.failure('invalid id') unless values[:id] == query_id
                end
              end)
-
       options(->(_parser, request) { { query_id: request.params['id'] } })
     end
 
@@ -131,8 +130,8 @@ end
 class IntegrationTestRequestHandlerWithMultiparts < RequestHandler::Base
   options do
     multipart do
-      meta do
-        type type
+      resource :meta do
+        type 'jsonapi'
         schema(Class.new(Dry::Validation::Contract) do
           option :query_id
           params do
@@ -155,7 +154,7 @@ class IntegrationTestRequestHandlerWithMultiparts < RequestHandler::Base
         options(->(_parser, request) { { query_id: request.params['id'] } })
       end
 
-      file do
+      resource :file do
       end
     end
   end
@@ -172,8 +171,6 @@ describe RequestHandler do
   it 'has a version' do
     expect(described_class::VERSION).not_to be_nil
   end
-
-  let(:type) { 'jsonapi' }
 
   let(:headers) do
     {

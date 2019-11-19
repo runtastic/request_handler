@@ -355,7 +355,6 @@ describe RequestHandler do
     let(:required_name_schema) do
       Definition.Keys do
         option :ignore_extra_keys
-
         required :name, Definition.NonEmptyString
       end
     end

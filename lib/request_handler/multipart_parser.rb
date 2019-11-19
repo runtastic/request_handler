@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 
 require 'request_handler/error'
+require 'request_handler/base_parser'
 require 'request_handler/schema_parser'
 require 'request_handler/document_parser'
 
 module RequestHandler
-  class MultipartsParser
+  class MultipartsParser < BaseParser
     def initialize(request:, multipart_config:)
       @request = request
       @params = request.params
@@ -14,10 +15,10 @@ module RequestHandler
     end
 
     def run
-      multipart_config.each_with_object({}) do |(name, config), memo|
+      deep_to_h(multipart_config).each_with_object({}) do |(name, config), indexed_parts|
         validate_presence!(name) if config[:required]
         next if params[name.to_s].nil?
-        memo[name] = parse_part(name.to_s)
+        indexed_parts[name] = parse_part(name.to_s)
       end
     end
 
@@ -38,7 +39,7 @@ module RequestHandler
 
     def parse_part(name)
       params[name].fetch(:tempfile) { raise MultipartParamsError, [{ multipart_file: 'missing' }] }
-      if lookup("#{name}.schema")
+      if lookup(multipart_config, "#{name}.schema")
         parse_data(name)
       else
         params[name]
@@ -47,12 +48,12 @@ module RequestHandler
 
     def parse_data(name)
       data = load_json(name)
-      type = lookup("#{name}.type")
+      type = lookup(multipart_config, "#{name}.type")
       DocumentParser.new(
         type:             type,
         document:         data,
-        schema:           lookup("#{name}.schema"),
-        schema_options:   execute_options(lookup("#{name}.options"))
+        schema:           lookup(multipart_config, "#{name}.schema"),
+        schema_options:   execute_options(lookup(multipart_config, "#{name}.options"))
       ).run
     end
 
@@ -67,10 +68,6 @@ module RequestHandler
 
     def multipart_file(name)
       params[name][:tempfile]
-    end
-
-    def lookup(key)
-      multipart_config.lookup!(key)
     end
 
     def execute_options(options)

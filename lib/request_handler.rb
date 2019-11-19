@@ -3,7 +3,6 @@
 require 'request_handler/version'
 require 'request_handler/base'
 require 'request_handler/validation/dry_engine'
-require 'confstruct'
 require 'multi_json'
 require 'logger'
 require 'gem_config'

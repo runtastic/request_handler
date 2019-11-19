@@ -108,7 +108,7 @@ class DemoHandler < RequestHandler::Base
     page do
       default_size 10
       max_size 20
-      comments do
+      resource :comments do
         default_size 20
         max_size 100
       end
@@ -224,7 +224,7 @@ file related to the question
 class CreateQuestionHandler < RequestHandler::Base
   options do
     multipart do
-      question do
+      resource :question do
         required true
         type "json"
         schema(
@@ -236,7 +236,7 @@ class CreateQuestionHandler < RequestHandler::Base
         )
       end
 
-      file do
+      resource :file do
         # no validation necessary
       end
     end
@@ -332,6 +332,128 @@ get "/users/:user_id/posts" do
   # more code
 end
 ```
+
+## v1 to v2 migration guide
+Multiple breaking changes were introduced with request_handler 2.0. This section
+describes which steps have to be taken in order to migrate from 1.x to 2.0.
+
+### Configure validation engine
+By default the DryEngine was used in 1.0. You now have to explicitly configure
+a validation engine:
+
+```ruby
+RequestHandler.configure do |config|
+  config.validation_engine = RequestHandler::Validation::DryEngine
+end
+```
+
+### Add dry dependency if you use the DryEngine
+Since the DryEngine is not configured by default anymore, the dependency to the
+dry gems could be removed from request_handler. If you use the DryEngine
+simply add the dry-gems to your Gemfile:
+
+```ruby
+gem 'dry-validation', '~> 1.0'
+gem 'dry-types', '~> 1.0'
+```
+Note that only dry >= 1.0 is supported.
+
+### Define custom resources via the `resource` key
+In request_handler 1.x it was possible to define custom resource names like this:
+
+```ruby
+options  do
+  fieldsets do
+    allowed do
+      posts schema
+    end
+  end
+end
+```
+
+This was possible in multiple places (`page`, `multipart`, `fieldsets.allowed`).
+Starting with version 2.0 you will have to define those custom resources via the
+`resource` key:
+
+```ruby
+options do
+  fieldsets do
+    allowed do
+      resource :posts, schema
+    end
+  end
+end
+```
+
+### Use dry-* 1.x instead of dry-* 0.x if you use the DryEngine
+Some of the most common required changes are listed here:
+
+* Use `Dry::Schema.Params` instead of `Dry::Validation.Schema`
+* Use `Dry::Schema.JSON` instead of `Dry::Validation.JSON`
+* If you use some more complex validation rules with options like this:
+
+```
+Dry::Validation.Params do
+  configure do
+    option :query_id
+  end
+  required(:id).value(eql?: query_id)
+end
+
+options(->(_parser, request) { { query_id: request.params['id'] } })
+```
+
+please rewrite it using `Dry::Validation::Contract` like this:
+
+```
+Class.new(Dry::Validation::Contract) do
+  option :query_id
+  params do
+    required(:id).value(:string)
+  end
+  rule(:id) do
+    key.failure('invalid id') unless values[:id] == query_id
+  end
+end)
+options(->(_parser, request) { { query_id: request.params['id'] } })
+```
+
+A useful guide for upgrading to dry 1 types, validations and schemas can be
+found [here](https://www.morozov.is/2019/05/31/upgrading-dry-gems.html).
+
+Also please refer to the official docs of
+[dry-schema](https://dry-rb.org/gems/dry-schema) and
+[dry-validation](https://dry-rb.org/gems/dry-validation).
+
+### Remove config inheritance
+It was possible to (partially) overwrite configs defined in a request-handler
+super-class:
+```
+class Parent < RequestHandler::Base
+  options  do
+    page do
+      comments do
+        default_size 20
+      end
+    end
+  end
+end
+```
+
+```ruby
+class Child < Parent
+  options  do
+    page do
+      comments do
+        default_size 10
+      end
+    end
+  end
+end
+```
+
+Support for this has been fully removed. If you overwrite configs in subclasses
+please remove the inheritance and define the two request-handlers separately.
 
 ## Development
 

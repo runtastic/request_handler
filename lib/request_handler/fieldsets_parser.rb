@@ -7,9 +7,10 @@ module RequestHandler
     def initialize(params:, allowed: {}, required: [])
       @params = params
       allowed.reject! { |_k, v| v == false }
-      allowed.each_value do |option|
+      allowed.each_pair do |_key, value|
         raise InternalArgumentError, allowed: 'must be a Schema or a Boolean' unless
-          RequestHandler.configuration.validation_engine.valid_schema?(option) || option.is_a?(TrueClass)
+          RequestHandler.configuration.validation_engine.valid_schema?(value) ||
+          value.is_a?(TrueClass) || value.is_a?(FalseClass)
       end
       @allowed = allowed
       raise InternalArgumentError, required: 'must be an Array' unless required.is_a?(Array)
@@ -55,7 +56,7 @@ module RequestHandler
     end
 
     def raise_invalid_field_option(type)
-      return if allowed.key?(type)
+      return if allowed.dig(type)
       raise OptionNotAllowedError, [
         {
           code: 'INVALID_QUERY_PARAMETER',

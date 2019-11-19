@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
 require 'request_handler/error'
+require 'request_handler/base_parser'
+
 module RequestHandler
-  class PageParser
+  class PageParser < BaseParser
     def initialize(params:, page_config:)
       missing_arguments = []
       missing_arguments << { params: 'is missing' } if params.nil?
@@ -14,8 +16,7 @@ module RequestHandler
     end
 
     def run
-      base = { number: extract_number, size: extract_size }
-      cfg = config.keys.reduce(base) do |memo, key|
+      cfg = deep_to_h(config).keys.reduce(base_page) do |memo, key|
         next memo if TOP_LEVEL_PAGE_KEYS.include?(key)
         memo.merge!("#{key}#{separator}number".to_sym => extract_number(prefix: key),
                     "#{key}#{separator}size".to_sym   => extract_size(prefix: key))
@@ -28,6 +29,10 @@ module RequestHandler
 
     TOP_LEVEL_PAGE_KEYS = Set.new(%i[default_size max_size])
     attr_reader :page_options, :config
+
+    def base_page
+      { number: extract_number, size: extract_size }
+    end
 
     def check_for_missing_options(config)
       missing_arguments = page_options.keys - config.keys.map(&:to_s)
@@ -93,7 +98,7 @@ module RequestHandler
 
     def lookup_nested_config_key(key, prefix)
       key = prefix ? "#{prefix}.#{key}" : key
-      config.lookup!(key)
+      lookup(config, key)
     end
 
     def lookup_nested_params_key(key, prefix)

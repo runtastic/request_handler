@@ -10,22 +10,22 @@ require 'request_handler/multipart_parser'
 require 'request_handler/fieldsets_parser'
 require 'request_handler/query_parser'
 require 'request_handler/helper'
-require 'confstruct'
+require 'request_handler/builder/options_builder'
+require 'request_handler/concerns/config_helper'
+require 'request_handler/config'
+
 module RequestHandler
   class Base
+    include RequestHandler::Concerns::ConfigHelper
+
     class << self
       def options(&block)
-        @config ||= ::Confstruct::Configuration.new
-        @config.configure(&block)
-      end
-
-      def inherited(subclass)
-        return if @config.nil?
-        subclass.config = @config.deep_copy
+        @config = Config.new(&block)
       end
 
       attr_accessor :config
     end
+
     def initialize(request:)
       raise MissingArgumentError, request: 'is missing' if request.nil?
       @request = request
@@ -38,7 +38,7 @@ module RequestHandler
     def page_params
       @page_params ||= PageParser.new(
         params:      params,
-        page_config: lookup!('page')
+        page_config: config.lookup!('page')
       ).run
     end
 
@@ -82,9 +82,9 @@ module RequestHandler
       defaults = fetch_defaults('filter.defaults', {})
       defaults.merge(FilterParser.new(
         params:                params,
-        schema:                lookup!('filter.schema'),
-        additional_url_filter: lookup('filter.additional_url_filter'),
-        schema_options:        execute_options(lookup('filter.options'))
+        schema:                config.lookup!('filter.schema'),
+        additional_url_filter: config.lookup('filter.additional_url_filter'),
+        schema_options:        execute_options(config.lookup('filter.options'))
       ).run)
     end
 
@@ -100,7 +100,7 @@ module RequestHandler
       defaults = fetch_defaults("#{type}.defaults", [])
       result = parser.new(
         params:               params,
-        allowed_options_type: lookup!("#{type}.allowed")
+        allowed_options_type: config.lookup!("#{type}.allowed")
       ).run
       result.empty? ? defaults : result
     end
@@ -108,35 +108,35 @@ module RequestHandler
     def parse_body_params
       BodyParser.new(
         request:          request,
-        schema:           lookup!('body.schema'),
-        schema_options:   execute_options(lookup('body.options')),
-        type:             lookup('body.type')
+        schema:           config.lookup!('body.schema'),
+        schema_options:   execute_options(config.lookup('body.options')),
+        type:             config.lookup('body.type')
       ).run
     end
 
     def parse_multipart_params
       MultipartsParser.new(
         request:           request,
-        multipart_config: lookup!('multipart')
+        multipart_config: config.lookup!('multipart').to_h
       ).run
     end
 
     def parse_fieldsets_params
       FieldsetsParser.new(params:   params,
-                          allowed:  lookup!('fieldsets.allowed'),
-                          required: lookup('fieldsets.required') || []).run
+                          allowed:  config.lookup!('fieldsets.allowed'),
+                          required: config.lookup('fieldsets.required') || []).run
     end
 
     def parse_query_params
       QueryParser.new(
         params:         params,
-        schema:         lookup!('query.schema'),
-        schema_options: execute_options(lookup('query.options'))
+        schema:         config.lookup!('query.schema'),
+        schema_options: execute_options(config.lookup('query.options'))
       ).run
     end
 
     def fetch_defaults(key, default)
-      value = lookup(key)
+      value = config.lookup(key)
       return default if value.nil?
       return value unless value.respond_to?(:call)
       value.call(request)
@@ -146,16 +146,6 @@ module RequestHandler
       return {} if options.nil?
       return options unless options.respond_to?(:call)
       options.call(self, request)
-    end
-
-    def lookup!(key)
-      config.lookup!(key).tap do |data|
-        raise NoConfigAvailableError, key.to_sym => 'is not configured' if data.nil?
-      end
-    end
-
-    def lookup(key)
-      config.lookup!(key)
     end
 
     def params

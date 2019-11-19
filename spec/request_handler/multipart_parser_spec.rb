@@ -71,9 +71,13 @@ describe RequestHandler::MultipartsParser do
   end
 
   let(:config) do
-    Confstruct::Configuration.new do
+    build_docile(RequestHandler::Builder::OptionsBuilder, &block)
+  end
+
+  let(:block) do
+    proc do
       multipart do
-        meta do
+        resource :meta do
           required true
           type 'jsonapi'
           schema(Class.new(Dry::Validation::Contract) do
@@ -97,7 +101,7 @@ describe RequestHandler::MultipartsParser do
           options(->(_parser, request) { { query_id: request.params['id'] } })
         end
 
-        file do
+        resource :file do
         end
       end
     end
@@ -169,9 +173,13 @@ describe RequestHandler::MultipartsParser do
     end
 
     let(:config) do
-      Confstruct::Configuration.new do
+      build_docile(RequestHandler::Builder::OptionsBuilder, &block)
+    end
+
+    let(:block) do
+      proc do
         multipart do
-          meta do
+          resource :meta do
             required true
             type 'json'
             schema(Class.new(Dry::Validation::Contract) do
@@ -195,7 +203,7 @@ describe RequestHandler::MultipartsParser do
             options(->(_parser, request) { { query_id: request.params['id'] } })
           end
 
-          file do
+          resource :file do
           end
         end
       end

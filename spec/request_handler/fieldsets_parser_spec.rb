@@ -3,21 +3,25 @@
 require 'spec_helper'
 describe RequestHandler::FieldsetsParser do
   let(:opts) do
-    Confstruct::Configuration.new do
+    build_docile(RequestHandler::Builder::OptionsBuilder, &block)
+  end
+
+  let(:block) do
+    proc do
       fieldsets do
         allowed do
-          posts Dry::Types['strict.string'].enum('awesome', 'samples')
-          photos Dry::Types['strict.string'].enum('foo', 'bar')
-          videos true
-          musicfiles false
+          resource :posts, Dry::Types['strict.string'].enum('awesome', 'samples')
+          resource :photos, Dry::Types['strict.string'].enum('foo', 'bar')
+          resource :videos, true
+          resource :musicfiles, false
         end
         required [:posts]
       end
     end
   end
 
-  let(:allowed) { opts.lookup!('fieldsets.allowed') }
-  let(:required) { opts.lookup!('fieldsets.required') }
+  let(:allowed) { lookup!(opts, 'fieldsets.allowed') }
+  let(:required) { lookup!(opts, 'fieldsets.required') }
   subject(:run) { described_class.new(params: params, allowed: allowed, required: required).run }
 
   shared_examples 'returns fieldsets' do
@@ -69,7 +73,7 @@ describe RequestHandler::FieldsetsParser do
 
     context 'fieldset settings and the required parameters are set' do
       before do
-        opts.required = %i[posts photos]
+        opts.fieldsets.required = %i[posts photos]
       end
       it_behaves_like 'returns fieldsets' do
         let(:params) { { 'fields' => { 'posts' => 'awesome', 'photos' => 'foo' } } }
@@ -166,7 +170,7 @@ describe RequestHandler::FieldsetsParser do
     end
     context 'one required type is not set in the request' do
       before do
-        opts.required = %i[posts photos]
+        opts.fieldsets.required = %i[posts photos]
       end
       it_behaves_like 'fails' do
         let(:jsonapi_error) do

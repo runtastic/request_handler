@@ -5,13 +5,18 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- BREAKING: Required configuration of validation engine
+- BREAKING: Dynamic resource keys in config DSL are not supported anymore and
+  have to be defined via the `resource` key
+
 ### Added
 - Support for dry-* 1.x
-- Required configuration of validation engine
 
 ### Removed
-- Support for dry-* 0.x
-- Dry dependency
+- BREAKING: Dry dependencies were removed and should manually be added
+- BREAKING: Support for config inheritance
+- BREAKING: Support for dry-* 0.x
 
 ## [1.3.0] - 2019-05-21
 ### Added
