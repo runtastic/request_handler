@@ -63,7 +63,7 @@ describe RequestHandler do
       end
 
       context 'with a value that is not allowed for a type' do
-        before { testclass.config.fieldsets.allowed.posts = %w[foo bar] }
+        before { testclass.config.config.fieldsets.allowed.posts = %w[foo bar] }
         let(:request) { build_mock_request(params: { 'fields' => { 'posts' => 'foo' } }, headers: nil, body: '') }
         it { expect { to_dto }.to raise_error(RequestHandler::InternalArgumentError) }
       end

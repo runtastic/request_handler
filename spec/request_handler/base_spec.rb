@@ -435,13 +435,13 @@ describe RequestHandler::Base do
     it "doesn't fail for a missing required fieldset params" do
       config = handler.send(:config)
       resource = OpenStruct.new(posts: Dry::Types['strict.string'].enum('foo', 'bar'))
-      config.fieldsets = RequestHandler::Builder::FieldsetsBuilder::Fieldsets.new(resource)
+      config.config.fieldsets = RequestHandler::Builder::FieldsetsBuilder::Fieldsets.new(resource)
       expect { handler.send(:fieldsets_params) }.not_to raise_error(RequestHandler::NoConfigAvailableError)
     end
 
     it 'fails for a missing allowed fieldset params' do
       config = handler.send(:config)
-      config.fieldsets = RequestHandler::Builder::FieldsetsBuilder::Fieldsets.new(nil, ['Foo'])
+      config.config.fieldsets = RequestHandler::Builder::FieldsetsBuilder::Fieldsets.new(nil, ['Foo'])
       expect { handler.send(:fieldsets_params) }.to raise_error(RequestHandler::NoConfigAvailableError)
     end
   end
