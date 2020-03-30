@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'request_handler/builder/base'
+require 'request_handler/builder/headers_builder'
 require 'request_handler/builder/page_builder'
 require 'request_handler/builder/include_options_builder'
 require 'request_handler/builder/sort_options_builder'
@@ -14,7 +15,7 @@ module RequestHandler
   module Builder
     class OptionsBuilder < Base
       Options = Struct.new(:page, :include_options, :sort_options, :filter, :query, :body,
-                           :multipart, :fieldsets)
+                           :multipart, :fieldsets, :headers)
 
       def create_klass_struct
         @result = Options.new
@@ -52,6 +53,10 @@ module RequestHandler
         @result.fieldsets = build_fieldsets(&block)
       end
 
+      def headers(&block)
+        @result.headers = build_headers(&block)
+      end
+
       def build_page(&block)
         Docile.dsl_eval(PageBuilder.new, &block).build
       end
@@ -82,6 +87,10 @@ module RequestHandler
 
       def build_fieldsets(&block)
         Docile.dsl_eval(FieldsetsBuilder.new, &block).build
+      end
+
+      def build_headers(&block)
+        Docile.dsl_eval(HeadersBuilder.new, &block).build
       end
     end
   end
