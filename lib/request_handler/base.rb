@@ -51,7 +51,7 @@ module RequestHandler
     end
 
     def headers
-      @headers ||= HeaderParser.new(env: request.env).run
+      @headers ||= parse_headers
     end
 
     def body_params
@@ -103,6 +103,21 @@ module RequestHandler
         allowed_options_type: config.lookup!("#{type}.allowed")
       ).run
       result.empty? ? defaults : result
+    end
+
+    def parse_headers
+      HeaderParser.new(header_parser_params).run
+    end
+
+    def header_parser_params
+      params = { env: request.env }
+
+      return params if config.nil?
+
+      params.merge(
+        schema:         config.lookup('headers.schema'),
+        schema_options: execute_options(config.lookup('headers.options'))
+      )
     end
 
     def parse_body_params
