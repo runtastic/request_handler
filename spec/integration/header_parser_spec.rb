@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 describe RequestHandler do
-  shared_examples 'it set the headers' do
+  shared_examples 'it sets the headers' do
     subject(:to_dto) { class_without_headers_schema.new(request: request).to_dto }
     let(:request) { build_mock_request(params: {}, headers: headers, body: '') }
 
@@ -103,14 +103,14 @@ describe RequestHandler do
 
   context 'with dry engine' do
     include_context 'with dry validation engine' do
-      it_behaves_like 'it set the headers'
+      it_behaves_like 'it sets the headers'
       it_behaves_like 'it validates the headers'
     end
   end
 
   context 'with definition engine' do
     include_context 'with definition validation engine' do
-      it_behaves_like 'it set the headers'
+      it_behaves_like 'it sets the headers'
       it_behaves_like 'it validates the headers'
     end
   end
