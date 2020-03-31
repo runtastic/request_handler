@@ -79,7 +79,7 @@ describe RequestHandler::HeaderParser do
       it_behaves_like 'fetch proper headers'
     end
 
-    context 'converts the heades into lowercase without the http_ prefix' do
+    context 'converts the headers into lowercase without the http_ prefix' do
       let(:headers) do
         {
           'HTTP_USER_ID'     => 'user1',
