@@ -17,13 +17,13 @@ describe RequestHandler::HeaderParser do
     end
 
     context 'when the header `Client-Id` is defined in schema' do
-      let(:headers) { { 'HTTP_CLIENT_ID' => 'foo' } }
+      let(:headers) { { 'HTTP_CLIENT_ID' => '0001234' } }
       let(:schema) do
         Dry::Schema.Params do
-          required(:client_id).filled(:string)
+          required(:client_id).filled(:integer)
         end
       end
-      let(:expected_headers) { { client_id: 'foo' } }
+      let(:expected_headers) { { client_id: 1234 } }
 
       it_behaves_like 'fetch proper headers'
 
@@ -46,7 +46,7 @@ describe RequestHandler::HeaderParser do
       end
 
       context 'when the header `Client-Id` is invalid' do
-        let(:headers) { { 'HTTP_CLIENT_ID' => 123 } }
+        let(:headers) { { 'HTTP_CLIENT_ID' => 'abc' } }
         it 'returns code INVALID_HEADER' do
           expect { subject }.to raise_error(RequestHandler::ExternalArgumentError) do |raised_error|
             expect(raised_error.errors).to eq(
@@ -54,7 +54,7 @@ describe RequestHandler::HeaderParser do
                 {
                   status: '400',
                   code: 'INVALID_HEADER',
-                  detail: 'must be a string',
+                  detail: 'must be an integer',
                   source: { header: 'Client-Id' }
                 }
               ]

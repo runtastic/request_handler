@@ -39,7 +39,7 @@ describe RequestHandler do
           options do
             headers do
               schema(Dry::Schema.Params do
-                required(:client_id).filled(:string)
+                required(:client_id).filled(:integer)
               end)
             end
           end
@@ -53,7 +53,7 @@ describe RequestHandler do
       end
 
       context 'when the headers are invalid' do
-        let(:headers) { { 'HTTP_CLIENT_ID' => 123 } }
+        let(:headers) { { 'HTTP_CLIENT_ID' => 'abc' } }
 
         it 'raises an exception' do
           expect { to_dto }.to raise_error(RequestHandler::ExternalArgumentError) do |raised_error|
@@ -62,7 +62,7 @@ describe RequestHandler do
                 {
                   status: '400',
                   code: 'INVALID_HEADER',
-                  detail: 'must be a string',
+                  detail: 'must be an integer',
                   source: { header: 'Client-Id' }
                 }
               ]
@@ -91,11 +91,14 @@ describe RequestHandler do
       end
 
       context 'when the headers are valid' do
-        let(:client_id) { 'foo.123' }
-        let(:headers) { { 'HTTP_CLIENT_ID' => client_id } }
+        let(:headers) { { 'HTTP_CLIENT_ID' => '0001234' } }
 
         it 'does not raise an exception' do
-          expect(to_dto).to eq(OpenStruct.new(headers: { client_id: client_id }))
+          expect { to_dto }.to_not raise_error(RequestHandler::ExternalArgumentError)
+        end
+
+        it 'sets the headers' do
+          expect(to_dto).to eq(OpenStruct.new(headers: { client_id: 1234 }))
         end
       end
     end
