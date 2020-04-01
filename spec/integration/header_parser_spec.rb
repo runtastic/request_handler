@@ -62,8 +62,7 @@ describe RequestHandler do
                 {
                   status: '400',
                   code: 'INVALID_HEADER',
-                  detail: 'must be an integer',
-                  source: { header: 'Client-Id' }
+                  detail: 'Client-Id must be an integer'
                 }
               ]
             )
@@ -81,8 +80,7 @@ describe RequestHandler do
                 {
                   status: '400',
                   code: 'MISSING_HEADER',
-                  detail: 'is missing',
-                  source: { header: 'Client-Id' }
+                  detail: 'Client-Id is missing'
                 }
               ]
             )

@@ -34,8 +34,7 @@ module RequestHandler
         {
           status: '400',
           code: "#{headers[header.to_sym] ? 'INVALID' : 'MISSING'}_HEADER",
-          detail: schema_error[:detail],
-          source: { header: format_header_name(header) }
+          detail: "#{format_header_name(header)} #{schema_error[:detail]}"
         }
       end
     end
