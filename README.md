@@ -82,7 +82,7 @@ the abstract class `RequestHandler::Validation::Engine`
 To set up a handler, you need create a class which inherits from
 `RequestHandler::Base`, providing at least the options block and a `to_dto`
 method with the parts you want to use. To use it, create a new instance of the
-handler passing in the request, after that you can use the handler.dto method to
+handler passing in the request, after that you can use the handler.to_dto method to
 process and access the data. Here is a short example, check
 `spec/integration/request_handler_spec.rb` for a detailed one.
 
@@ -249,7 +249,7 @@ class CreateQuestionHandler < RequestHandler::Base
 end
 ```
 
-Assuming that the request consists of a json file `question.json` containing  
+Assuming that the request consists of a json file `question.json` containing
 ``` json
 {
   "id": "1",
