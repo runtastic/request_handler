@@ -30,6 +30,8 @@ module RequestHandler
       b.rewind
       b = b.read
       b.empty? ? {} : MultiJson.load(b)
+    rescue MultiJson::ParseError => e
+      raise ParseError, json: e.message
     end
 
     attr_reader :request, :schema, :schema_options, :type
