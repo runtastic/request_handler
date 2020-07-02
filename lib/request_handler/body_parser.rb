@@ -30,6 +30,10 @@ module RequestHandler
       b.rewind
       b = b.read
       b.empty? ? {} : MultiJson.load(b)
+    rescue MultiJson::ParseError => e
+      raise BodyFormatError, [{ status: '400',
+                                code: 'INVALID_BODY_FORMAT',
+                                detail: e.message }]
     end
 
     attr_reader :request, :schema, :schema_options, :type

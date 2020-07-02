@@ -295,6 +295,7 @@ with one issue per line.
 | `:code`                   | `:status` | What is it? |
 |:--------------------------|:----------|:------------|
 | INVALID_RESOURCE_SCHEMA   | 422       | Resource did not pass configured validation |
+| INVALID_BODY_FORMAT       | 400       | Request body is invalid JSON |
 | INVALID_QUERY_PARAMETER   | 400       | Query parameter violates syntax or did not pass configured validation |
 | MISSING_QUERY_PARAMETER   | 400       | Query parameter required in configuration is missing |
 | INVALID_JSON_API          | 400       | Request body violates JSON:API syntax |

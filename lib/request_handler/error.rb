@@ -42,6 +42,8 @@ module RequestHandler
   class NoConfigAvailableError < InternalBaseError
   end
 
+  class BodyFormatError < ExternalArgumentError
+  end
   class BodyParamsError < ExternalArgumentError
   end
   class FieldsetsParamsError < ExternalArgumentError

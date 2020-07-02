@@ -103,6 +103,20 @@ describe RequestHandler::BodyParser do
         .to raise_error(RequestHandler::MissingArgumentError)
     end
 
+    it 'fails if the request body is not json' do
+      schema = Dry::Schema.JSON {}
+      expect do
+        described_class.new(
+          schema: schema,
+          type: type,
+          request: instance_double('Rack::Request',
+                                   params: {},
+                                   body: StringIO.new('foo'))
+        ).run
+      end
+        .to raise_error(RequestHandler::BodyFormatError)
+    end
+
     it "doesn't fail if the request body does not contain a data hash" do
       schema = Dry::Schema.JSON {}
       expect do
