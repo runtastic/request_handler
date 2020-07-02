@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 ### Added
-- `ParseError` error type
+- `INVALID_BODY_FORMAT` JSON:API error
 
 ### Changed
 - Rescue and translate `MultiJson::ParseError` while parsing body

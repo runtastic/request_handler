@@ -29,8 +29,6 @@ module RequestHandler
       RequestHandler.configuration.raise_jsonapi_errors ? @errors : []
     end
   end
-  class ParseError < ExternalBaseError
-  end
   class MissingArgumentError < InternalBaseError
   end
   class ExternalArgumentError < JsonApiError
@@ -44,6 +42,8 @@ module RequestHandler
   class NoConfigAvailableError < InternalBaseError
   end
 
+  class BodyFormatError < ExternalArgumentError
+  end
   class BodyParamsError < ExternalArgumentError
   end
   class FieldsetsParamsError < ExternalArgumentError

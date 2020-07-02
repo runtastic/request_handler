@@ -114,7 +114,7 @@ describe RequestHandler::BodyParser do
                                    body: StringIO.new('foo'))
         ).run
       end
-        .to raise_error(RequestHandler::ParseError)
+        .to raise_error(RequestHandler::BodyFormatError)
     end
 
     it "doesn't fail if the request body does not contain a data hash" do
