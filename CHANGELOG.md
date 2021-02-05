@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 ### Changed
-- Error obejct's source attribute `param` to `parameters`
+- Error object's source attribute from `param` to `parameters`
 
 ## [2.1.0] - 2020-04-01
 ### Added
