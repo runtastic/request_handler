@@ -215,7 +215,7 @@ describe RequestHandler do
                                                              status: '400',
                                                              code: 'INVALID_QUERY_PARAMETER',
                                                              detail: anything,
-                                                             source: { param: 'filter[name]' }
+                                                             source: { parameter: 'filter[name]' }
                                                            }])
               end
             end

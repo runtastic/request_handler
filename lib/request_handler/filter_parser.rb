@@ -37,7 +37,7 @@ module RequestHandler
       {
         status: '400',
         code: 'INVALID_QUERY_PARAMETER',
-        source: { param: source_param }
+        source: { parameter: source_param }
       }
     end
 

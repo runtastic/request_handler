@@ -46,7 +46,7 @@ module RequestHandler
       raise FieldsetsParamsError, [{ code: 'INVALID_QUERY_PARAMETER',
                                      status: '400',
                                      detail: "allowed fieldset does not include '#{option}'",
-                                     source: { param: "fields[#{type}]" } }]
+                                     source: { parameter: "fields[#{type}]" } }]
     end
 
     def check_required_fieldsets_types(fieldsets)
@@ -62,7 +62,7 @@ module RequestHandler
           code: 'INVALID_QUERY_PARAMETER',
           status: '400',
           detail: "fieldset for '#{type}' not allowed",
-          source: { param: "fields[#{type}]" }
+          source: { parameter: "fields[#{type}]" }
         }
       ]
     end
@@ -77,7 +77,7 @@ module RequestHandler
         {
           code: 'MISSING_QUERY_PARAMETER',
           status: '400',
-          source: { param: '' },
+          source: { parameter: '' },
           detail: "missing required parameter fields[#{type}]"
         }
       end

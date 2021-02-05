@@ -33,7 +33,7 @@ describe RequestHandler::QueryParser do
                                                        status: '400',
                                                        code: 'MISSING_QUERY_PARAMETER',
                                                        detail: 'is missing',
-                                                       source: { param: 'name' }
+                                                       source: { parameter: 'name' }
                                                      }])
         end
       end

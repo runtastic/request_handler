@@ -117,7 +117,7 @@ describe RequestHandler::FilterParser do
         jsonapi_error = {
           status: '400',
           code: 'INVALID_QUERY_PARAMETER',
-          source: { param: 'filter' },
+          source: { parameter: 'filter' },
           detail: 'Filter parameter must conform to JSON API recommendation',
           links: { about: anything }
         }

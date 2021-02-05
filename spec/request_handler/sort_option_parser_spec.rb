@@ -56,7 +56,7 @@ describe RequestHandler::SortOptionParser do
       code: 'INVALID_QUERY_PARAMETER',
       status: '400',
       detail: expected_detail,
-      source: { param: 'sort' }
+      source: { parameter: 'sort' }
     }
   end
 

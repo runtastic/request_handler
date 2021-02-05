@@ -79,7 +79,7 @@ module RequestHandler
         code: 'INVALID_QUERY_PARAMETER',
         status: '400',
         detail: 'must be a positive integer',
-        source: { param: "page[#{param}]" }
+        source: { parameter: "page[#{param}]" }
       }]
     end
 
