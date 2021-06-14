@@ -26,7 +26,7 @@ describe RequestHandler::SchemaParser do
 
   module Types
     require 'dry-types'
-    include Dry::Types.module
+    include Dry::Types()
     ArrayFromCSV = Strict::Array.constructor do |val|
       val.is_a?(::Array) ? val : val.to_s.split(',')
     end

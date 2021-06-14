@@ -122,7 +122,7 @@ describe RequestHandler::PageParser do
         code: 'INVALID_QUERY_PARAMETER',
         status: '400',
         detail: 'must be a positive integer',
-        source: { param: expected_param }
+        source: { parameter: expected_param }
       }
     end
 

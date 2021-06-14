@@ -51,7 +51,7 @@ module RequestHandler
       {
         code: 'INVALID_QUERY_PARAMETER',
         status: '400',
-        source: { param: 'sort' },
+        source: { parameter: 'sort' },
         detail: detail
       }
     end

@@ -88,7 +88,7 @@ describe RequestHandler::FieldsetsParser do
             code: 'INVALID_QUERY_PARAMETER',
             status: '400',
             detail: "allowed fieldset does not include 'good'",
-            source: { param: 'fields[posts]' }
+            source: { parameter: 'fields[posts]' }
           }
         end
         let(:params) { { 'fields' => { 'posts' => 'awesome,good' } } }
@@ -111,7 +111,7 @@ describe RequestHandler::FieldsetsParser do
             code: 'INVALID_QUERY_PARAMETER',
             status: '400',
             detail: "allowed fieldset does not include 'post1'",
-            source: { param: 'fields[posts]' }
+            source: { parameter: 'fields[posts]' }
           }
         end
         let(:params) { { 'fields' => { 'posts' => 'post1,post2', 'videos' => 'nr1,nr2' } } }
@@ -129,7 +129,7 @@ describe RequestHandler::FieldsetsParser do
             code: 'INVALID_QUERY_PARAMETER',
             status: '400',
             detail: "fieldset for 'musicfiles' not allowed",
-            source: { param: 'fields[musicfiles]' }
+            source: { parameter: 'fields[musicfiles]' }
           }
         end
         let(:error) { RequestHandler::OptionNotAllowedError }
@@ -146,7 +146,7 @@ describe RequestHandler::FieldsetsParser do
             code: 'INVALID_QUERY_PARAMETER',
             status: '400',
             detail: "fieldset for 'games' not allowed",
-            source: { param: 'fields[games]' }
+            source: { parameter: 'fields[games]' }
           }
         end
         let(:error) { RequestHandler::OptionNotAllowedError }
@@ -162,7 +162,7 @@ describe RequestHandler::FieldsetsParser do
             code: 'MISSING_QUERY_PARAMETER',
             status: '400',
             detail: 'missing required parameter fields[posts]',
-            source: { param: '' }
+            source: { parameter: '' }
           }
         end
         let(:params) { { 'fields' => { 'photos' => 'bar' } } }
@@ -178,7 +178,7 @@ describe RequestHandler::FieldsetsParser do
             code: 'MISSING_QUERY_PARAMETER',
             status: '400',
             detail: 'missing required parameter fields[posts]',
-            source: { param: '' }
+            source: { parameter: '' }
           }
         end
         let(:params) { { 'fields' => { 'photos' => 'bar' } } }
@@ -191,7 +191,7 @@ describe RequestHandler::FieldsetsParser do
             code: 'MISSING_QUERY_PARAMETER',
             status: '400',
             detail: 'missing required parameter fields[posts]',
-            source: { param: '' }
+            source: { parameter: '' }
           }
         end
         let(:params) { {} }
@@ -205,7 +205,7 @@ describe RequestHandler::FieldsetsParser do
             code: 'INVALID_QUERY_PARAMETER',
             status: '400',
             detail: "fieldset for 'post' not allowed",
-            source: { param: 'fields[post]' }
+            source: { parameter: 'fields[post]' }
           }
         end
         let(:error) { RequestHandler::OptionNotAllowedError }
@@ -218,7 +218,7 @@ describe RequestHandler::FieldsetsParser do
             code: 'INVALID_QUERY_PARAMETER',
             status: '400',
             detail: "allowed fieldset does not include 'bars'",
-            source: { param: 'fields[posts]' }
+            source: { parameter: 'fields[posts]' }
           }
         end
         let(:params) { { 'fields' => { 'posts' => 'bars' } } }

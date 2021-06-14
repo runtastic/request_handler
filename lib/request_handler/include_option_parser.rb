@@ -35,7 +35,7 @@ module RequestHandler
           status: '400',
           code:   code,
           detail: detail,
-          source: { param: 'include' }
+          source: { parameter: 'include' }
         }
       ]
     end

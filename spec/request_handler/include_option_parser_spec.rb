@@ -13,9 +13,13 @@ describe RequestHandler::IncludeOptionParser do
       expect(handler.run).to eq output
     end
   end
+  let(:jsonapi_error) { anything }
   shared_examples 'proccesses invalid options correctly' do
     it 'raises an error if the include options are invalid' do
-      expect { handler.run }.to raise_error(error)
+      expect { handler.run }.to raise_error(error) do |raised_error|
+        expect(raised_error.errors).to contain_exactly(jsonapi_error)
+      end
+      # expect { handler.run }.to raise_error(error)
     end
   end
 
@@ -37,22 +41,39 @@ describe RequestHandler::IncludeOptionParser do
     it_behaves_like 'proccesses valid options correctly'
   end
 
+  let(:jsonapi_error) do
+    {
+      code: expected_code,
+      status: '400',
+      detail: expected_detail,
+      source: { parameter: expected_param }
+    }
+  end
   context 'no include options are specified' do
     let(:params) { { 'include' => '' } }
     let(:output) { [] }
     let(:error) { RequestHandler::IncludeParamsError }
+    let(:expected_code) { 'INVALID_QUERY_PARAMETER' }
+    let(:expected_param) { 'include' }
+    let(:expected_detail) { 'must not be empty' }
     it_behaves_like 'proccesses invalid options correctly'
   end
 
   context 'options contain a space' do
     let(:params) { { 'include' => 'user, email' } }
     let(:error) { RequestHandler::IncludeParamsError }
+    let(:expected_code) { 'INVALID_QUERY_PARAMETER' }
+    let(:expected_param) { 'include' }
+    let(:expected_detail) { 'must not contain a space' }
     it_behaves_like 'proccesses invalid options correctly'
   end
 
   context 'option is not allowed' do
     let(:params)  { { 'include' => 'user,password' } }
     let(:error) { RequestHandler::OptionNotAllowedError }
+    let(:expected_code) { 'OPTION_NOT_ALLOWED' }
+    let(:expected_param) { 'include' }
+    let(:expected_detail) { 'password is not an allowed include option' }
     it_behaves_like 'proccesses invalid options correctly'
   end
 end

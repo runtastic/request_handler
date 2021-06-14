@@ -41,7 +41,7 @@ describe RequestHandler do
             jsonapi_error = { code: 'INVALID_QUERY_PARAMETER',
                               status: '400',
                               detail: "fieldset for 'photos' not allowed",
-                              source: { param: 'fields[photos]' } }
+                              source: { parameter: 'fields[photos]' } }
             expect(raised_error.errors).to match_array([jsonapi_error])
           end
         end
