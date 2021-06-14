@@ -19,7 +19,6 @@ describe RequestHandler::IncludeOptionParser do
       expect { handler.run }.to raise_error(error) do |raised_error|
         expect(raised_error.errors).to contain_exactly(jsonapi_error)
       end
-      # expect { handler.run }.to raise_error(error)
     end
   end
 
