@@ -12,7 +12,7 @@ module RequestHandler
       type = type.to_sym unless type.nil?
       PARSER_MAPPING
         .fetch(type) { raise InternalArgumentError.new(detail: "parser for type '#{type}' not found") }
-        .new(args)
+        .new(**args)
     end
 
     PARSER_MAPPING = {

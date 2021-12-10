@@ -21,7 +21,7 @@ module RequestHandler
         if options.empty?
           schema_instance?(schema) ? schema.call(value) : schema.new.call(value)
         else
-          schema_instance?(schema) ? schema.with(options).call(value) : schema.new(options).call(value)
+          schema_instance?(schema) ? schema.with(**options).call(value) : schema.new(**options).call(value)
         end
       end
 
@@ -34,7 +34,7 @@ module RequestHandler
       end
 
       def self.validate!(value, schema, options: {})
-        validate(value, schema, options).tap do |result|
+        validate(value, schema, options: options).tap do |result|
           valid = result.respond_to?(:valid?) ? result.valid? : result.success?
           raise Validation::Error unless valid
         end

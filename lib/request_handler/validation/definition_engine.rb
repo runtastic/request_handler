@@ -17,7 +17,7 @@ module RequestHandler
       end
 
       def self.validate!(value, schema, options: {})
-        validate(value, schema, options).tap do |result|
+        validate(value, schema, options: options).tap do |result|
           valid = result.respond_to?(:valid?) ? result.valid? : result.success?
           raise Validation::Error unless valid
         end
