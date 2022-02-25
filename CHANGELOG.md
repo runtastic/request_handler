@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [2.2.0] - 2022-02-25
+### Changed
+- The definition engine now makes use of the translated error messages to return more useful messages
+
 ## [2.1.1] - 2021-06-14
 ### Fixed
 - Change error object's source attribute from `param` to `parameters` to align with JSONAPI specification

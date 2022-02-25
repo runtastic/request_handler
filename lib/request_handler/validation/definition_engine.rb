@@ -24,7 +24,7 @@ module RequestHandler
       end
 
       def self.error_message(validation_error)
-        validation_error.message
+        validation_error.translated_error
       end
 
       def self.error_pointer(validation_error)

@@ -44,5 +44,5 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency 'rack'
 
-  spec.add_development_dependency 'definition', '~> 0.5'
+  spec.add_development_dependency 'definition', '~> 0.7'
 end
