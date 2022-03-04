@@ -42,24 +42,24 @@ common_steps: &common_steps
 
 version: 2
 jobs:
-  ruby-2.4:
+  ruby-2.6:
     docker:
-      - image: circleci/ruby:2.4
+      - image: circleci/ruby:2.6
     steps:
       *common_steps
-  ruby-2.5:
+  ruby-2.7:
     docker:
-      - image: circleci/ruby:2.5
+      - image: circleci/ruby:2.7
     steps:
       *common_steps
-  jruby-9.2:
+  jruby-9.3:
     docker:
-      - image: circleci/jruby:9.2
+      - image: circleci/jruby:9.3
     steps:
       *common_steps
-  jruby-9.2-indy:
+  jruby-9.3-indy:
     docker:
-      - image: circleci/jruby:9.2
+      - image: circleci/jruby:9.3
     environment:
       JRUBY_OPTS: '-Xcompile.invokedynamic=true'
     steps:
@@ -69,7 +69,7 @@ workflows:
   version: 2
   build:
     jobs:
-      - ruby-2.4
-      - ruby-2.5
-      - jruby-9.2
-      - jruby-9.2-indy
+      - ruby-2.6
+      - ruby-2.7
+      - jruby-9.3
+      - jruby-9.3-indy
