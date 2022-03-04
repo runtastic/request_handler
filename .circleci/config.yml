@@ -19,7 +19,6 @@ common_steps: &common_steps
         - vendor/bundle
 
   - run: ruby -v
-  - run: bundle exec danger
   - run: 
       name: run tests
       command: |
