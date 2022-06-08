@@ -19,7 +19,7 @@ common_steps: &common_steps
         - vendor/bundle
 
   - run: ruby -v
-  - run: 
+  - run:
       name: run tests
       command: |
         mkdir /tmp/test-results
@@ -51,6 +51,11 @@ jobs:
       - image: circleci/ruby:2.7
     steps:
       *common_steps
+  ruby-3.0:
+    docker:
+      - image: circleci/ruby:3.0
+    steps:
+      *common_steps
   jruby-9.3:
     docker:
       - image: circleci/jruby:9.3
@@ -70,5 +75,6 @@ workflows:
     jobs:
       - ruby-2.6
       - ruby-2.7
+      - ruby-3.0
       - jruby-9.3
       - jruby-9.3-indy
