@@ -14,7 +14,7 @@ Gem::Specification.new do |spec|
   spec.description   = 'shared base for request_handler using dry-* gems'
   spec.homepage      = 'https://github.com/runtastic/request_handler'
   spec.license       = 'MIT'
-  spec.required_ruby_version = '~> 2.6'
+  spec.required_ruby_version = '>= 2.6'
 
   spec.files = `git ls-files -z`.split("\x0").reject do |f|
     f.match(%r{^(test|spec|features)/})

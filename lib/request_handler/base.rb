@@ -106,7 +106,7 @@ module RequestHandler
     end
 
     def parse_headers
-      HeaderParser.new(header_parser_params).run
+      HeaderParser.new(**header_parser_params).run
     end
 
     def header_parser_params
