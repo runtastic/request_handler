@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 ### Changed
-- explicitly pass kwargs to support ruby 3.0
+- Explicitly pass kwargs to support ruby 3.0
 
 ## [2.2.0] - 2022-02-25
 ### Changed
