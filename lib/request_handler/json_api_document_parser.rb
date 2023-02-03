@@ -5,6 +5,8 @@ require "request_handler/error"
 module RequestHandler
   class JsonApiDocumentParser < SchemaParser
     NON_ATTRIBUTE_MEMBERS = %i[id type meta links].freeze
+    # SEE: https://jsonapi.org/format/1.0/#document-resource-objects
+    VALID_DATA_MEMBERS = %w[id type attributes relationships links meta].freeze
 
     def initialize(document:, schema:, schema_options: {})
       raise MissingArgumentError.new(data: "is missing") if document.nil?
@@ -24,11 +26,24 @@ module RequestHandler
       resource = document.fetch("data") do
         raise BodyParamsError.new([{ code:   "INVALID_JSON_API",
                                      status: "400",
-                                     title:  "Body is not valid JSON API payload",
+                                     title:  "Body is not a valid JSON API payload",
                                      detail: "Member 'data' is missing",
                                      source: { pointer: "/" } }])
       end
+      validate_json_api_data_members(resource)
       flatten_resource!(resource)
+    end
+
+    def validate_json_api_data_members(data)
+      data.each_key do |k|
+        next if VALID_DATA_MEMBERS.include?(k)
+
+        raise BodyParamsError.new([{ code:   "INVALID_JSON_API",
+                                     status: "400",
+                                     title:  "Body is not a valid JSON API payload",
+                                     detail: "Member 'data' contains invalid member!",
+                                     source: { pointer: "/data/#{k}" } }])
+      end
     end
 
     def flatten_resource!(resource)

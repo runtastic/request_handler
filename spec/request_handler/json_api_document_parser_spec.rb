@@ -62,6 +62,55 @@ describe RequestHandler::JsonApiDocumentParser do
     it_behaves_like "flattens the body as expected"
   end
 
+  context "with attributes, relationships, links and meta" do
+    let(:raw_body) do
+      <<-JSON
+      {
+        "data": {
+          "id": "fer342ref",
+          "type": "post",
+          "attributes": {
+            "user_id": "awesome_user_id"
+          },
+          "relationships":{
+            "category": {
+              "data": {
+                "id": "54",
+                "type": "category"
+              }
+            }
+          },
+          "links": {
+            "self": "http://example.com/1"
+          },
+          "meta": {
+            "foo": "bar"
+          }
+        }
+      }
+      JSON
+    end
+    let(:wanted_result) do
+      {
+        "id"       => "fer342ref",
+        "type"     => "post",
+        "user_id"  => "awesome_user_id",
+        "category" => {
+          "id"   => "54",
+          "type" => "category"
+        },
+        "links"    => {
+          "self" => "http://example.com/1"
+        },
+        "meta"     => {
+          "foo" => "bar"
+        }
+      }
+    end
+
+    it_behaves_like "flattens the body as expected"
+  end
+
   context "multiple relationships" do
     let(:raw_body) do
       <<-JSON
@@ -301,9 +350,40 @@ describe RequestHandler::JsonApiDocumentParser do
         expected_error = {
           code:   "INVALID_JSON_API",
           status: "400",
-          title:  "Body is not valid JSON API payload",
+          title:  "Body is not a valid JSON API payload",
           detail: "Member 'data' is missing",
           source: { pointer: "/" }
+        }
+        expect(error.errors).to contain_exactly(expected_error)
+      end
+    end
+  end
+
+  context "when 'data' contains non-JSONAPI members" do
+    let(:raw_body) do
+      <<-JSON
+      {
+        "data": {
+          "type": "post",
+          "id": "fer342ref",
+          "attributes": {
+            "foo": "bar"
+          },
+          "non_jsonapi_member": "baz"
+        }
+      }
+      JSON
+    end
+
+    it "raises an ExternalArgumentError" do
+      expect { handler.run }.to raise_error do |error|
+        expect(error).to be_a(RequestHandler::ExternalArgumentError)
+        expected_error = {
+          code:   "INVALID_JSON_API",
+          status: "400",
+          title:  "Body is not a valid JSON API payload",
+          detail: "Member 'data' contains invalid member!",
+          source: { pointer: "/data/non_jsonapi_member" }
         }
         expect(error.errors).to contain_exactly(expected_error)
       end
