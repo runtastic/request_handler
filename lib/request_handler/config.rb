@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'docile'
+require "docile"
 
 module RequestHandler
   class Config
@@ -11,7 +11,7 @@ module RequestHandler
     attr_accessor :config
 
     def lookup!(key)
-      lookup(key) || (raise NoConfigAvailableError, key.to_sym => 'is not configured')
+      lookup(key) || (raise NoConfigAvailableError.new(key.to_sym => "is not configured"))
     end
 
     def lookup(key)
@@ -21,7 +21,7 @@ module RequestHandler
     private
 
     def symbolize_key(key)
-      key.split('.').map(&:to_sym)
+      key.split(".").map(&:to_sym)
     end
 
     def deep_to_h(obj)

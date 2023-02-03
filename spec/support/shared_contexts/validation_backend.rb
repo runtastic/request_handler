@@ -1,4 +1,6 @@
-shared_context 'with dry validation engine' do
+# frozen_string_literal: true
+
+shared_context "with dry validation engine" do
   around do |example|
     original_engine = RequestHandler.configuration.validation_engine
     RequestHandler.configuration.validation_engine = RequestHandler::Validation::DryEngine
@@ -9,10 +11,10 @@ shared_context 'with dry validation engine' do
   end
 end
 
-shared_context 'with definition validation engine' do
+shared_context "with definition validation engine" do
   around do |example|
-    require 'request_handler/validation/definition_engine'
-    require 'definition'
+    require "request_handler/validation/definition_engine"
+    require "definition"
     original_engine = RequestHandler.configuration.validation_engine
     RequestHandler.configuration.validation_engine = RequestHandler::Validation::DefinitionEngine
 

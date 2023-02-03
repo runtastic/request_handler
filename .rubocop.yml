@@ -1,21 +1,20 @@
+inherit_from: .rubocop_todo.yml
+
 # minitest specifics
+require:
+  - rubocop-rake
+  - rubocop-rspec
+  - rt_rubocop_defaults
+
 AllCops:
-  TargetRubyVersion: 2.2
+  TargetRubyVersion: 2.6
   Exclude:
     - Dangerfile
-Metrics/LineLength:
-  Max: 119
-Metrics/MethodLength:
-  Exclude:
-    - test/**/*
+
+Gemspec/DevelopmentDependencies:
+  EnforcedStyle: gemspec
+
+
 Metrics/ClassLength:
   Exclude:
     - lib/request_handler/base.rb
-Style/ClassAndModuleChildren:
-  Exclude:
-    - test/**/*
-
-Metrics/BlockLength:
-  Enabled: false
-Style/Documentation:
-  Enabled: false

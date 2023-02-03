@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require 'request_handler/schema_parser'
-require 'request_handler/error'
+require "request_handler/schema_parser"
+require "request_handler/error"
 module RequestHandler
   class QueryParser < SchemaParser
     RESERVED_KEYS = %w[fields filter include page sort].freeze
@@ -15,13 +15,13 @@ module RequestHandler
     def run
       validate_schema(query)
     rescue SchemaValidationError => e
-      raise ExternalArgumentError, (e.errors.map do |schema_error|
+      raise ExternalArgumentError.new((e.errors.map do |schema_error|
         param = schema_error[:source][:pointer]
-        { status: '400',
-          code: "#{query[param] ? 'INVALID' : 'MISSING'}_QUERY_PARAMETER",
+        { status: "400",
+          code:   "#{query[param] ? 'INVALID' : 'MISSING'}_QUERY_PARAMETER",
           detail: schema_error[:detail],
           source: { parameter: param } }
-      end)
+      end))
     end
 
     private

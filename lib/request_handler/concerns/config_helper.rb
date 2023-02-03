@@ -4,7 +4,7 @@ module RequestHandler
   module Concerns
     module ConfigHelper
       def lookup!(hash, key)
-        lookup(hash, key) || (raise NoConfigAvailableError, key.to_sym => 'is not configured')
+        lookup(hash, key) || (raise NoConfigAvailableError.new(key.to_sym => "is not configured"))
       end
 
       def lookup(config, key)
@@ -12,7 +12,7 @@ module RequestHandler
       end
 
       def symbolize_key(key)
-        key.split('.').map(&:to_sym)
+        key.split(".").map(&:to_sym)
       end
 
       def deep_to_h(obj)

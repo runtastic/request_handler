@@ -1,24 +1,24 @@
 # frozen_string_literal: true
 
-ENV['RACK_ENV'] = ENV['ENVIRONMENT'] ||= 'test'
-require 'simplecov'
-if ENV['CIRCLECI']
-  require 'codecov'
+ENV["RACK_ENV"] = ENV["ENVIRONMENT"] ||= "test"
+require "simplecov"
+if ENV["CIRCLECI"]
+  require "codecov"
   SimpleCov.formatter SimpleCov::Formatter::Codecov
 end
 SimpleCov.start do
-  add_filter '/spec/'
+  add_filter "/spec/"
 end
 
-$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
-require 'request_handler'
-require 'pry'
-require 'ostruct'
-require 'rack'
-require 'dry-validation'
+$LOAD_PATH.unshift File.expand_path("../lib", __dir__)
+require "request_handler"
+require "pry"
+require "ostruct"
+require "rack"
+require "dry-validation"
 
 [
-  'spec/support/**/*.rb'
+  "spec/support/**/*.rb"
 ].each do |pattern|
   Dir[File.join(pattern)].sort.each { |file| require "./#{file}" }
 end
@@ -35,9 +35,9 @@ RSpec.configure do |config|
   config.filter_run :focus
   config.run_all_when_everything_filtered = true
 
-  config.example_status_persistence_file_path = 'spec/examples.txt'
+  config.example_status_persistence_file_path = "spec/examples.txt"
 
-  config.default_formatter = 'doc' if config.files_to_run.one?
+  config.default_formatter = "doc" if config.files_to_run.one?
   config.profile_examples = 5
 
   config.order = :random
@@ -48,7 +48,7 @@ RSpec.configure do |config|
     meta[:aggregate_failures] = true unless meta.key?(:aggregate_failures)
   end
 
-  config.before(:example) do
+  config.before do
     RequestHandler.configure do |rh_config|
       rh_config.validation_engine = RequestHandler::Validation::DryEngine
       rh_config.raise_jsonapi_errors = true

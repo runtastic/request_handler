@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require 'request_handler/json_api_document_parser'
-require 'request_handler/json_parser'
+require "request_handler/json_api_document_parser"
+require "request_handler/json_parser"
 
 module RequestHandler
   module DocumentParser
@@ -16,9 +16,9 @@ module RequestHandler
     end
 
     PARSER_MAPPING = {
-      nil       => JsonApiDocumentParser, # no config defaults to jsonapi
-      :jsonapi  => JsonApiDocumentParser,
-      :json     => JsonParser
+      nil      => JsonApiDocumentParser, # no config defaults to jsonapi
+      :jsonapi => JsonApiDocumentParser,
+      :json    => JsonParser
     }.freeze
   end
 end

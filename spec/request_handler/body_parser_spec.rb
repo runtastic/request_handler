@@ -1,16 +1,16 @@
 # frozen_string_literal: true
 
-require 'spec_helper'
-require 'request_handler/body_parser'
-require 'request_handler/json_api_document_parser'
-require 'request_handler/json_parser'
+require "spec_helper"
+require "request_handler/body_parser"
+require "request_handler/json_api_document_parser"
+require "request_handler/json_parser"
 
 describe RequestHandler::BodyParser do
   let(:handler) do
     described_class.new(
-      schema:           schema,
-      type:             type,
-      request:          build_mock_request(params: {}, body: raw_body, headers: {})
+      schema:  schema,
+      type:    type,
+      request: build_mock_request(params: {}, body: raw_body, headers: {})
     )
   end
 
@@ -40,9 +40,10 @@ describe RequestHandler::BodyParser do
     JSON
   end
 
-  context 'jsonapi' do
-    let(:type) { 'jsonapi' }
-    it 'constructs and runs JsonApiDocumentParser correctly' do
+  context "jsonapi" do
+    let(:type) { "jsonapi" }
+
+    it "constructs and runs JsonApiDocumentParser correctly" do
       parser_double = instance_double(RequestHandler::JsonApiDocumentParser)
       expect(RequestHandler::JsonApiDocumentParser)
         .to receive(:new)
@@ -54,34 +55,35 @@ describe RequestHandler::BodyParser do
       expect(handler.run).to eq(result_double)
     end
 
-    it 'fails if the request body is nil' do
+    it "fails if the request body is nil" do
       schema = Dry::Schema.JSON {}
       expect do
         described_class.new(schema:  schema,
-                            type: type,
-                            request: instance_double('Rack::Request', params: {}, body: nil))
+                            type:    type,
+                            request: instance_double(Rack::Request, params: {}, body: nil))
       end
         .to raise_error(RequestHandler::MissingArgumentError)
     end
 
-    it 'fails if the request body does not contain a data hash' do
+    it "fails if the request body does not contain a data hash" do
       schema = Dry::Schema.JSON {}
       expect do
         described_class.new(
           schema:  schema,
-          type: type,
-          request: instance_double('Rack::Request',
+          type:    type,
+          request: instance_double(Rack::Request,
                                    params: {},
-                                   body: StringIO.new('{"include": [{"type": "foo", "id": "bar"}]}'))
+                                   body:   StringIO.new('{"include": [{"type": "foo", "id": "bar"}]}'))
         ).run
       end
         .to raise_error(RequestHandler::BodyParamsError)
     end
   end
 
-  context 'json' do
-    let(:type) { 'json' }
-    it 'constructs and runs JsonParser correctly' do
+  context "json" do
+    let(:type) { "json" }
+
+    it "constructs and runs JsonParser correctly" do
       parser_double = instance_double(RequestHandler::JsonParser)
       expect(RequestHandler::JsonParser)
         .to receive(:new)
@@ -93,12 +95,12 @@ describe RequestHandler::BodyParser do
       expect(handler.run).to eq(result_double)
     end
 
-    it 'fails if the request body is nil' do
+    it "fails if the request body is nil" do
       schema = Dry::Schema.JSON {}
       expect do
         described_class.new(schema:  schema,
-                            type: type,
-                            request: instance_double('Rack::Request', params: {}, body: nil))
+                            type:    type,
+                            request: instance_double(Rack::Request, params: {}, body: nil))
       end
         .to raise_error(RequestHandler::MissingArgumentError)
     end
@@ -108,10 +110,10 @@ describe RequestHandler::BodyParser do
       expect do
         described_class.new(
           schema:  schema,
-          type: type,
-          request: instance_double('Rack::Request',
+          type:    type,
+          request: instance_double(Rack::Request,
                                    params: {},
-                                   body: StringIO.new('{"include": [{"type": "foo", "id": "bar"}]}'))
+                                   body:   StringIO.new('{"include": [{"type": "foo", "id": "bar"}]}'))
         ).run
       end
         .not_to raise_error
