@@ -1,7 +1,9 @@
-require_relative 'errors'
-require_relative 'engine'
-require_relative 'result'
-require 'active_support/core_ext/hash/keys'
+# frozen_string_literal: true
+
+require_relative "errors"
+require_relative "engine"
+require_relative "result"
+require "active_support/core_ext/hash/keys"
 
 module RequestHandler
   module Validation
@@ -28,7 +30,7 @@ module RequestHandler
       end
 
       def self.error_pointer(validation_error)
-        validation_error.error_path.join('/')
+        validation_error.error_path.join("/")
       end
     end
   end

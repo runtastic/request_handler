@@ -18,8 +18,8 @@
 # and, you'll have to watch "config/Guardfile" instead of "Guardfile"
 
 group :red_green_refactor, halt_on_fail: true do
-  guard :rspec, cmd: 'bundle exec rspec', all_after_pass: true do
-    require 'guard/rspec/dsl'
+  guard :rspec, cmd: "bundle exec rspec", all_after_pass: true do
+    require "guard/rspec/dsl"
     dsl = Guard::RSpec::Dsl.new(self)
 
     # Feel free to open issues for suggestions and improvements
@@ -37,11 +37,11 @@ group :red_green_refactor, halt_on_fail: true do
     # Turnip features and steps
     watch(%r{^spec/acceptance/(.+)\.feature$})
     watch(%r{^spec/acceptance/steps/(.+)_steps\.rb$}) do |m|
-      Dir[File.join("**/#{m[1]}.feature")][0] || 'spec/acceptance'
+      Dir[File.join("**/#{m[1]}.feature")][0] || "spec/acceptance"
     end
   end
 
-  guard :rubocop, all_on_start: false, cli: ['--auto-correct'] do
+  guard :rubocop, all_on_start: false, cli: ["--auto-correct"] do
     watch(/.+\.rb$/)
     watch(%r{(?:.+/)?\.rubocop\.yml$}) { |m| File.dirname(m[0]) }
   end

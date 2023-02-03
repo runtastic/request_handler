@@ -1,5 +1,6 @@
+# frozen_string_literal: true
 
-require_relative 'errors'
+require_relative "errors"
 
 module RequestHandler
   module Validation
@@ -8,11 +9,11 @@ module RequestHandler
         raise NotImplementedError
       end
 
-      def self.validate(_value, _schema, options: {}) # rubocop:disable Lint/UnusedMethodArgument
+      def self.validate(_value, _schema, options: {})
         raise NotImplementedError
       end
 
-      def self.validate!(_value, _schema, options: {}) # rubocop:disable Lint/UnusedMethodArgument
+      def self.validate!(_value, _schema, options: {})
         raise NotImplementedError
       end
 

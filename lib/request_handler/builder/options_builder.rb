@@ -1,18 +1,19 @@
 # frozen_string_literal: true
 
-require 'request_handler/builder/base'
-require 'request_handler/builder/headers_builder'
-require 'request_handler/builder/page_builder'
-require 'request_handler/builder/include_options_builder'
-require 'request_handler/builder/sort_options_builder'
-require 'request_handler/builder/filter_builder'
-require 'request_handler/builder/query_builder'
-require 'request_handler/builder/body_builder'
-require 'request_handler/builder/multipart_builder'
-require 'request_handler/builder/fieldsets_builder'
+require "request_handler/builder/base"
+require "request_handler/builder/headers_builder"
+require "request_handler/builder/page_builder"
+require "request_handler/builder/include_options_builder"
+require "request_handler/builder/sort_options_builder"
+require "request_handler/builder/filter_builder"
+require "request_handler/builder/query_builder"
+require "request_handler/builder/body_builder"
+require "request_handler/builder/multipart_builder"
+require "request_handler/builder/fieldsets_builder"
 
 module RequestHandler
   module Builder
+    # rubocop:disable Lint/StructNewOverride
     class OptionsBuilder < Base
       Options = Struct.new(:page, :include_options, :sort_options, :filter, :query, :body,
                            :multipart, :fieldsets, :headers)
@@ -93,5 +94,6 @@ module RequestHandler
         Docile.dsl_eval(HeadersBuilder.new, &block).build
       end
     end
+    # rubocop:enable Lint/StructNewOverride
   end
 end

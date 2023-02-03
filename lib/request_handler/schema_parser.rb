@@ -1,14 +1,15 @@
 # frozen_string_literal: true
 
-require 'request_handler/error'
+require "request_handler/error"
 module RequestHandler
   class SchemaParser
     def initialize(schema:, schema_options: {})
       missing_arguments = []
-      missing_arguments << { schema: 'is missing' } if schema.nil?
-      missing_arguments << { schema_options: 'is missing' } if schema_options.nil?
-      raise MissingArgumentError, missing_arguments unless missing_arguments.empty?
-      raise InternalArgumentError, schema: 'must be a Schema' unless validation_engine.valid_schema?(schema)
+      missing_arguments << { schema: "is missing" } if schema.nil?
+      missing_arguments << { schema_options: "is missing" } if schema_options.nil?
+      raise MissingArgumentError.new(missing_arguments) unless missing_arguments.empty?
+      raise InternalArgumentError.new(schema: "must be a Schema") unless validation_engine.valid_schema?(schema)
+
       @schema = schema
       @schema_options = schema_options
     end
@@ -16,7 +17,8 @@ module RequestHandler
     private
 
     def validate_schema(data, with: schema)
-      raise MissingArgumentError, data: 'is missing' if data.nil?
+      raise MissingArgumentError.new(data: "is missing") if data.nil?
+
       validator = validate(data, schema: with)
       validation_failure?(validator)
       validator.output
@@ -32,7 +34,7 @@ module RequestHandler
       errors = build_errors(validator.errors).map do |error|
         jsonapi_error(error)
       end
-      raise SchemaValidationError, errors
+      raise SchemaValidationError.new(errors)
     end
 
     def build_errors(error_hash, path = [])
@@ -46,19 +48,19 @@ module RequestHandler
     end
 
     def error(path, element, failure)
-      schema_pointer = validation_engine.error_pointer(failure) || (path + [element]).join('/')
+      schema_pointer = validation_engine.error_pointer(failure) || (path + [element]).join("/")
       {
-        schema_pointer:  schema_pointer,
-        element: element,
-        message: validation_engine.error_message(failure)
+        schema_pointer: schema_pointer,
+        element:        element,
+        message:        validation_engine.error_message(failure)
       }
     end
 
     def jsonapi_error(error)
       {
-        status: '422',
-        code: 'INVALID_RESOURCE_SCHEMA',
-        title: 'Invalid resource',
+        status: "422",
+        code:   "INVALID_RESOURCE_SCHEMA",
+        title:  "Invalid resource",
         detail: error[:message],
         source: { pointer: build_pointer(error) }
       }
@@ -69,9 +71,10 @@ module RequestHandler
     end
 
     def add_note(v, k, memo)
-      memo[k] = if v.is_a? Array
-                  v.join(' ')
-                elsif v.is_a? Hash
+      memo[k] = case v
+                when Array
+                  v.join(" ")
+                when Hash
                   v.each { |(val, key)| add_note(val, key, memo) }
                 end
       memo

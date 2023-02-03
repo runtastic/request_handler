@@ -1,7 +1,9 @@
-require_relative 'errors'
-require_relative 'engine'
-require_relative 'result'
-require 'active_support/core_ext/hash/keys'
+# frozen_string_literal: true
+
+require_relative "errors"
+require_relative "engine"
+require_relative "result"
+require "active_support/core_ext/hash/keys"
 
 module RequestHandler
   module Validation
@@ -14,7 +16,7 @@ module RequestHandler
         value = value.deep_symbolize_keys if value.is_a?(Hash)
         to_result(call_schema(value, schema, options))
       rescue Dry::Types::ConstraintError => e
-        Result.new(output: nil, errors: { '' => e })
+        Result.new(output: nil, errors: { "" => e })
       end
 
       def self.call_schema(value, schema, options)

@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-require 'request_handler/error'
+require "request_handler/error"
 module RequestHandler
   class OptionParser
     def initialize(params:, allowed_options_type:)
       @params = params
       @allowed_options_type = allowed_options_type
-      raise InternalArgumentError, allowed_options_type: 'must be a Schema' unless schema?
+      raise InternalArgumentError.new(allowed_options_type: "must be a Schema") unless schema?
     end
 
     private
@@ -16,7 +16,7 @@ module RequestHandler
     end
 
     def empty_param?(param)
-      params.fetch(param) { nil } == ''
+      params.fetch(param, nil) == ""
     end
     attr_reader :params, :allowed_options_type
   end

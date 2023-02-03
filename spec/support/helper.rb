@@ -2,8 +2,8 @@
 
 include RequestHandler::Concerns::ConfigHelper
 
-def build_mock_request(params:, headers:, body: '')
-  instance_double('Rack::Request', params: params, env: headers, body: StringIO.new(body))
+def build_mock_request(params:, headers:, body: "")
+  instance_double(Rack::Request, params: params, env: headers, body: StringIO.new(body))
 end
 
 def build_docile(class_name, &block)
